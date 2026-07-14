@@ -375,7 +375,7 @@ function MessageRow({ message }: { message: Message }) {
 function HaloMessage({ text }: { text: string }) {
   const [vote, setVote] = React.useState<"up" | "down" | null>(null)
   const [copied, setCopied] = React.useState(false)
-  const [reasons, setReasons] = React.useState<string[]>([])
+  const [reasonSent, setReasonSent] = React.useState(false)
 
   function copy() {
     navigator.clipboard?.writeText(text).catch(() => {})
@@ -386,7 +386,7 @@ function HaloMessage({ text }: { text: string }) {
   function setVoteTo(v: "up" | "down") {
     setVote((prev) => {
       const next = prev === v ? null : v
-      if (next !== "down") setReasons([])
+      if (next !== "down") setReasonSent(false)
       return next
     })
   }
@@ -417,33 +417,26 @@ function HaloMessage({ text }: { text: string }) {
 
         {vote === "down" && (
           <div className="mt-2 flex flex-wrap items-center gap-1.5 duration-200 animate-in fade-in-0 slide-in-from-top-1">
-            <span className="mr-0.5 text-[12px] text-muted-foreground">What went wrong?</span>
-            {DISLIKE_TAGS.map((t) => {
-              const on = reasons.includes(t)
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() =>
-                    setReasons((prev) =>
-                      on ? prev.filter((x) => x !== t) : [...prev, t]
-                    )
-                  }
-                  className={cn(
-                    "rounded-full border px-2.5 py-1 text-[12px] transition-colors",
-                    on
-                      ? "border-halo-border bg-halo-subtle text-halo"
-                      : "border-border text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-                  )}
-                >
-                  {t}
-                </button>
-              )
-            })}
-            {reasons.length > 0 && (
-              <span className="ml-0.5 text-[12px] text-muted-foreground animate-in fade-in-0">
+            {reasonSent ? (
+              <span className="text-[12px] text-muted-foreground">
                 Thanks — this helps Halo improve.
               </span>
+            ) : (
+              <>
+                <span className="mr-0.5 text-[12px] text-muted-foreground">
+                  What went wrong?
+                </span>
+                {DISLIKE_TAGS.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setReasonSent(true)}
+                    className="rounded-full border border-border px-2.5 py-1 text-[12px] text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </>
             )}
           </div>
         )}
@@ -464,21 +457,16 @@ function ActionButton({
   active?: boolean
 }) {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          onClick={onClick}
-          aria-label={label}
-          className={cn(
-            "flex size-7 items-center justify-center rounded-md transition-colors hover:bg-secondary hover:text-foreground",
-            active ? "bg-secondary text-foreground" : "text-muted-foreground"
-          )}
-        >
-          {children}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
-    </Tooltip>
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className={cn(
+        "flex size-7 items-center justify-center rounded-md transition-colors hover:bg-secondary hover:text-foreground",
+        active ? "bg-secondary text-foreground" : "text-muted-foreground"
+      )}
+    >
+      {children}
+    </button>
   )
 }
