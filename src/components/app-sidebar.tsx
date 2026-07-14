@@ -1,17 +1,17 @@
 import * as React from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
-  Building2,
-  ChevronDown,
-  ChevronsUpDown,
-  FileText,
-  House,
-  ShieldCheck,
-  Sparkles,
-  Users,
-  Wrench,
-  X,
-} from "lucide-react"
+  RiBuilding2Line,
+  RiArrowDownSLine,
+  RiExpandUpDownLine,
+  RiFileTextLine,
+  RiHome5Line,
+  RiShieldCheckLine,
+  RiSparkling2Line,
+  RiTeamLine,
+  RiToolsLine,
+  RiCloseLine,
+} from "@remixicon/react"
 
 import {
   Sidebar,
@@ -40,18 +40,18 @@ type NavNode = {
 }
 
 const NAV: NavNode[] = [
-  { title: "Dashboard", to: "/", icon: House },
-  { title: "Ask Halo", to: "/ask", icon: Sparkles },
+  { title: "Dashboard", to: "/", icon: RiHome5Line },
+  { title: "Ask Halo", to: "/ask", icon: RiSparkling2Line },
   {
     title: "Financial Tools",
     to: "/tools",
-    icon: Wrench,
+    icon: RiToolsLine,
     children: [
       { title: "Calculators", to: "/tools/calculators" },
       { title: "Goals", to: "/tools/goals" },
     ],
   },
-  { title: "Advisor Match", to: "/advisors", icon: Users },
+  { title: "Advisor Match", to: "/advisors", icon: RiTeamLine },
 ]
 
 function isActive(pathname: string, to: string) {
@@ -80,7 +80,7 @@ export function AppSidebar() {
           className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-sidebar-hover group-data-[collapsible=icon]:hidden"
         >
           <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo text-halo-foreground">
-            <Sparkles className="size-4" />
+            <RiSparkling2Line className="size-4" />
           </span>
           <span className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-[14px] font-semibold tracking-[-0.01em]">
@@ -90,7 +90,7 @@ export function AppSidebar() {
               Powered by Datalign
             </span>
           </span>
-          <ChevronsUpDown className="size-3.5 shrink-0 text-muted-foreground" />
+          <RiExpandUpDownLine className="size-3.5 shrink-0 text-muted-foreground" />
         </button>
         <SidebarTrigger className="size-8 shrink-0 text-muted-foreground" />
       </SidebarHeader>
@@ -136,7 +136,7 @@ export function AppSidebar() {
               tooltip="Disclosures"
             >
               <Link to="/disclosures" onClick={closeMobile}>
-                <FileText />
+                <RiFileTextLine />
                 <span>Disclosures</span>
               </Link>
             </SidebarMenuButton>
@@ -191,7 +191,7 @@ function NavGroup({
       >
         <item.icon />
         <span>{item.title}</span>
-        <ChevronDown
+        <RiArrowDownSLine
           className={cn(
             "ml-auto size-4 text-sidebar-foreground/50 transition-transform duration-200 group-data-[collapsible=icon]:hidden",
             open && "rotate-180"
@@ -230,10 +230,10 @@ function ConnectAccountsBanner() {
         aria-label="Dismiss"
         onClick={() => setDismissed(true)}
       >
-        <X className="size-3.5" />
+        <RiCloseLine className="size-3.5" />
       </Button>
       <span className="flex size-7 items-center justify-center rounded-md bg-halo-subtle text-halo">
-        <Building2 className="size-4" />
+        <RiBuilding2Line className="size-4" />
       </span>
       <p className="mt-2.5 pr-4 text-[13px] font-semibold text-foreground">
         Connect your accounts
@@ -245,7 +245,7 @@ function ConnectAccountsBanner() {
         Connect accounts
       </Button>
       <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted-foreground">
-        <ShieldCheck className="size-3" />
+        <RiShieldCheckLine className="size-3" />
         128-bit SSL encryption
       </p>
     </div>

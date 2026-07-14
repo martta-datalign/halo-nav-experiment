@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { Bell, Plus, Sparkles } from "lucide-react"
+import { RiNotification3Line, RiAddLine, RiSparkling2Line } from "@remixicon/react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -104,7 +104,7 @@ export function SiteHeader({
           onClick={() => ask()}
           className="group flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 text-left text-muted-foreground shadow-xs transition-colors hover:border-halo-border hover:bg-halo-subtle/40 md:ml-auto md:w-96 md:flex-none"
         >
-          <Sparkles className="size-4 shrink-0 text-halo" />
+          <RiSparkling2Line className="size-4 shrink-0 text-halo" />
           <span className="truncate text-[13px]">Ask Halo anything…</span>
           <kbd className="ml-auto hidden shrink-0 items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 font-sans text-[10px] font-medium text-muted-foreground sm:flex">
             ⌘K
@@ -120,12 +120,12 @@ export function SiteHeader({
       >
         {actions}
         <Button className="hidden gap-1.5 sm:flex">
-          <Plus className="size-4" />
+          <RiAddLine className="size-4" />
           Add accounts
         </Button>
 
         <Button size="icon" variant="ghost" className="relative text-muted-foreground" aria-label="Notifications">
-          <Bell className="size-4" />
+          <RiNotification3Line className="size-4" />
           <span className="absolute right-2 top-2 size-1.5 rounded-full bg-negative ring-2 ring-background" />
         </Button>
 

@@ -1,4 +1,4 @@
-import { Sparkles } from "lucide-react"
+import { RiSparkling2Line } from "@remixicon/react"
 
 import { cn } from "@/lib/utils"
 import { useAskHalo } from "@/components/ask-halo"
@@ -28,7 +28,7 @@ export function AskHaloAction({
         className
       )}
     >
-      <Sparkles className="size-3.5 shrink-0 transition-transform duration-300 ease-out group-hover/ask:rotate-180" />
+      <RiSparkling2Line className="size-3.5 shrink-0 transition-transform duration-300 ease-out group-hover/ask:rotate-180" />
       <span className="truncate">{text}</span>
     </button>
   )

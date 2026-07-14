@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ChevronRight } from "lucide-react"
+import { RiArrowRightSLine } from "@remixicon/react"
 
 import { Card } from "@/components/ui/card"
 import { CardTitleRow } from "@/components/home/accounts-card"
@@ -25,7 +25,7 @@ export function GoalsCard() {
                 <span className="text-[13.5px] font-medium">{g.name}</span>
                 <span className="flex items-center gap-1.5">
                   <span className="text-[13px] font-semibold tabular-nums">{pct}%</span>
-                  <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground" />
+                  <RiArrowRightSLine className="size-3.5 shrink-0 text-muted-foreground/60 transition-transform group-hover:translate-x-0.5 group-hover:text-muted-foreground" />
                 </span>
               </div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">

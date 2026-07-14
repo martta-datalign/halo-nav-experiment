@@ -1,4 +1,4 @@
-import { Sparkles, X } from "lucide-react"
+import { RiSparkling2Line, RiCloseLine } from "@remixicon/react"
 
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -16,7 +16,7 @@ export function InsightsCard({ onDismiss }: { onDismiss?: () => void }) {
     <Card className="gap-0 overflow-hidden p-0">
       <div className="flex items-center gap-2 border-b border-border px-5 py-3.5">
         <span className="flex size-6 items-center justify-center rounded-md bg-halo-subtle text-halo">
-          <Sparkles className="size-3.5" />
+          <RiSparkling2Line className="size-3.5" />
         </span>
         <h2 className="text-[15px] font-semibold tracking-[-0.005em]">
           Halo insights
@@ -30,7 +30,7 @@ export function InsightsCard({ onDismiss }: { onDismiss?: () => void }) {
               aria-label="Dismiss"
               className="-mr-1.5 flex size-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              <X className="size-3.5" />
+              <RiCloseLine className="size-3.5" />
             </button>
           )}
         </div>

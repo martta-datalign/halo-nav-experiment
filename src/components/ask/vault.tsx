@@ -1,5 +1,5 @@
 import * as React from "react"
-import { FileText, Trash2, Upload } from "lucide-react"
+import { RiFileTextLine, RiDeleteBinLine, RiUpload2Line } from "@remixicon/react"
 
 import {
   Dialog,
@@ -85,7 +85,7 @@ export function VaultDialog({
           )}
         >
           <span className="flex size-9 items-center justify-center rounded-xl bg-halo-subtle text-halo">
-            <Upload className="size-4.5" />
+            <RiUpload2Line className="size-4.5" />
           </span>
           <span className="text-[13px] font-medium">Drop files here, or click to browse</span>
           <span className="text-[11px] text-muted-foreground">
@@ -99,7 +99,7 @@ export function VaultDialog({
           </div>
           {docs.length === 0 ? (
             <p className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-[13px] text-muted-foreground">
-              No documents yet. Upload one above to get started.
+              No documents yet. RiUpload2Line one above to get started.
             </p>
           ) : (
             <div className="-mx-1 max-h-64 space-y-0.5 overflow-y-auto px-1">
@@ -109,7 +109,7 @@ export function VaultDialog({
                   className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-secondary/60"
                 >
                   <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
-                    <FileText className="size-4" />
+                    <RiFileTextLine className="size-4" />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-medium text-foreground">
@@ -125,7 +125,7 @@ export function VaultDialog({
                     aria-label={`Delete ${d.name}`}
                     className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-negative/10 hover:text-negative focus-visible:opacity-100 group-hover:opacity-100"
                   >
-                    <Trash2 className="size-4" />
+                    <RiDeleteBinLine className="size-4" />
                   </button>
                 </div>
               ))}

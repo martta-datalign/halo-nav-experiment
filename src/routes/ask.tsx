@@ -1,9 +1,14 @@
 import * as React from "react"
 import { useSearchParams } from "react-router-dom"
-import { ArrowUp, Plus, Sparkles, Vault } from "lucide-react"
+import { RiArrowUpLine, RiCheckLine, RiFileCopyLine, RiAddLine, RiSparkling2Line, RiThumbDownLine, RiThumbUpLine, RiSafe2Line } from "@remixicon/react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { suggestedPrompts } from "@/lib/data"
 import { SiteHeader } from "@/components/site-header"
@@ -190,7 +195,7 @@ export default function AskHalo() {
         <aside className="hidden w-64 shrink-0 flex-col border-r border-border md:flex">
           <div className="p-3">
             <Button variant="outline" className="w-full justify-start gap-2" onClick={newChat}>
-              <Plus className="size-4" />
+              <RiAddLine className="size-4" />
               New chat
             </Button>
           </div>
@@ -224,7 +229,7 @@ export default function AskHalo() {
               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-secondary/60"
             >
               <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo-subtle text-halo">
-                <Vault className="size-4" />
+                <RiSafe2Line className="size-4" />
               </span>
               <span className="flex-1 text-[13px] font-medium text-foreground">My Vault</span>
               <span className="text-[11px] text-muted-foreground">{docs.length}</span>
@@ -239,7 +244,7 @@ export default function AskHalo() {
               {empty ? (
                 <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
                   <span className="flex size-12 items-center justify-center rounded-2xl bg-halo-subtle text-halo">
-                    <Sparkles className="size-6" />
+                    <RiSparkling2Line className="size-6" />
                   </span>
                   <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
                     Ask anything about your money — your goals, cash flow, or what to do
@@ -271,19 +276,27 @@ export default function AskHalo() {
             <div className="mx-auto w-full max-w-3xl px-4 pb-3 pt-2 sm:px-6">
               <div className="mb-2 flex w-fit rounded-lg bg-secondary p-0.5 text-[12px]">
                 {(["simple", "deep"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setMode(m)}
-                    className={cn(
-                      "rounded-md px-2.5 py-1 font-medium capitalize transition-colors",
-                      mode === m
-                        ? "bg-card text-foreground shadow-xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {m}
-                  </button>
+                  <Tooltip key={m} delayDuration={500}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setMode(m)}
+                        className={cn(
+                          "rounded-md px-2.5 py-1 font-medium capitalize transition-colors",
+                          mode === m
+                            ? "bg-card text-foreground shadow-xs"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {m}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {m === "simple"
+                        ? "Short, direct answers"
+                        : "Detailed reasoning & next steps"}
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
 
@@ -293,8 +306,7 @@ export default function AskHalo() {
                   send(draft)
                 }}
               >
-                <div className="flex items-end gap-2 rounded-xl border border-border bg-card py-1.5 pl-3.5 pr-1.5 shadow-xs transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/15">
-                  <Sparkles className="mb-1.5 size-4 shrink-0 text-halo" />
+                <div className="flex items-end gap-2 rounded-xl border border-border bg-card py-1.5 pl-4 pr-1.5 shadow-xs transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/15">
                   <textarea
                     ref={textareaRef}
                     value={draft}
@@ -306,7 +318,7 @@ export default function AskHalo() {
                       }
                     }}
                     rows={1}
-                    placeholder="Ask Halo anything about your money…"
+                    placeholder="Ask me anything about your finances"
                     className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-sm leading-relaxed outline-none placeholder:text-muted-foreground"
                   />
                   <Button
@@ -315,7 +327,7 @@ export default function AskHalo() {
                     className="size-8 shrink-0 rounded-lg"
                     disabled={!draft.trim()}
                   >
-                    <ArrowUp className="size-4" />
+                    <RiArrowUpLine className="size-4" />
                   </Button>
                 </div>
               </form>
@@ -344,6 +356,8 @@ function truncate(text: string, max = 32) {
   return text.length > max ? text.slice(0, max).trimEnd() + "…" : text
 }
 
+const DISLIKE_TAGS = ["Not what I asked", "Inaccurate", "Too verbose", "Tone was off"]
+
 function MessageRow({ message }: { message: Message }) {
   if (message.role === "user") {
     return (
@@ -354,15 +368,117 @@ function MessageRow({ message }: { message: Message }) {
       </div>
     )
   }
-  // Halo replies are plain — no bubble — just the mark + text.
+  return <HaloMessage text={message.text} />
+}
+
+// Halo replies are plain (no bubble) and carry copy + feedback actions.
+function HaloMessage({ text }: { text: string }) {
+  const [vote, setVote] = React.useState<"up" | "down" | null>(null)
+  const [copied, setCopied] = React.useState(false)
+  const [reasons, setReasons] = React.useState<string[]>([])
+
+  function copy() {
+    navigator.clipboard?.writeText(text).catch(() => {})
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1500)
+  }
+
+  function setVoteTo(v: "up" | "down") {
+    setVote((prev) => {
+      const next = prev === v ? null : v
+      if (next !== "down") setReasons([])
+      return next
+    })
+  }
+
   return (
     <div className="flex gap-3">
       <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-halo text-halo-foreground">
-        <Sparkles className="size-4" />
+        <RiSparkling2Line className="size-4" />
       </span>
-      <div className="min-w-0 flex-1 pt-1 text-sm leading-relaxed text-foreground">
-        {message.text}
+      <div className="min-w-0 flex-1">
+        <div className="pt-1 text-sm leading-relaxed text-foreground">{text}</div>
+
+        <div className="mt-2 flex items-center gap-0.5">
+          <ActionButton label={copied ? "Copied" : "Copy"} onClick={copy}>
+            {copied ? (
+              <RiCheckLine className="size-3.5 text-positive" />
+            ) : (
+              <RiFileCopyLine className="size-3.5" />
+            )}
+          </ActionButton>
+          <ActionButton label="Good response" active={vote === "up"} onClick={() => setVoteTo("up")}>
+            <RiThumbUpLine className="size-3.5" />
+          </ActionButton>
+          <ActionButton label="Needs work" active={vote === "down"} onClick={() => setVoteTo("down")}>
+            <RiThumbDownLine className="size-3.5" />
+          </ActionButton>
+        </div>
+
+        {vote === "down" && (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 duration-200 animate-in fade-in-0 slide-in-from-top-1">
+            <span className="mr-0.5 text-[12px] text-muted-foreground">What went wrong?</span>
+            {DISLIKE_TAGS.map((t) => {
+              const on = reasons.includes(t)
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() =>
+                    setReasons((prev) =>
+                      on ? prev.filter((x) => x !== t) : [...prev, t]
+                    )
+                  }
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-[12px] transition-colors",
+                    on
+                      ? "border-halo-border bg-halo-subtle text-halo"
+                      : "border-border text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+                  )}
+                >
+                  {t}
+                </button>
+              )
+            })}
+            {reasons.length > 0 && (
+              <span className="ml-0.5 text-[12px] text-muted-foreground animate-in fade-in-0">
+                Thanks — this helps Halo improve.
+              </span>
+            )}
+          </div>
+        )}
       </div>
     </div>
+  )
+}
+
+function ActionButton({
+  children,
+  label,
+  onClick,
+  active,
+}: {
+  children: React.ReactNode
+  label: string
+  onClick: () => void
+  active?: boolean
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={onClick}
+          aria-label={label}
+          className={cn(
+            "flex size-7 items-center justify-center rounded-md transition-colors hover:bg-secondary hover:text-foreground",
+            active ? "bg-secondary text-foreground" : "text-muted-foreground"
+          )}
+        >
+          {children}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   )
 }

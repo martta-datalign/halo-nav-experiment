@@ -1,5 +1,5 @@
 import * as React from "react"
-import { SlidersHorizontal } from "lucide-react"
+import { RiEqualizerLine } from "@remixicon/react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -156,7 +156,7 @@ function CustomizeMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="gap-1.5">
-          <SlidersHorizontal className="size-4 text-muted-foreground" />
+          <RiEqualizerLine className="size-4 text-muted-foreground" />
           Customize
         </Button>
       </DropdownMenuTrigger>

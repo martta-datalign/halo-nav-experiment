@@ -1,4 +1,4 @@
-import { ShieldCheck, X } from "lucide-react"
+import { RiShieldCheckLine, RiCloseLine } from "@remixicon/react"
 import { toast } from "sonner"
 
 import { Card } from "@/components/ui/card"
@@ -27,7 +27,7 @@ export function ActionableCard({ onDismiss }: { onDismiss?: () => void }) {
           aria-label="Dismiss"
           className="absolute right-3 top-3 flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
         >
-          <X className="size-4" />
+          <RiCloseLine className="size-4" />
         </button>
       )}
 
@@ -46,7 +46,7 @@ export function ActionableCard({ onDismiss }: { onDismiss?: () => void }) {
         anytime.
       </p>
       <Button className="mt-4 w-full gap-1.5" onClick={share}>
-        <ShieldCheck className="size-4" />
+        <RiShieldCheckLine className="size-4" />
         Share with my advisor
       </Button>
     </Card>

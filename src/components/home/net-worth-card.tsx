@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ArrowDownRight, ArrowUpRight } from "lucide-react"
+import { RiArrowRightDownLine, RiArrowRightUpLine } from "@remixicon/react"
 import {
   Area,
   AreaChart,
@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils"
 import { CardPromptFooter } from "@/components/ask-halo-action"
 import {
+  accounts,
   NET_WORTH,
   NET_WORTH_AS_OF,
   netWorthSeries,
@@ -49,6 +50,12 @@ export function NetWorthCard() {
 
   // Rule: point-over-point change + key driver only make sense on the longer
   // ranges — daily/weekly noise on 1W/1M isn't worth annotating.
+  // Assets vs debts — derived from accounts so they reconcile with net worth.
+  const assetAccounts = accounts.filter((a) => a.balance > 0)
+  const debtAccounts = accounts.filter((a) => a.balance < 0)
+  const totalAssets = assetAccounts.reduce((s, a) => s + a.balance, 0)
+  const totalDebts = debtAccounts.reduce((s, a) => s + Math.abs(a.balance), 0)
+
   const showAnalytics = range === "3M" || range === "YTD" || range === "ALL"
   const chartData = points.map((p, i) => ({
     ...p,
@@ -58,15 +65,13 @@ export function NetWorthCard() {
 
   return (
     <Card className="gap-0 p-5 sm:p-6">
-      <div className="flex items-start justify-between gap-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-medium text-muted-foreground">Net worth</h2>
-          </div>
-          <div className="mt-1.5 text-[28px] font-semibold leading-none tracking-[-0.02em] tabular-nums">
+          <p className="text-sm font-medium text-muted-foreground">Net worth</p>
+          <p className="mt-1.5 text-[28px] font-semibold leading-none tracking-[-0.02em] tabular-nums">
             {formatUSD(NET_WORTH)}
-          </div>
-          <div
+          </p>
+          <p
             className={cn(
               "mt-2 text-[13px] font-medium tabular-nums",
               up ? "text-positive" : "text-negative"
@@ -74,14 +79,29 @@ export function NetWorthCard() {
           >
             {formatUSD(delta, { sign: true })} ({up ? "+" : "−"}
             {Math.abs(pct).toFixed(2)}%) {period}
-          </div>
+          </p>
         </div>
-        <span className="whitespace-nowrap text-xs text-muted-foreground">
-          As of {NET_WORTH_AS_OF}
-        </span>
+        <div>
+          <p className="text-sm font-medium text-muted-foreground">Total assets</p>
+          <p className="mt-1.5 text-2xl font-semibold leading-none tracking-[-0.01em] tabular-nums">
+            {formatUSD(totalAssets)}
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Across {assetAccounts.length} account{assetAccounts.length === 1 ? "" : "s"}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm font-medium text-muted-foreground">Total debts</p>
+          <p className="mt-1.5 text-2xl font-semibold leading-none tracking-[-0.01em] tabular-nums">
+            {formatUSD(totalDebts)}
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Across {debtAccounts.length} account{debtAccounts.length === 1 ? "" : "s"}
+          </p>
+        </div>
       </div>
 
-      <ChartContainer config={chartConfig} className="mt-5 aspect-[16/6] w-full">
+      <ChartContainer config={chartConfig} className="mt-6 aspect-[16/6] w-full">
         <AreaChart data={chartData} margin={{ left: 6, right: 8, top: 8, bottom: 4 }}>
           <defs>
             <linearGradient id="fillNetWorth" x1="0" y1="0" x2="0" y2="1">
@@ -127,21 +147,26 @@ export function NetWorthCard() {
         </AreaChart>
       </ChartContainer>
 
-      <div className="mt-4 flex items-center justify-center gap-1">
-        {RANGES.map((r) => (
-          <button
-            key={r}
-            onClick={() => setRange(r)}
-            className={cn(
-              "rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors",
-              r === range
-                ? "bg-secondary text-foreground"
-                : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
-            )}
-          >
-            {r}
-          </button>
-        ))}
+      <div className="mt-4 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1">
+          {RANGES.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRange(r)}
+              className={cn(
+                "rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors",
+                r === range
+                  ? "bg-secondary text-foreground"
+                  : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"
+              )}
+            >
+              {r}
+            </button>
+          ))}
+        </div>
+        <span className="whitespace-nowrap text-xs text-muted-foreground">
+          As of {NET_WORTH_AS_OF}
+        </span>
       </div>
 
       <CardPromptFooter
@@ -197,9 +222,9 @@ function ChartTooltipCustom({ showAnalytics }: { showAnalytics: boolean }) {
                     )}
                   >
                     {up ? (
-                      <ArrowUpRight className="size-3" />
+                      <RiArrowRightUpLine className="size-3" />
                     ) : (
-                      <ArrowDownRight className="size-3" />
+                      <RiArrowRightDownLine className="size-3" />
                     )}
                     {formatUSD(change as number, { sign: true })}
                     <span className="font-normal text-muted-foreground">

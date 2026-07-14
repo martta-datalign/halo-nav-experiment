@@ -1,5 +1,5 @@
 import type { ElementType } from "react"
-import { CreditCard, Landmark, LineChart } from "lucide-react"
+import { RiBankCardLine, RiBankLine, RiLineChartLine } from "@remixicon/react"
 
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
@@ -8,9 +8,9 @@ import { accounts, type AccountKind } from "@/lib/data"
 import { formatUSD } from "@/lib/format"
 
 const ICONS: Record<AccountKind, ElementType> = {
-  bank: Landmark,
-  investment: LineChart,
-  card: CreditCard,
+  bank: RiBankLine,
+  investment: RiLineChartLine,
+  card: RiBankCardLine,
 }
 
 export function AccountsCard() {

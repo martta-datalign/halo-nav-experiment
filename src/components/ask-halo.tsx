@@ -1,12 +1,12 @@
 import * as React from "react"
 import { useNavigate } from "react-router-dom"
 import {
-  ArrowUpRight,
-  House,
-  Sparkles,
-  Users,
-  Wrench,
-} from "lucide-react"
+  RiArrowRightUpLine,
+  RiHome5Line,
+  RiSparkling2Line,
+  RiTeamLine,
+  RiToolsLine,
+} from "@remixicon/react"
 
 import {
   CommandDialog,
@@ -35,10 +35,10 @@ export function useAskHalo() {
 }
 
 const NAV_ACTIONS = [
-  { label: "Dashboard", to: "/", icon: House },
-  { label: "Ask Halo", to: "/ask", icon: Sparkles },
-  { label: "Tools", to: "/tools", icon: Wrench },
-  { label: "Advisors", to: "/advisors", icon: Users },
+  { label: "Dashboard", to: "/", icon: RiHome5Line },
+  { label: "Ask Halo", to: "/ask", icon: RiSparkling2Line },
+  { label: "Tools", to: "/tools", icon: RiToolsLine },
+  { label: "Advisors", to: "/advisors", icon: RiTeamLine },
 ]
 
 export function AskHaloProvider({ children }: { children: React.ReactNode }) {
@@ -106,7 +106,7 @@ export function AskHaloProvider({ children }: { children: React.ReactNode }) {
                   className="gap-2.5"
                 >
                   <span className="flex size-6 items-center justify-center rounded-md bg-halo-subtle text-halo">
-                    <Sparkles className="size-3.5" />
+                    <RiSparkling2Line className="size-3.5" />
                   </span>
                   <span className="truncate">
                     Ask Halo:{" "}
@@ -121,7 +121,7 @@ export function AskHaloProvider({ children }: { children: React.ReactNode }) {
           <CommandGroup heading="Suggested">
             {suggestedPrompts.map((p) => (
               <CommandItem key={p} value={p} onSelect={() => submit(p)} className="gap-2.5">
-                <Sparkles className="size-4 text-halo" />
+                <RiSparkling2Line className="size-4 text-halo" />
                 <span className="truncate">{p}</span>
               </CommandItem>
             ))}
@@ -142,7 +142,7 @@ export function AskHaloProvider({ children }: { children: React.ReactNode }) {
               >
                 <a.icon className="size-4 text-muted-foreground" />
                 <span>{a.label}</span>
-                <ArrowUpRight className="ml-auto size-3.5 text-muted-foreground/60" />
+                <RiArrowRightUpLine className="ml-auto size-3.5 text-muted-foreground/60" />
               </CommandItem>
             ))}
           </CommandGroup>
