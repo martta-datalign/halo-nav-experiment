@@ -166,7 +166,7 @@ function NavGroup({
   const { state, isMobile } = useSidebar()
   const navigate = useNavigate()
   const sectionActive = isActive(pathname, item.to)
-  const [open, setOpen] = React.useState(sectionActive)
+  const [open, setOpen] = React.useState(true)
   const iconCollapsed = state === "collapsed" && !isMobile
 
   // Keep the group open whenever the current route lives inside it.

@@ -155,8 +155,8 @@ function CustomizeMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <SlidersHorizontal className="size-3.5 text-muted-foreground" />
+        <Button variant="outline" className="gap-1.5">
+          <SlidersHorizontal className="size-4 text-muted-foreground" />
           Customize
         </Button>
       </DropdownMenuTrigger>

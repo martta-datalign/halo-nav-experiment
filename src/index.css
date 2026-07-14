@@ -34,7 +34,7 @@
 
   --border: #e6e8ec;               /* cool hairline */
   --input: #dee1e6;
-  --ring: #8a86c4;                 /* focus = soft halo violet */
+  --ring: #1d2026;                 /* focus = theme dark */
 
   /* Halo AI accent — a refined, dusty periwinkle. Reserved for genuine AI/Halo
      moments (brand mark, Ask Halo affordances, insights) and used sparingly. */
@@ -63,7 +63,7 @@
   --sidebar-accent-foreground: #1d2026;
   --sidebar-hover: #ecf1fb;          /* hover tint (barely-there blue) */
   --sidebar-border: #e8edf6;
-  --sidebar-ring: #8a86c4;
+  --sidebar-ring: #1d2026;
 }
 
 .dark {
@@ -84,7 +84,7 @@
   --destructive: #e06a62;
   --border: #302c37;
   --input: #35313d;
-  --ring: #8c85e6;
+  --ring: #e8e6f0;
   --halo: #8c85e6;
   --halo-foreground: #17151a;
   --halo-subtle: #26233250;
@@ -99,7 +99,7 @@
   --sidebar-accent-foreground: #f3f1ee;
   --sidebar-hover: #211f27;
   --sidebar-border: #302c37;
-  --sidebar-ring: #8c85e6;
+  --sidebar-ring: #e8e6f0;
 }
 
 @theme inline {

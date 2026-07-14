@@ -38,10 +38,10 @@ export function AccountsCard() {
               <div
                 className={cn(
                   "text-[13.5px] font-semibold tabular-nums",
-                  negative ? "text-negative" : "text-foreground"
+                  negative ? "text-negative" : "text-positive"
                 )}
               >
-                {formatUSD(a.balance, { sign: negative })}
+                {formatUSD(a.balance)}
               </div>
             </li>
           )
