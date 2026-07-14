@@ -20,6 +20,7 @@ import { ActivityCard } from "@/components/home/activity-card"
 import { InsightsCard } from "@/components/home/insights-card"
 import { ActionableCard } from "@/components/home/actionable-card"
 import { AnalysisCard } from "@/components/home/analysis-card"
+import { MoneyFlowCard } from "@/components/home/money-flow-card"
 
 const SUBTABS = [
   "Overview",
@@ -129,6 +130,10 @@ export default function Home() {
               <ActionableCard onDismiss={() => toggle("actionable")} />
             )}
           </div>
+        </div>
+      ) : subtab === "Money flow" ? (
+        <div className="mt-6">
+          <MoneyFlowCard />
         </div>
       ) : (
         <div className="mt-6 flex min-h-[40vh] items-center justify-center rounded-xl border border-dashed border-border bg-card/40">
