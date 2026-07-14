@@ -1,0 +1,253 @@
+import * as React from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import {
+  Building2,
+  ChevronDown,
+  ChevronsUpDown,
+  FileText,
+  House,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Wrench,
+  X,
+} from "lucide-react"
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+
+type NavNode = {
+  title: string
+  to: string
+  icon: React.ElementType
+  children?: { title: string; to: string }[]
+}
+
+const NAV: NavNode[] = [
+  { title: "Dashboard", to: "/", icon: House },
+  { title: "Ask Halo", to: "/ask", icon: Sparkles },
+  {
+    title: "Financial Tools",
+    to: "/tools",
+    icon: Wrench,
+    children: [
+      { title: "Calculators", to: "/tools/calculators" },
+      { title: "Goals", to: "/tools/goals" },
+    ],
+  },
+  { title: "Advisor Match", to: "/advisors", icon: Users },
+]
+
+function isActive(pathname: string, to: string) {
+  if (to === "/") return pathname === "/"
+  return pathname === to || pathname.startsWith(to + "/")
+}
+
+/** On mobile the sidebar is an overlay sheet — close it after navigating. */
+function useCloseMobile() {
+  const { isMobile, setOpenMobile } = useSidebar()
+  return React.useCallback(() => {
+    if (isMobile) setOpenMobile(false)
+  }, [isMobile, setOpenMobile])
+}
+
+export function AppSidebar() {
+  const { pathname } = useLocation()
+  const closeMobile = useCloseMobile()
+
+  return (
+    <Sidebar collapsible="icon" className="border-r">
+      <SidebarHeader className="h-14 flex-row items-center gap-1 border-b border-sidebar-border px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+        <button
+          type="button"
+          aria-label="Halo AI workspace"
+          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-sidebar-hover group-data-[collapsible=icon]:hidden"
+        >
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo text-halo-foreground">
+            <Sparkles className="size-4" />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-col leading-tight">
+            <span className="truncate text-[14px] font-semibold tracking-[-0.01em]">
+              Halo AI
+            </span>
+            <span className="truncate text-[11px] text-muted-foreground">
+              Powered by Datalign
+            </span>
+          </span>
+          <ChevronsUpDown className="size-3.5 shrink-0 text-muted-foreground" />
+        </button>
+        <SidebarTrigger className="size-8 shrink-0 text-muted-foreground" />
+      </SidebarHeader>
+
+      <SidebarContent className="py-2">
+        <SidebarGroup>
+          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
+          <SidebarMenu>
+            {NAV.map((item) =>
+              item.children ? (
+                <NavGroup
+                  key={item.to}
+                  item={item}
+                  pathname={pathname}
+                  onNavigate={closeMobile}
+                />
+              ) : (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(pathname, item.to)}
+                    tooltip={item.title}
+                  >
+                    <Link to={item.to} onClick={closeMobile}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )
+            )}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter className="gap-2">
+        <ConnectAccountsBanner />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive(pathname, "/disclosures")}
+              tooltip="Disclosures"
+            >
+              <Link to="/disclosures" onClick={closeMobile}>
+                <FileText />
+                <span>Disclosures</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  )
+}
+
+/**
+ * A collapsible nav group with a chevron affordance (Grok-style): the row
+ * toggles its sub-menu open/closed and the chevron flips down→up. It opens
+ * automatically when you're inside the section. When the rail is collapsed to
+ * icons there's no room for a sub-menu, so a click navigates to the section
+ * landing instead of toggling a hidden panel.
+ */
+function NavGroup({
+  item,
+  pathname,
+  onNavigate,
+}: {
+  item: NavNode
+  pathname: string
+  onNavigate: () => void
+}) {
+  const { state, isMobile } = useSidebar()
+  const navigate = useNavigate()
+  const sectionActive = isActive(pathname, item.to)
+  const [open, setOpen] = React.useState(sectionActive)
+  const iconCollapsed = state === "collapsed" && !isMobile
+
+  // Keep the group open whenever the current route lives inside it.
+  React.useEffect(() => {
+    if (sectionActive) setOpen(true)
+  }, [sectionActive])
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        tooltip={item.title}
+        isActive={pathname === item.to}
+        aria-expanded={iconCollapsed ? undefined : open}
+        onClick={() => {
+          if (iconCollapsed) {
+            navigate(item.to)
+            onNavigate()
+          } else {
+            setOpen((v) => !v)
+          }
+        }}
+      >
+        <item.icon />
+        <span>{item.title}</span>
+        <ChevronDown
+          className={cn(
+            "ml-auto size-4 text-sidebar-foreground/50 transition-transform duration-200 group-data-[collapsible=icon]:hidden",
+            open && "rotate-180"
+          )}
+        />
+      </SidebarMenuButton>
+      {open && (
+        <SidebarMenuSub>
+          {item.children!.map((child) => (
+            <SidebarMenuSubItem key={child.to}>
+              <SidebarMenuSubButton asChild isActive={pathname === child.to}>
+                <Link to={child.to} onClick={onNavigate}>
+                  <span>{child.title}</span>
+                </Link>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+          ))}
+        </SidebarMenuSub>
+      )}
+    </SidebarMenuItem>
+  )
+}
+
+/** Connect-accounts prompt — shown until dismissed. Hidden when the rail is collapsed. */
+function ConnectAccountsBanner() {
+  const { state, isMobile } = useSidebar()
+  const [dismissed, setDismissed] = React.useState(false)
+  if (dismissed || (state === "collapsed" && !isMobile)) return null
+
+  return (
+    <div className="relative rounded-lg border border-sidebar-border bg-card p-3.5 group-data-[collapsible=icon]:hidden">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="absolute right-1.5 top-1.5 size-6 text-muted-foreground"
+        aria-label="Dismiss"
+        onClick={() => setDismissed(true)}
+      >
+        <X className="size-3.5" />
+      </Button>
+      <span className="flex size-7 items-center justify-center rounded-md bg-halo-subtle text-halo">
+        <Building2 className="size-4" />
+      </span>
+      <p className="mt-2.5 pr-4 text-[13px] font-semibold text-foreground">
+        Connect your accounts
+      </p>
+      <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+        Link your bank and investment accounts for a full picture of your finances.
+      </p>
+      <Button variant="outline" size="sm" className="mt-3 w-full">
+        Connect accounts
+      </Button>
+      <p className="mt-2 flex items-center justify-center gap-1 text-[11px] text-muted-foreground">
+        <ShieldCheck className="size-3" />
+        128-bit SSL encryption
+      </p>
+    </div>
+  )
+}

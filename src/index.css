@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+  Halo AI — design tokens, "Mercury / Willow" voice.
+  Warm off-white surfaces, hairline borders, near-black primary (Mercury signature),
+  and a reserved violet "Halo" accent used only for AI/Ask-Halo affordances.
+*/
+:root {
+  --radius: 0.625rem;
+
+  --background: #ffffff;            /* white content field */
+  --foreground: #1a1c22;           /* cool near-black text */
+
+  --card: #ffffff;
+  --card-foreground: #1a1c22;
+  --popover: #ffffff;
+  --popover-foreground: #1a1c22;
+
+  /* Primary = near-black (Mercury-style dark buttons), faintly cool */
+  --primary: #1d2026;
+  --primary-foreground: #f8f9fa;
+
+  --secondary: #eceef1;
+  --secondary-foreground: #1d2026;
+  --muted: #eceef1;
+  --muted-foreground: #6b6f78;
+  --accent: #eceef1;
+  --accent-foreground: #1d2026;
+
+  --destructive: #c4453d;
+
+  --border: #e6e8ec;               /* cool hairline */
+  --input: #dee1e6;
+  --ring: #8a86c4;                 /* focus = soft halo violet */
+
+  /* Halo AI accent — a refined, dusty periwinkle. Reserved for genuine AI/Halo
+     moments (brand mark, Ask Halo affordances, insights) and used sparingly. */
+  --halo: #6d6ab5;
+  --halo-foreground: #ffffff;
+  --halo-subtle: #f2f1fa;
+  --halo-border: #e7e6f3;
+
+  /* Money semantics */
+  --positive: #1f8a5b;
+  --negative: #c4453d;
+
+  /* Data viz */
+  --chart-1: #6461ad;
+  --chart-2: #1f8a5b;
+  --chart-3: #c99a3f;
+  --chart-4: #4a86c5;
+  --chart-5: #a35bd6;
+
+  /* Sidebar */
+  --sidebar: #f7f9fe;               /* very faint Mercury-like blue panel */
+  --sidebar-foreground: #45505f;
+  --sidebar-primary: #1d2026;
+  --sidebar-primary-foreground: #f8f9fa;
+  --sidebar-accent: #e0e8f5;        /* active/selected fill (blue-tinted, > hover) */
+  --sidebar-accent-foreground: #1d2026;
+  --sidebar-hover: #ecf1fb;          /* hover tint (barely-there blue) */
+  --sidebar-border: #e8edf6;
+  --sidebar-ring: #8a86c4;
+}
+
+.dark {
+  --background: #17151a;
+  --foreground: #f3f1ee;
+  --card: #201d24;
+  --card-foreground: #f3f1ee;
+  --popover: #201d24;
+  --popover-foreground: #f3f1ee;
+  --primary: #f3f1ee;
+  --primary-foreground: #201d1a;
+  --secondary: #2a2730;
+  --secondary-foreground: #f3f1ee;
+  --muted: #2a2730;
+  --muted-foreground: #a7a29b;
+  --accent: #2a2730;
+  --accent-foreground: #f3f1ee;
+  --destructive: #e06a62;
+  --border: #302c37;
+  --input: #35313d;
+  --ring: #8c85e6;
+  --halo: #8c85e6;
+  --halo-foreground: #17151a;
+  --halo-subtle: #26233250;
+  --halo-border: #3a3550;
+  --positive: #4fbf8a;
+  --negative: #e06a62;
+  --sidebar: #1c1a20;
+  --sidebar-foreground: #c7c3bc;
+  --sidebar-primary: #f3f1ee;
+  --sidebar-primary-foreground: #201d1a;
+  --sidebar-accent: #29262f;
+  --sidebar-accent-foreground: #f3f1ee;
+  --sidebar-hover: #211f27;
+  --sidebar-border: #302c37;
+  --sidebar-ring: #8c85e6;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-halo: var(--halo);
+  --color-halo-foreground: var(--halo-foreground);
+  --color-halo-subtle: var(--halo-subtle);
+  --color-halo-border: var(--halo-border);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-hover: var(--sidebar-hover);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  /* Financial figures read as aligned columns everywhere */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
