@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { Bell, Plus, Sparkles } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import {
@@ -48,7 +49,17 @@ function useCrumbs() {
  * is shared, but each page renders its own header and can pass page-specific
  * controls via `actions` — so the top nav isn't global.
  */
-export function SiteHeader({ actions }: { actions?: ReactNode }) {
+export function SiteHeader({
+  actions,
+  title,
+  showSearch = true,
+}: {
+  actions?: ReactNode
+  /** Overrides the route breadcrumb with a specific label (e.g., a chat title). */
+  title?: string
+  /** Set false to drop the ⌘K command bar on pages that have their own input. */
+  showSearch?: boolean
+}) {
   const { ask } = useAskHalo()
   const crumbs = useCrumbs()
 
@@ -58,42 +69,55 @@ export function SiteHeader({ actions }: { actions?: ReactNode }) {
           sidebar is an off-canvas sheet, so it still needs a trigger here. */}
       <SidebarTrigger className="text-muted-foreground md:hidden" />
 
-      {/* Breadcrumb is desktop-only; on mobile the page owns its own title. */}
-      <nav
-        aria-label="Breadcrumb"
-        className="hidden min-w-0 items-center gap-1.5 text-sm md:flex"
-      >
-        {crumbs.map((c, i) => (
-          <span key={i} className="flex items-center gap-1.5">
-            {i > 0 && <span className="text-border">/</span>}
-            <span
-              className={
-                i === crumbs.length - 1
-                  ? "font-medium text-foreground"
-                  : "text-muted-foreground"
-              }
-            >
-              {c.label}
+      {title !== undefined ? (
+        <span className="min-w-0 truncate text-sm font-medium text-foreground">
+          {title}
+        </span>
+      ) : (
+        // Breadcrumb is desktop-only; on mobile the page owns its own title.
+        <nav
+          aria-label="Breadcrumb"
+          className="hidden min-w-0 items-center gap-1.5 text-sm md:flex"
+        >
+          {crumbs.map((c, i) => (
+            <span key={i} className="flex items-center gap-1.5">
+              {i > 0 && <span className="text-border">/</span>}
+              <span
+                className={
+                  i === crumbs.length - 1
+                    ? "font-medium text-foreground"
+                    : "text-muted-foreground"
+                }
+              >
+                {c.label}
+              </span>
             </span>
-          </span>
-        ))}
-      </nav>
+          ))}
+        </nav>
+      )}
 
       {/* AI-native command bar — the product's spine, so it stays visible on
           mobile too (fills the row) instead of collapsing to an icon. */}
-      <button
-        type="button"
-        onClick={() => ask()}
-        className="group flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 text-left text-muted-foreground shadow-xs transition-colors hover:border-halo-border hover:bg-halo-subtle/40 md:ml-auto md:w-96 md:flex-none"
-      >
-        <Sparkles className="size-4 shrink-0 text-halo" />
-        <span className="truncate text-[13px]">Ask Halo anything…</span>
-        <kbd className="ml-auto hidden shrink-0 items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 font-sans text-[10px] font-medium text-muted-foreground sm:flex">
-          ⌘K
-        </kbd>
-      </button>
+      {showSearch && (
+        <button
+          type="button"
+          onClick={() => ask()}
+          className="group flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 text-left text-muted-foreground shadow-xs transition-colors hover:border-halo-border hover:bg-halo-subtle/40 md:ml-auto md:w-96 md:flex-none"
+        >
+          <Sparkles className="size-4 shrink-0 text-halo" />
+          <span className="truncate text-[13px]">Ask Halo anything…</span>
+          <kbd className="ml-auto hidden shrink-0 items-center gap-0.5 rounded border border-border bg-muted px-1.5 py-0.5 font-sans text-[10px] font-medium text-muted-foreground sm:flex">
+            ⌘K
+          </kbd>
+        </button>
+      )}
 
-      <div className="flex shrink-0 items-center gap-1.5 md:ml-2">
+      <div
+        className={cn(
+          "flex shrink-0 items-center gap-1.5",
+          showSearch ? "md:ml-2" : "ml-auto"
+        )}
+      >
         {actions}
         <Button className="hidden gap-1.5 sm:flex">
           <Plus className="size-4" />
