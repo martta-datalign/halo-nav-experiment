@@ -79,9 +79,6 @@ export function AppSidebar() {
           aria-label="Halo AI workspace"
           className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-sidebar-hover group-data-[collapsible=icon]:hidden"
         >
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo text-halo-foreground">
-            <RiSparkling2Line className="size-4" />
-          </span>
           <span className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-[14px] font-semibold tracking-[-0.01em]">
               Halo AI
