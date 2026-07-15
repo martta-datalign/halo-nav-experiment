@@ -6,17 +6,19 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { SiteHeader } from "@/components/site-header"
+import { EmptyResult } from "@/components/calculators/fields"
 import { CALCULATORS, type CalcEntry, type CalcId } from "@/components/calculators/registry"
 
 export default function Calculators() {
-  // Inputs persist per calculator so reopening a dialog restores prior edits.
+  // Draft inputs, edited live and persisted so reopening restores prior edits.
   const [inputs, setInputs] = React.useState<Record<CalcId, unknown>>(() =>
     Object.fromEntries(CALCULATORS.map((c) => [c.id, c.blanks])) as Record<CalcId, unknown>
   )
-  // Headline captured at "Calculate" time — null until first run. This is what
-  // the card shows, so an uncommitted edit doesn't silently change the card.
-  const [results, setResults] = React.useState<Record<CalcId, string | null>>(
-    () => Object.fromEntries(CALCULATORS.map((c) => [c.id, null])) as Record<CalcId, string | null>
+  // Snapshot of the inputs at the last "Calculate" press — null until first run.
+  // Results (dialog + card) are derived from this, never from the live draft, so
+  // nothing computes until the user explicitly calculates.
+  const [calculated, setCalculated] = React.useState<Record<CalcId, unknown | null>>(
+    () => Object.fromEntries(CALCULATORS.map((c) => [c.id, null])) as Record<CalcId, unknown | null>
   )
   const [openId, setOpenId] = React.useState<CalcId | null>(null)
 
@@ -39,7 +41,7 @@ export default function Calculators() {
             <CalculatorCard
               key={calc.id}
               calc={calc}
-              result={results[calc.id]}
+              result={calculated[calc.id] != null ? calc.headline(calculated[calc.id]) : null}
               onOpen={() => setOpenId(calc.id)}
             />
           ))}
@@ -52,17 +54,16 @@ export default function Calculators() {
             key={openCalc.id}
             calc={openCalc}
             inputs={inputs[openCalc.id]}
+            calculated={calculated[openCalc.id]}
             onChange={(next) => setInputs((prev) => ({ ...prev, [openCalc.id]: next }))}
-            onCalculate={() => {
-              setResults((prev) => ({
-                ...prev,
-                [openCalc.id]: openCalc.headline(inputs[openCalc.id]),
-              }))
-              setOpenId(null)
-            }}
-            onReset={() =>
-              setInputs((prev) => ({ ...prev, [openCalc.id]: openCalc.blanks }))
+            onCalculate={() =>
+              // Snapshot the current draft; keep the dialog open so results show inline.
+              setCalculated((prev) => ({ ...prev, [openCalc.id]: inputs[openCalc.id] }))
             }
+            onReset={() => {
+              setInputs((prev) => ({ ...prev, [openCalc.id]: openCalc.blanks }))
+              setCalculated((prev) => ({ ...prev, [openCalc.id]: null }))
+            }}
           />
         )}
       </Dialog>
@@ -130,17 +131,28 @@ function CalculatorCard({
 function CalculatorDialog({
   calc,
   inputs,
+  calculated,
   onChange,
   onCalculate,
   onReset,
 }: {
   calc: CalcEntry
   inputs: unknown
+  /** Snapshot from the last Calculate, or null if not calculated yet. */
+  calculated: unknown | null
   onChange: (next: unknown) => void
   onCalculate: () => void
   onReset: () => void
 }) {
   const Icon = calc.icon
+  const hasResult = calculated != null
+  // Results are shown; but if the draft has changed since they were calculated,
+  // flag that the displayed numbers are stale.
+  const stale = React.useMemo(
+    () => hasResult && JSON.stringify(inputs) !== JSON.stringify(calculated),
+    [hasResult, inputs, calculated]
+  )
+
   return (
     <DialogContent
       className="max-h-[92vh] gap-0 overflow-hidden p-0 sm:max-w-3xl lg:max-w-6xl lg:!w-[min(94vw,1200px)]"
@@ -156,12 +168,30 @@ function CalculatorDialog({
         </div>
       </div>
 
-      <div className="grid max-h-[calc(92vh-9.5rem)] grid-cols-1 gap-6 overflow-y-auto px-6 py-6 lg:grid-cols-2">
-        <div className="min-w-0">
+      {/* On desktop the form column stays put and only the results scroll; on
+          mobile the whole body scrolls as one. */}
+      <div className="flex max-h-[calc(92vh-9.5rem)] flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+        <div className="min-w-0 px-6 pt-6 pb-4 lg:w-1/2 lg:shrink-0 lg:self-stretch lg:overflow-y-auto">
           <calc.Form inputs={inputs} onChange={onChange} />
         </div>
-        <div className="min-w-0">
-          <calc.Result inputs={inputs} />
+        <div className="min-w-0 px-6 pb-4 lg:w-1/2 lg:self-stretch lg:overflow-y-auto lg:border-l lg:border-border lg:pt-6">
+          {hasResult ? (
+            <>
+              {stale && (
+                <p className="mb-3 rounded-lg bg-halo-subtle px-3 py-2 text-[12px] leading-relaxed text-halo">
+                  Inputs changed — press{" "}
+                  <span className="font-semibold">{calc.cta}</span> to update these results.
+                </p>
+              )}
+              {/* Results render from the calculated snapshot, not the live draft. */}
+              <calc.Result inputs={calculated} />
+            </>
+          ) : (
+            <EmptyResult
+              cta={calc.cta}
+              preview={<calc.Result inputs={calc.defaults} />}
+            />
+          )}
         </div>
       </div>
 

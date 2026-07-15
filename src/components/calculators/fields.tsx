@@ -1,5 +1,5 @@
 import * as React from "react"
-import { RiInformationLine } from "@remixicon/react"
+import { RiBarChart2Line, RiInformationLine } from "@remixicon/react"
 
 import { cn } from "@/lib/utils"
 import {
@@ -251,5 +251,65 @@ export function ResultPanel({
 }) {
   return (
     <div className={cn("rounded-xl bg-muted/50 p-5", className)}>{children}</div>
+  )
+}
+
+/**
+ * Placeholder shown in the results area before the user runs the numbers.
+ * `preview` is a blurred, non-interactive glimpse of the real result (computed
+ * from example values) that sits behind the prompt — a subtle nudge to fill the
+ * form in — while reserving the vertical space so nothing jumps on Calculate.
+ */
+export function EmptyResult({
+  cta,
+  preview,
+}: {
+  cta: string
+  preview?: React.ReactNode
+}) {
+  return (
+    // No filled surface — a blurred glimpse of the metrics sits directly on the
+    // dialog background, fading at the edges, with the prompt centered on top.
+    <div className="relative flex h-full min-h-[380px] items-center justify-center overflow-hidden rounded-xl px-6 py-10">
+      {/* Live SVG/DOM glimpse (not a raster image). Panel chrome is stripped so
+          it reads as a single faint backdrop; chart rows are centered. */}
+      <div
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden px-6 opacity-40 blur-[1.5px]",
+          // Fade the top/bottom edges so the glimpse dissolves instead of
+          // hard-cutting through a number.
+          "[-webkit-mask-image:linear-gradient(to_bottom,transparent,#000_24%,#000_76%,transparent)]",
+          "[mask-image:linear-gradient(to_bottom,transparent,#000_24%,#000_76%,transparent)]"
+        )}
+      >
+        {/* Overrides live here so `&>div>*` resolves to the result's panels
+            (strip their chrome) rather than the result root. */}
+        <div
+          className={cn(
+            "w-full max-w-[420px]",
+            "[&>div>*]:!border-0 [&>div>*]:!bg-transparent [&>div>*]:!p-0",
+            "[&_[class~='sm:flex-row']]:!flex-col [&_[class~='sm:flex-row']]:!items-center"
+          )}
+        >
+          {preview}
+        </div>
+      </div>
+
+      {/* Soft scrim (page background) so the centered prompt stays legible. */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_58%_48%_at_center,var(--color-background)_0%,var(--color-background)_36%,transparent_76%)]" />
+
+      {/* Prompt — centered horizontally and vertically. */}
+      <div className="relative flex max-w-[300px] flex-col items-center text-center">
+        <span className="flex size-11 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-sm ring-1 ring-border">
+          <RiBarChart2Line className="size-5" />
+        </span>
+        <p className="mt-4 text-sm font-medium text-foreground">Your results will appear here</p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+          Fill in your details, then press{" "}
+          <span className="font-medium text-foreground">{cta}</span> to see the breakdown.
+        </p>
+      </div>
+    </div>
   )
 }
