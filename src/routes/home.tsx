@@ -2,11 +2,10 @@ import * as React from "react"
 import { RiEqualizerLine } from "@remixicon/react"
 
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
@@ -21,6 +20,8 @@ import { InsightsCard } from "@/components/home/insights-card"
 import { ActionableCard } from "@/components/home/actionable-card"
 import { AnalysisCard } from "@/components/home/analysis-card"
 import { MoneyFlowCard } from "@/components/home/money-flow-card"
+import { AssetsLiabilities } from "@/components/home/assets-liabilities"
+import { OpportunitiesCard } from "@/components/home/opportunities-card"
 
 const SUBTABS = [
   "Overview",
@@ -47,6 +48,8 @@ const CARD_LABELS: Record<CardKey, string> = {
   goals: "Goals",
   activity: "Recent activity",
 }
+
+const CUSTOMIZABLE_CARDS: CardKey[] = ["accounts", "goals", "activity"]
 
 function todayLabel() {
   try {
@@ -124,6 +127,7 @@ export default function Home() {
           </div>
 
           <div className="flex min-w-0 flex-col gap-5">
+            <OpportunitiesCard />
             {visible.analysis && <AnalysisCard onDismiss={() => toggle("analysis")} />}
             {visible.insights && <InsightsCard onDismiss={() => toggle("insights")} />}
             {visible.actionable && (
@@ -134,6 +138,10 @@ export default function Home() {
       ) : subtab === "Money flow" ? (
         <div className="mt-6">
           <MoneyFlowCard />
+        </div>
+      ) : subtab === "Assets & liabilities" ? (
+        <div className="mt-6">
+          <AssetsLiabilities />
         </div>
       ) : (
         <div className="mt-6 flex min-h-[40vh] items-center justify-center rounded-xl border border-dashed border-border bg-card/40">
@@ -160,21 +168,36 @@ function CustomizeMenu({
           Customize
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-52">
-        <DropdownMenuLabel>Show on Overview</DropdownMenuLabel>
-        <DropdownMenuCheckboxItem checked disabled>
-          Net worth
-        </DropdownMenuCheckboxItem>
-        {(Object.keys(CARD_LABELS) as CardKey[]).map((key) => (
-          <DropdownMenuCheckboxItem
-            key={key}
-            checked={visible[key]}
-            onCheckedChange={() => toggle(key)}
-            onSelect={(e) => e.preventDefault()}
-          >
-            {CARD_LABELS[key]}
-          </DropdownMenuCheckboxItem>
-        ))}
+      <DropdownMenuContent align="end" className="w-72 p-3">
+        <div className="px-1 pb-2">
+          <p className="text-sm font-semibold">Customize overview</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Choose which sections appear on your dashboard.
+          </p>
+        </div>
+
+        <div className="space-y-1 px-1">
+          <label className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-2 py-2 text-sm opacity-60">
+            <Checkbox checked disabled aria-label="Net worth" />
+            <span>Net worth</span>
+            <span className="ml-auto text-[11px] text-muted-foreground">Required</span>
+          </label>
+
+          {CUSTOMIZABLE_CARDS.map((key) => (
+            <label
+              key={key}
+              htmlFor={`customize-${key}`}
+              className="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-2 text-sm transition-colors hover:bg-accent"
+            >
+              <Checkbox
+                id={`customize-${key}`}
+                checked={visible[key]}
+                onCheckedChange={() => toggle(key)}
+              />
+              <span>{CARD_LABELS[key]}</span>
+            </label>
+          ))}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   )

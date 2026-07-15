@@ -109,29 +109,203 @@ export type Account = {
   id: string
   name: string
   kind: AccountKind
+  institution: string
+  typeLabel: string
   mask: string
   balance: number
+  updatedAt: string
 }
 
-/** Balances reconcile to NET_WORTH: 12,480 + 34,200 + 602,741 + 8,000 − 8,000 = 649,421. */
-export const accounts: Account[] = [
-  { id: "checking", name: "Checking", kind: "bank", mask: "4821", balance: 12480 },
-  { id: "savings", name: "Savings", kind: "bank", mask: "5679", balance: 34200 },
-  { id: "investments", name: "Investments", kind: "investment", mask: "0092", balance: 602741 },
-  { id: "hsa", name: "HSA", kind: "investment", mask: "7112", balance: 8000 },
-  { id: "card", name: "Credit Card", kind: "card", mask: "3310", balance: -8000 },
+export type IntakeBalance = {
+  side: "asset" | "liability"
+  category: string
+  type?: string
+  amount: number
+}
+
+/**
+ * Original lead-form allocation. Categories with a connected balance are used
+ * only for comparison; unconnected categories remain included as estimates.
+ */
+export const intakeAllocation: IntakeBalance[] = [
+  { side: "asset", category: "Cash & Banking", amount: 50_000 },
+  { side: "asset", category: "Investment Accounts", amount: 590_000 },
+  { side: "asset", category: "Retirement Accounts", amount: 30_000 },
+  { side: "asset", category: "Other Assets", type: "Cryptocurrency", amount: 15_000 },
+  { side: "liability", category: "Credit Cards", amount: 10_000 },
 ]
+
+export const unconnectedFormBalances = intakeAllocation.filter(
+  (item) => item.category === "Other Assets"
+)
+
+/** Connected balances net to $634,421; $15,000 of unconnected form assets brings total net worth to $649,421. */
+export const accounts: Account[] = [
+  {
+    id: "checking",
+    name: "Checking",
+    kind: "bank",
+    institution: "Chase",
+    typeLabel: "Checking account",
+    mask: "4821",
+    balance: 12480,
+    updatedAt: "Today at 9:42 AM",
+  },
+  {
+    id: "savings",
+    name: "Savings",
+    kind: "bank",
+    institution: "Chase",
+    typeLabel: "Savings account",
+    mask: "5679",
+    balance: 34200,
+    updatedAt: "Today at 9:42 AM",
+  },
+  {
+    id: "investments",
+    name: "Investments",
+    kind: "investment",
+    institution: "Fidelity",
+    typeLabel: "Brokerage account",
+    mask: "0092",
+    balance: 587741,
+    updatedAt: "Today at 9:40 AM",
+  },
+  {
+    id: "hsa",
+    name: "HSA",
+    kind: "investment",
+    institution: "Fidelity",
+    typeLabel: "Health savings account",
+    mask: "7112",
+    balance: 8000,
+    updatedAt: "Today at 9:40 AM",
+  },
+  {
+    id: "card",
+    name: "Credit Card",
+    kind: "card",
+    institution: "Chase",
+    typeLabel: "Credit card",
+    mask: "3310",
+    balance: -8000,
+    updatedAt: "Today at 9:42 AM",
+  },
+]
+
+/**
+ * Every goal belongs to one of five categories. The union is the source of
+ * truth for the category picker and the grouped sections on the Goals page.
+ */
+export type GoalCategory =
+  | "lifestyle"
+  | "financial-security"
+  | "life-milestone"
+  | "experience"
+  | "other"
 
 export type Goal = {
   id: string
   name: string
+  category: GoalCategory
+  /** Amount saved toward the goal so far — user-editable. */
   current: number
   target: number
+  /** Optional freeform target, e.g. "Dec 2027". */
+  targetDate?: string
+}
+
+/** Display order for the grouped sections; also drives the category picker. */
+export const GOAL_CATEGORY_ORDER: GoalCategory[] = [
+  "financial-security",
+  "life-milestone",
+  "lifestyle",
+  "experience",
+  "other",
+]
+
+/** Label + one-line description per category (icons resolved in components). */
+export const goalCategoryMeta: Record<
+  GoalCategory,
+  { label: string; description: string }
+> = {
+  "financial-security": {
+    label: "Financial security",
+    description: "Safety nets and freedom from debt.",
+  },
+  "life-milestone": {
+    label: "Life milestone",
+    description: "Major moments — a home, a wedding, a family.",
+  },
+  lifestyle: {
+    label: "Lifestyle",
+    description: "Upgrades and purchases for your day-to-day.",
+  },
+  experience: {
+    label: "Experience",
+    description: "Travel and once-in-a-lifetime adventures.",
+  },
+  other: {
+    label: "Other",
+    description: "Everything else you're setting money aside for.",
+  },
 }
 
 export const goals: Goal[] = [
-  { id: "emergency", name: "Emergency fund", current: 18000, target: 25000 },
-  { id: "home", name: "Home down payment", current: 49200, target: 120000 },
+  {
+    id: "emergency",
+    name: "Emergency fund",
+    category: "financial-security",
+    current: 18000,
+    target: 25000,
+    targetDate: "Mar 2027",
+  },
+  {
+    id: "loans",
+    name: "Pay off student loans",
+    category: "financial-security",
+    current: 14000,
+    target: 22000,
+    targetDate: "Dec 2027",
+  },
+  {
+    id: "home",
+    name: "Home down payment",
+    category: "life-milestone",
+    current: 49200,
+    target: 120000,
+    targetDate: "Jun 2028",
+  },
+  {
+    id: "wedding",
+    name: "Wedding",
+    category: "life-milestone",
+    current: 12500,
+    target: 40000,
+    targetDate: "Sep 2027",
+  },
+  {
+    id: "car",
+    name: "New car",
+    category: "lifestyle",
+    current: 8500,
+    target: 32000,
+  },
+  {
+    id: "japan",
+    name: "Trip to Japan",
+    category: "experience",
+    current: 3200,
+    target: 9000,
+    targetDate: "Apr 2027",
+  },
+  {
+    id: "giving",
+    name: "Charitable giving fund",
+    category: "other",
+    current: 2000,
+    target: 10000,
+  },
 ]
 
 export type Activity = {
@@ -194,7 +368,9 @@ export const suggestedPrompts: string[] = [
   "How would a $120k home purchase affect my plan?",
 ]
 
-/** Percent helper for goals. */
-export function goalPct(goal: Goal) {
-  return Math.round((goal.current / goal.target) * 100)
+/** Percent funded for a goal, clamped to 0–100 and safe when target is 0. */
+export function goalPct(goal: Pick<Goal, "current" | "target">) {
+  if (!(goal.target > 0)) return 0
+  const pct = Math.round((goal.current / goal.target) * 100)
+  return Math.max(0, Math.min(100, pct))
 }

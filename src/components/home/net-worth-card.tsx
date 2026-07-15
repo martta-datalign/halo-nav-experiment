@@ -21,6 +21,7 @@ import {
   NET_WORTH,
   NET_WORTH_AS_OF,
   netWorthSeries,
+  unconnectedFormBalances,
   type RangeKey,
 } from "@/lib/data"
 import { formatCompactUSD, formatUSD } from "@/lib/format"
@@ -53,8 +54,13 @@ export function NetWorthCard() {
   // Assets vs debts — derived from accounts so they reconcile with net worth.
   const assetAccounts = accounts.filter((a) => a.balance > 0)
   const debtAccounts = accounts.filter((a) => a.balance < 0)
-  const totalAssets = assetAccounts.reduce((s, a) => s + a.balance, 0)
+  const formAssets = unconnectedFormBalances.filter((item) => item.side === "asset")
+  const formLiabilities = unconnectedFormBalances.filter((item) => item.side === "liability")
+  const totalAssets =
+    assetAccounts.reduce((s, a) => s + a.balance, 0) +
+    formAssets.reduce((s, item) => s + item.amount, 0)
   const totalDebts = debtAccounts.reduce((s, a) => s + Math.abs(a.balance), 0)
+    + formLiabilities.reduce((s, item) => s + item.amount, 0)
 
   const showAnalytics = range === "3M" || range === "YTD" || range === "ALL"
   const chartData = points.map((p, i) => ({
@@ -87,7 +93,7 @@ export function NetWorthCard() {
             {formatUSD(totalAssets)}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Across {assetAccounts.length} account{assetAccounts.length === 1 ? "" : "s"}
+            {assetAccounts.length} connected · {formAssets.length} estimated from form
           </p>
         </div>
         <div>
@@ -96,7 +102,7 @@ export function NetWorthCard() {
             {formatUSD(totalDebts)}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Across {debtAccounts.length} account{debtAccounts.length === 1 ? "" : "s"}
+            {debtAccounts.length} connected{formLiabilities.length > 0 ? ` · ${formLiabilities.length} estimated from form` : ""}
           </p>
         </div>
       </div>

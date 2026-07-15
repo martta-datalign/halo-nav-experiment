@@ -301,7 +301,7 @@ export function EmptyResult({
 
       {/* Prompt — centered horizontally and vertically. */}
       <div className="relative flex max-w-[300px] flex-col items-center text-center">
-        <span className="flex size-11 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-sm ring-1 ring-border">
+        <span className="calculator-result-disclosure-icon flex size-11 items-center justify-center rounded-xl bg-background text-muted-foreground shadow-sm ring-1 ring-border">
           <RiBarChart2Line className="size-5" />
         </span>
         <p className="mt-4 text-sm font-medium text-foreground">Your results will appear here</p>

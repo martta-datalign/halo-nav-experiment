@@ -3,9 +3,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
   RiBuilding2Line,
   RiArrowDownSLine,
-  RiExpandUpDownLine,
   RiFileTextLine,
   RiHome5Line,
+  RiQuestionLine,
   RiShieldCheckLine,
   RiSparkling2Line,
   RiTeamLine,
@@ -87,7 +87,6 @@ export function AppSidebar() {
               Powered by Datalign
             </span>
           </span>
-          <RiExpandUpDownLine className="size-3.5 shrink-0 text-muted-foreground" />
         </button>
         <SidebarTrigger className="size-8 shrink-0 text-muted-foreground" />
       </SidebarHeader>
@@ -126,6 +125,18 @@ export function AppSidebar() {
       <SidebarFooter className="gap-2">
         <ConnectAccountsBanner />
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={isActive(pathname, "/faq")}
+              tooltip="FAQ"
+            >
+              <Link to="/faq" onClick={closeMobile}>
+                <RiQuestionLine />
+                <span>FAQ</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild

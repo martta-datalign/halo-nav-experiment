@@ -1,6 +1,7 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
 
 import { formatUSD } from "@/lib/format"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import {
   computeMortgage,
   mortgageDefaults,
@@ -119,6 +120,7 @@ export function MortgageForm({
 }
 
 export function MortgageResultView({ result }: { result: MortgageResult }) {
+  const reducedMotion = useReducedMotion()
   const slices = [
     { name: "Principal & Interest", value: result.monthlyPI },
     { name: "Property tax", value: result.monthlyTax },
@@ -140,7 +142,7 @@ export function MortgageResultView({ result }: { result: MortgageResult }) {
       <ResultPanel>
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5">
           <div className="relative h-[168px] w-[168px] shrink-0">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={slices}
@@ -150,7 +152,10 @@ export function MortgageResultView({ result }: { result: MortgageResult }) {
                   outerRadius={78}
                   paddingAngle={1.5}
                   stroke="none"
-                  isAnimationActive={false}
+                  isAnimationActive={!reducedMotion}
+                  animationBegin={180}
+                  animationDuration={900}
+                  animationEasing="ease-out"
                 >
                   {slices.map((_, i) => (
                     <Cell key={i} fill={SLICE_COLORS[i % SLICE_COLORS.length]} />

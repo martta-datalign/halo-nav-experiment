@@ -146,16 +146,10 @@ function CalculatorDialog({
 }) {
   const Icon = calc.icon
   const hasResult = calculated != null
-  // Results are shown; but if the draft has changed since they were calculated,
-  // flag that the displayed numbers are stale.
-  const stale = React.useMemo(
-    () => hasResult && JSON.stringify(inputs) !== JSON.stringify(calculated),
-    [hasResult, inputs, calculated]
-  )
 
   return (
     <DialogContent
-      className="max-h-[92vh] gap-0 overflow-hidden p-0 sm:max-w-3xl lg:max-w-6xl lg:!w-[min(94vw,1200px)]"
+      className="h-[92dvh] max-h-[92dvh] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-3xl lg:h-auto lg:max-h-[92vh] lg:max-w-6xl lg:!w-[min(94vw,1200px)]"
       showCloseButton
     >
       <div className="flex items-start gap-3 border-b border-border px-6 py-5">
@@ -170,28 +164,27 @@ function CalculatorDialog({
 
       {/* On desktop the form column stays put and only the results scroll; on
           mobile the whole body scrolls as one. */}
-      <div className="flex max-h-[calc(92vh-9.5rem)] flex-col overflow-y-auto lg:flex-row lg:overflow-hidden">
+      <div className="flex min-h-0 flex-col overflow-y-auto lg:max-h-[calc(92vh-9.5rem)] lg:flex-row lg:overflow-hidden">
         <div className="min-w-0 px-6 pt-6 pb-4 lg:w-1/2 lg:shrink-0 lg:self-stretch lg:overflow-y-auto">
           <calc.Form inputs={inputs} onChange={onChange} />
         </div>
         <div className="min-w-0 px-6 pb-4 lg:w-1/2 lg:self-stretch lg:overflow-y-auto lg:border-l lg:border-border lg:pt-6">
-          {hasResult ? (
-            <>
-              {stale && (
-                <p className="mb-3 rounded-lg bg-halo-subtle px-3 py-2 text-[12px] leading-relaxed text-halo">
-                  Inputs changed — press{" "}
-                  <span className="font-semibold">{calc.cta}</span> to update these results.
-                </p>
-              )}
-              {/* Results render from the calculated snapshot, not the live draft. */}
-              <calc.Result inputs={calculated} />
-            </>
-          ) : (
-            <EmptyResult
-              cta={calc.cta}
-              preview={<calc.Result inputs={calc.defaults} />}
-            />
-          )}
+          <div
+            key={hasResult ? "calculated" : "empty"}
+            className="calculator-result-disclosure h-full"
+          >
+            {hasResult ? (
+              <>
+                {/* Results render from the calculated snapshot, not the live draft. */}
+                <calc.Result inputs={calculated} />
+              </>
+            ) : (
+              <EmptyResult
+                cta={calc.cta}
+                preview={<calc.Result inputs={calc.defaults} />}
+              />
+            )}
+          </div>
         </div>
       </div>
 

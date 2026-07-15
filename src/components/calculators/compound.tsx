@@ -18,6 +18,7 @@ import {
   type CompoundYearPoint,
 } from "@/lib/calculators"
 import { formatCompactUSD, formatUSD } from "@/lib/format"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { Field, NumberInput, placeholderText, ResultPanel, SelectInput, Stat } from "./fields"
 
 const ph = placeholderText
@@ -126,6 +127,7 @@ export function CompoundForm({
 }
 
 export function CompoundResultView({ result }: { result: CompoundResult }) {
+  const reducedMotion = useReducedMotion()
   const data = sampleSeries(result.series)
 
   return (
@@ -151,7 +153,7 @@ export function CompoundResultView({ result }: { result: CompoundResult }) {
           ))}
         </div>
         <div className="h-[260px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <BarChart data={data} margin={{ left: 4, right: 8, top: 4, bottom: 0 }}>
               <CartesianGrid vertical={false} strokeDasharray="3 4" stroke="var(--border)" />
               <XAxis
@@ -176,7 +178,10 @@ export function CompoundResultView({ result }: { result: CompoundResult }) {
                   dataKey={s.key}
                   stackId="a"
                   fill={s.color}
-                  isAnimationActive={false}
+                  isAnimationActive={!reducedMotion}
+                  animationBegin={180}
+                  animationDuration={720}
+                  animationEasing="ease-out"
                   radius={i === SERIES.length - 1 ? [3, 3, 0, 0] : 0}
                   maxBarSize={40}
                 />

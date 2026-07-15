@@ -158,7 +158,7 @@ export function MoneyFlowCard() {
 
       <div className="mt-3 overflow-x-auto">
         <div className="min-w-[720px]">
-          <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+          <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={0}>
             <Sankey
               key={range}
               data={{ nodes: flow.nodes, links: flow.links }}

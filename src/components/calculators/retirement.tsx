@@ -17,6 +17,7 @@ import {
   type RetirementYearPoint,
 } from "@/lib/calculators"
 import { formatCompactUSD, formatUSD } from "@/lib/format"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 import { Field, NumberInput, placeholderText, ResultPanel, Stat } from "./fields"
 
 const ph = placeholderText
@@ -113,6 +114,7 @@ export function RetirementForm({
 }
 
 export function RetirementResultView({ result }: { result: RetirementResult }) {
+  const reducedMotion = useReducedMotion()
   return (
     <div className="flex flex-col gap-4">
       <ResultPanel>
@@ -139,7 +141,7 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
           </span>
         </div>
         <div className="h-[240px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <AreaChart data={result.series} margin={{ left: 4, right: 8, top: 4, bottom: 0 }}>
               <defs>
                 <linearGradient id="fillRetireBalance" x1="0" y1="0" x2="0" y2="1">
@@ -171,7 +173,10 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
                 stroke={BALANCE_COLOR}
                 strokeWidth={2.5}
                 fill="url(#fillRetireBalance)"
-                isAnimationActive={false}
+                isAnimationActive={!reducedMotion}
+                animationBegin={180}
+                animationDuration={900}
+                animationEasing="ease-out"
                 dot={false}
               />
               <Area
@@ -181,7 +186,10 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
                 strokeWidth={1.5}
                 fill={INVESTMENT_COLOR}
                 fillOpacity={0.18}
-                isAnimationActive={false}
+                isAnimationActive={!reducedMotion}
+                animationBegin={260}
+                animationDuration={820}
+                animationEasing="ease-out"
                 dot={false}
               />
             </AreaChart>

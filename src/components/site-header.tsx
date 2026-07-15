@@ -23,10 +23,12 @@ import { user } from "@/lib/data"
 const TITLES: Record<string, string> = {
   "/": "Dashboard",
   "/ask": "Ask Halo",
+  "/accounts": "My Accounts",
   "/tools": "Financial Tools",
   "/tools/calculators": "Calculators",
   "/tools/goals": "Goals",
   "/advisors": "Advisor Match",
+  "/faq": "FAQ",
   "/disclosures": "Disclosures",
   "/settings": "Settings",
 }
@@ -45,7 +47,7 @@ function useCrumbs() {
 }
 
 /**
- * Per-page top bar. The shell (⌘K, Add accounts, notifications, account menu)
+ * Per-page top bar. The shell (⌘K, Connect accounts, notifications, account menu)
  * is shared, but each page renders its own header and can pass page-specific
  * controls via `actions` — so the top nav isn't global.
  */
@@ -55,6 +57,7 @@ export function SiteHeader({
   showSearch = true,
   hideAccountOnMobile = false,
   hideNotificationsOnMobile = false,
+  hideAddAccounts = false,
 }: {
   actions?: ReactNode
   /** Overrides the route breadcrumb with a specific label (e.g., a chat title). */
@@ -70,6 +73,8 @@ export function SiteHeader({
   hideAccountOnMobile?: boolean
   /** Hide the notifications bell below `md` — same rationale as the account avatar. */
   hideNotificationsOnMobile?: boolean
+  /** Hide the global account-connection shortcut when the page supplies its own. */
+  hideAddAccounts?: boolean
 }) {
   const { ask } = useAskHalo()
   const crumbs = useCrumbs()
@@ -81,7 +86,7 @@ export function SiteHeader({
       <SidebarTrigger className="size-10 text-muted-foreground md:hidden" />
 
       {title !== undefined ? (
-        <span className="min-w-0 truncate text-sm font-medium text-foreground">
+        <span className="min-w-0 truncate text-sm font-medium text-foreground md:absolute md:left-1/2 md:max-w-[40%] md:-translate-x-1/2">
           {title}
         </span>
       ) : (
@@ -130,10 +135,14 @@ export function SiteHeader({
         )}
       >
         {actions}
-        <Button className="hidden gap-1.5 sm:flex">
-          <RiAddLine className="size-4" />
-          Add accounts
-        </Button>
+        {!hideAddAccounts && (
+          <Button asChild className="hidden gap-1.5 sm:flex">
+            <Link to="/accounts">
+              <RiAddLine className="size-4" />
+              Connect accounts
+            </Link>
+          </Button>
+        )}
 
         <Button
           size="icon"
@@ -171,7 +180,9 @@ export function SiteHeader({
               </span>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>My Accounts</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/accounts">My Accounts</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/settings">Settings</Link>

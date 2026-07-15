@@ -1,0 +1,379 @@
+import * as React from "react"
+import type { ElementType } from "react"
+import {
+  RiAddLine,
+  RiBankCardLine,
+  RiBankLine,
+  RiDeleteBinLine,
+  RiExternalLinkLine,
+  RiLineChartLine,
+  RiMore2Line,
+  RiRefreshLine,
+} from "@remixicon/react"
+import { toast } from "sonner"
+
+import { SiteHeader } from "@/components/site-header"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { accounts, type Account, type AccountKind } from "@/lib/data"
+import { formatUSD } from "@/lib/format"
+import { cn } from "@/lib/utils"
+
+const ACCOUNT_ICONS: Record<AccountKind, ElementType> = {
+  bank: RiBankLine,
+  investment: RiLineChartLine,
+  card: RiBankCardLine,
+}
+
+const INSTITUTION_LOGOS: Record<string, string> = {
+  Chase: "/chase.ico",
+  Fidelity: "/fidelity.ico",
+}
+
+function groupByInstitution(accountList: Account[]) {
+  const grouped = new Map<string, Account[]>()
+  for (const account of accountList) {
+    const institutionAccounts = grouped.get(account.institution) ?? []
+    institutionAccounts.push(account)
+    grouped.set(account.institution, institutionAccounts)
+  }
+  return Array.from(grouped, ([institution, institutionAccounts]) => ({
+    institution,
+    accounts: institutionAccounts,
+  }))
+}
+
+export default function Accounts() {
+  const [connectOpen, setConnectOpen] = React.useState(false)
+  const [connectedAccounts, setConnectedAccounts] = React.useState<Account[]>(accounts)
+  const [disconnecting, setDisconnecting] = React.useState<Account | null>(null)
+  const institutions = groupByInstitution(connectedAccounts)
+
+  return (
+    <>
+      <SiteHeader
+        hideAddAccounts
+        actions={
+          <Button
+            className="gap-1.5 max-sm:size-9 max-sm:px-0"
+            aria-label="Connect accounts"
+            onClick={() => setConnectOpen(true)}
+          >
+            <RiAddLine className="size-4" />
+            <span className="max-sm:hidden">Connect accounts</span>
+          </Button>
+        }
+      />
+
+      <div className="mx-auto w-full max-w-[1100px] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-[26px] font-semibold tracking-[-0.02em]">My Accounts</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Manage your connected institutions and accounts.
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
+        </div>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <SummaryCard label="Connected institutions" value={String(institutions.length)} />
+          <SummaryCard label="Connected accounts" value={String(connectedAccounts.length)} />
+          <SummaryCard label="Sync status" value="Up to date" positive />
+        </div>
+
+        <section className="mt-6">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-base font-semibold">Connected institutions</h2>
+            <span className="text-xs text-muted-foreground">
+              Balances sync automatically through Plaid
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {institutions.map((institution) => (
+              <InstitutionCard
+                key={institution.institution}
+                institution={institution.institution}
+                accounts={institution.accounts}
+                onDisconnectAccount={setDisconnecting}
+              />
+            ))}
+          </div>
+        </section>
+
+        <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+          Halo uses Plaid for secure, read-only access to balances and account details; it cannot move money, change your accounts, or see your login credentials.
+        </p>
+      </div>
+
+      <ConnectAccountDialog open={connectOpen} onOpenChange={setConnectOpen} />
+      <DisconnectAccountDialog
+        account={disconnecting}
+        onOpenChange={(open) => !open && setDisconnecting(null)}
+        onConfirm={(account) => {
+          const otherInstitutionAccounts = connectedAccounts.filter(
+            (item) => item.institution === account.institution && item.id !== account.id
+          ).length
+          setConnectedAccounts((current) =>
+            current.filter((item) => item.id !== account.id)
+          )
+          setDisconnecting(null)
+          toast.success(`${account.name} disconnected`, {
+            description:
+              otherInstitutionAccounts > 0
+                ? `${account.institution}'s other accounts remain connected.`
+                : `${account.institution} has no remaining connected accounts.`,
+          })
+        }}
+      />
+    </>
+  )
+}
+
+function SummaryCard({
+  label,
+  value,
+  positive = false,
+}: {
+  label: string
+  value: string
+  positive?: boolean
+}) {
+  return (
+    <Card className="gap-1 p-5">
+      <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+      <p className={cn("text-2xl font-semibold tracking-[-0.02em]", positive && "text-positive")}>
+        {value}
+      </p>
+    </Card>
+  )
+}
+
+function InstitutionCard({
+  institution,
+  accounts,
+  onDisconnectAccount,
+}: {
+  institution: string
+  accounts: Account[]
+  onDisconnectAccount: (account: Account) => void
+}) {
+  const lastUpdated = accounts[0]?.updatedAt
+  const netBalance = accounts.reduce((total, account) => total + account.balance, 0)
+
+  return (
+    <Card className="gap-0 overflow-hidden p-0">
+      <div className="flex items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
+        <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-1.5">
+          <img
+            src={INSTITUTION_LOGOS[institution]}
+            alt=""
+            className="size-full object-contain"
+          />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-[15px] font-semibold">{institution}</h3>
+            <Badge className="border-positive/20 bg-positive/10 text-positive" variant="outline">
+              <span className="size-1.5 rounded-full bg-positive" />
+              Connected
+            </Badge>
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {accounts.length} account{accounts.length === 1 ? "" : "s"} · Last synced {lastUpdated?.toLowerCase()}
+          </p>
+        </div>
+        <div className="hidden text-right sm:block">
+          <p className="text-xs text-muted-foreground">Net balance</p>
+          <p className="mt-0.5 text-sm font-semibold tabular-nums">{formatUSD(netBalance)}</p>
+        </div>
+        <InstitutionMenu institution={institution} />
+      </div>
+
+      <ul className="px-5 sm:px-6">
+        {accounts.map((account) => {
+          const Icon = ACCOUNT_ICONS[account.kind]
+          return (
+            <li
+              key={account.id}
+              className="grid grid-cols-[36px_minmax(0,1fr)_auto_32px] items-center gap-3 border-b border-border py-3.5 last:border-0"
+            >
+              <span className="flex size-9 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
+                <Icon className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">{account.name}</p>
+                <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  {account.typeLabel} · •••• {account.mask}
+                </p>
+              </div>
+              <p
+                className={cn(
+                  "text-right text-sm font-semibold tabular-nums",
+                  account.balance < 0 && "text-negative"
+                )}
+              >
+                {formatUSD(account.balance)}
+              </p>
+              <AccountMenu
+                account={account}
+                onDisconnect={() => onDisconnectAccount(account)}
+              />
+            </li>
+          )
+        })}
+      </ul>
+    </Card>
+  )
+}
+
+function AccountMenu({
+  account,
+  onDisconnect,
+}: {
+  account: Account
+  onDisconnect: () => void
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="icon-sm" variant="ghost" aria-label={`Actions for ${account.name}`}>
+          <RiMore2Line />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuItem
+          variant="destructive"
+          onSelect={onDisconnect}
+          className="whitespace-nowrap"
+        >
+          <RiDeleteBinLine /> Disconnect account
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function InstitutionMenu({ institution }: { institution: string }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="icon-sm" variant="ghost" aria-label={`Actions for ${institution}`}>
+          <RiMore2Line />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuItem
+          onSelect={() => toast.success(`${institution} balances refreshed`, { description: "Balances are up to date." })}
+        >
+          <RiRefreshLine /> Refresh balances
+        </DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => toast.info(`Opening ${institution} connection settings`)}>
+          <RiExternalLinkLine /> Manage connection
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          variant="destructive"
+          onSelect={() => toast.info(`Disconnect ${institution} from connection settings.`)}
+          className="whitespace-nowrap"
+        >
+          <RiDeleteBinLine /> Disconnect institution
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function DisconnectAccountDialog({
+  account,
+  onOpenChange,
+  onConfirm,
+}: {
+  account: Account | null
+  onOpenChange: (open: boolean) => void
+  onConfirm: (account: Account) => void
+}) {
+  return (
+    <Dialog open={account !== null} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Disconnect account?</DialogTitle>
+          <DialogDescription>
+            {account
+              ? `${account.name} •••• ${account.mask} will no longer sync in Halo. Other accounts connected through ${account.institution} won’t be affected.`
+              : "This account will no longer sync in Halo."}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            disabled={!account}
+            onClick={() => account && onConfirm(account)}
+          >
+            Disconnect account
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function ConnectAccountDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+            <RiBankLine className="size-5" />
+          </span>
+          <DialogTitle>Connect accounts</DialogTitle>
+          <DialogDescription>
+            Connect a financial institution through Plaid to sync eligible account balances automatically.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="rounded-lg border border-border bg-muted/35 p-3 text-xs leading-relaxed text-muted-foreground">
+          You’ll sign in securely with Plaid and choose which accounts to share; Halo receives read-only account data, never your login credentials.
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              onOpenChange(false)
+              toast.success("Plaid connection flow started")
+            }}
+          >
+            Continue to Plaid
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
