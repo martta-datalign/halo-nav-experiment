@@ -7,6 +7,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { AskHaloProvider } from "@/components/ask-halo"
 import Home from "@/routes/home"
 import AskHalo from "@/routes/ask"
+import Calculators from "@/routes/calculators"
 import Placeholder from "@/routes/placeholder"
 
 export default function App() {
@@ -28,15 +29,7 @@ export default function App() {
                     />
                   }
                 />
-                <Route
-                  path="/tools/calculators"
-                  element={
-                    <Placeholder
-                      title="Calculators"
-                      description="Retirement, savings, and scenario calculators. Coming in a later pass."
-                    />
-                  }
-                />
+                <Route path="/tools/calculators" element={<Calculators />} />
                 <Route
                   path="/tools/goals"
                   element={
