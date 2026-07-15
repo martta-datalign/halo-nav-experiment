@@ -273,7 +273,9 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <RiLayoutLeftLine />
+      {/* Larger glyph on mobile (touch), 16px on desktop — matches the other
+          mobile nav icons. */}
+      <RiLayoutLeftLine className="size-5 md:size-4" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

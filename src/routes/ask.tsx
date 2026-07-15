@@ -1,9 +1,15 @@
 import * as React from "react"
 import { useSearchParams } from "react-router-dom"
-import { RiArrowUpLine, RiCheckLine, RiFileCopyLine, RiAddLine, RiSparkling2Line, RiThumbDownLine, RiThumbUpLine, RiSafe2Line } from "@remixicon/react"
+import { RiArrowUpLine, RiCheckLine, RiFileCopyLine, RiAddLine, RiSparkling2Line, RiThumbDownLine, RiThumbUpLine, RiSafe2Line, RiChatHistoryLine } from "@remixicon/react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 import {
   Tooltip,
   TooltipContent,
@@ -95,6 +101,8 @@ export default function AskHalo() {
   const [activeId, setActiveId] = React.useState("new")
   const [draft, setDraft] = React.useState("")
   const [vaultOpen, setVaultOpen] = React.useState(false)
+  // Chat history is a desktop <aside>; on mobile it becomes this off-canvas drawer.
+  const [historyOpen, setHistoryOpen] = React.useState(false)
   const [mode, setMode] = React.useState<Mode>("deep")
   const modeRef = React.useRef(mode)
   React.useEffect(() => {
@@ -161,6 +169,7 @@ export default function AskHalo() {
     const id = `new-${newChatCount.current++}`
     setChats((prev) => [{ id, title: "New chat", when: "Now", messages: [] }, ...prev])
     setActiveId(id)
+    setHistoryOpen(false)
   }
 
   // Consume the ?q= deep-link into the active chat (dedupes StrictMode).
@@ -187,55 +196,118 @@ export default function AskHalo() {
 
   const empty = messages.length === 0
 
-  return (
-    <>
-      <SiteHeader title={active.title} showSearch={false} />
-      <div className="flex h-[calc(100svh-3.5rem)]">
-        {/* Chat history */}
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-border md:flex">
+  // Shared body for both the desktop rail and the mobile drawer. Selecting a
+  // chat (or the Vault) also dismisses the drawer; on desktop that's a no-op.
+  // The drawer omits New chat — on mobile it lives in the header instead, so it
+  // doesn't collide with the sheet's close button.
+  function renderHistory({ showNewChat = true }: { showNewChat?: boolean } = {}) {
+    return (
+      <>
+        {showNewChat && (
           <div className="p-3">
             <Button variant="outline" className="w-full justify-start gap-2" onClick={newChat}>
               <RiAddLine className="size-4" />
               New chat
             </Button>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
-            <div className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-[0.05em] text-muted-foreground">
-              Recent
-            </div>
-            {chats
-              .filter((c) => c.messages.length > 0 || c.id === activeId)
-              .map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setActiveId(c.id)}
-                  className={cn(
-                    "flex w-full flex-col gap-0.5 rounded-lg px-2.5 py-2 text-left transition-colors",
-                    c.id === activeId ? "bg-secondary" : "hover:bg-secondary/60"
-                  )}
-                >
-                  <span className="truncate text-[13px] font-medium text-foreground">
-                    {c.title}
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">{c.when}</span>
-                </button>
-              ))}
+        )}
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+          <div className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-[0.05em] text-muted-foreground">
+            Recent
           </div>
-          {/* Vault lives one level down from chat — a utility, not a peer view. */}
-          <div className="border-t border-border p-2">
-            <button
-              type="button"
-              onClick={() => setVaultOpen(true)}
-              className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-secondary/60"
+          {chats
+            .filter((c) => c.messages.length > 0 || c.id === activeId)
+            .map((c) => (
+              <button
+                key={c.id}
+                onClick={() => {
+                  setActiveId(c.id)
+                  setHistoryOpen(false)
+                }}
+                className={cn(
+                  "flex w-full flex-col gap-0.5 rounded-lg px-2.5 py-2 text-left transition-colors",
+                  c.id === activeId ? "bg-secondary" : "hover:bg-secondary/60"
+                )}
+              >
+                <span className="truncate text-[13px] font-medium text-foreground">
+                  {c.title}
+                </span>
+                <span className="text-[11px] text-muted-foreground">{c.when}</span>
+              </button>
+            ))}
+        </div>
+        {/* Vault lives one level down from chat — a utility, not a peer view. */}
+        <div className="border-t border-border p-2">
+          <button
+            type="button"
+            onClick={() => {
+              setVaultOpen(true)
+              setHistoryOpen(false)
+            }}
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors hover:bg-secondary/60"
+          >
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo-subtle text-halo">
+              <RiSafe2Line className="size-4" />
+            </span>
+            <span className="flex-1 text-[13px] font-medium text-foreground">My Vault</span>
+            <span className="text-[11px] text-muted-foreground">{docs.length}</span>
+          </button>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <SiteHeader
+        title={active.title}
+        showSearch={false}
+        // On mobile New chat + history live in the header; hide the avatar and
+        // bell so the row doesn't crowd. Both stay reachable from other pages.
+        hideAccountOnMobile
+        hideNotificationsOnMobile
+        actions={
+          <>
+            <Button
+              size="icon"
+              variant="ghost"
+              // 40px touch target on mobile (36px is tight for fingers); the
+              // glyph stays 16px. Desktop is hidden anyway.
+              className="size-10 text-muted-foreground md:hidden"
+              aria-label="New chat"
+              onClick={newChat}
             >
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo-subtle text-halo">
-                <RiSafe2Line className="size-4" />
-              </span>
-              <span className="flex-1 text-[13px] font-medium text-foreground">My Vault</span>
-              <span className="text-[11px] text-muted-foreground">{docs.length}</span>
-            </button>
-          </div>
+              <RiAddLine className="size-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-10 text-muted-foreground md:hidden"
+              aria-label="Chat history"
+              onClick={() => setHistoryOpen(true)}
+            >
+              <RiChatHistoryLine className="size-5" />
+            </Button>
+          </>
+        }
+      />
+      <div className="flex h-[calc(100svh-3.5rem)]">
+        {/* Chat history — desktop rail. On mobile this collapses into the Sheet below. */}
+        <aside className="hidden w-64 shrink-0 flex-col border-r border-border md:flex">
+          {renderHistory()}
         </aside>
+
+        {/* Chat history — mobile off-canvas drawer, mirroring the main-nav sidebar pattern. */}
+        <Sheet open={historyOpen} onOpenChange={setHistoryOpen}>
+          {/* pt clears the sheet's absolute close (✕) button so it doesn't
+              overlap the first recent item. */}
+          <SheetContent side="left" className="w-72 gap-0 p-0 pt-6 md:hidden">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Chat history</SheetTitle>
+            </SheetHeader>
+            {renderHistory({ showNewChat: false })}
+          </SheetContent>
+        </Sheet>
 
         {/* Conversation */}
         <div className="flex min-w-0 flex-1 flex-col">
@@ -380,7 +452,9 @@ function HaloMessage({ text }: { text: string }) {
   function copy() {
     navigator.clipboard?.writeText(text).catch(() => {})
     setCopied(true)
-    window.setTimeout(() => setCopied(false), 1500)
+    // Confirmation flips in instantly (a plain icon swap, no fade) and clears
+    // quickly — long enough to register, short enough to feel snappy.
+    window.setTimeout(() => setCopied(false), 1000)
   }
 
   function setVoteTo(v: "up" | "down") {
@@ -402,7 +476,7 @@ function HaloMessage({ text }: { text: string }) {
         <div className="mt-2 flex items-center gap-0.5">
           <ActionButton label={copied ? "Copied" : "Copy"} onClick={copy}>
             {copied ? (
-              <RiCheckLine className="size-3.5 text-positive" />
+              <RiCheckLine className="size-3.5 text-foreground" />
             ) : (
               <RiFileCopyLine className="size-3.5" />
             )}

@@ -53,12 +53,23 @@ export function SiteHeader({
   actions,
   title,
   showSearch = true,
+  hideAccountOnMobile = false,
+  hideNotificationsOnMobile = false,
 }: {
   actions?: ReactNode
   /** Overrides the route breadcrumb with a specific label (e.g., a chat title). */
   title?: string
   /** Set false to drop the ⌘K command bar on pages that have their own input. */
   showSearch?: boolean
+  /**
+   * Hide the account avatar below `md`. Used by pages that put their own
+   * primary actions in the header on mobile (e.g. Ask Halo) and would
+   * otherwise crowd the row — the account menu stays reachable from any
+   * other page on mobile.
+   */
+  hideAccountOnMobile?: boolean
+  /** Hide the notifications bell below `md` — same rationale as the account avatar. */
+  hideNotificationsOnMobile?: boolean
 }) {
   const { ask } = useAskHalo()
   const crumbs = useCrumbs()
@@ -67,7 +78,7 @@ export function SiteHeader({
     <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/80 px-3 backdrop-blur-md sm:px-4">
       {/* Desktop collapses via the toggle inside the sidebar; on mobile the
           sidebar is an off-canvas sheet, so it still needs a trigger here. */}
-      <SidebarTrigger className="text-muted-foreground md:hidden" />
+      <SidebarTrigger className="size-10 text-muted-foreground md:hidden" />
 
       {title !== undefined ? (
         <span className="min-w-0 truncate text-sm font-medium text-foreground">
@@ -124,14 +135,27 @@ export function SiteHeader({
           Add accounts
         </Button>
 
-        <Button size="icon" variant="ghost" className="relative text-muted-foreground" aria-label="Notifications">
-          <RiNotification3Line className="size-4" />
+        <Button
+          size="icon"
+          variant="ghost"
+          className={cn(
+            "relative size-10 text-muted-foreground md:size-9",
+            hideNotificationsOnMobile && "max-md:hidden"
+          )}
+          aria-label="Notifications"
+        >
+          <RiNotification3Line className="size-5 md:size-4" />
           <span className="absolute right-2 top-2 size-1.5 rounded-full bg-negative ring-2 ring-background" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+            <button
+              className={cn(
+                "rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                hideAccountOnMobile && "max-md:hidden"
+              )}
+            >
               <Avatar className="size-8">
                 <AvatarFallback className="bg-secondary text-[12px] font-semibold text-muted-foreground">
                   {user.initials}
