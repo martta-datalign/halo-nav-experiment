@@ -147,7 +147,7 @@ export function NetWorthCard() {
         </AreaChart>
       </ChartContainer>
 
-      <div className="mt-4 flex items-center justify-between gap-2">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-1">
           {RANGES.map((r) => (
             <button

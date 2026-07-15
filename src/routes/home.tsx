@@ -112,7 +112,7 @@ export default function Home() {
 
       {subtab === "Overview" ? (
         <div className="mt-6 grid gap-5 lg:grid-cols-3">
-          <div className="flex flex-col gap-5 lg:col-span-2">
+          <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
             <NetWorthCard />
             {(visible.accounts || visible.goals) && (
               <div className="grid gap-5 sm:grid-cols-2">
@@ -123,7 +123,7 @@ export default function Home() {
             {visible.activity && <ActivityCard />}
           </div>
 
-          <div className="flex flex-col gap-5">
+          <div className="flex min-w-0 flex-col gap-5">
             {visible.analysis && <AnalysisCard onDismiss={() => toggle("analysis")} />}
             {visible.insights && <InsightsCard onDismiss={() => toggle("insights")} />}
             {visible.actionable && (
