@@ -258,7 +258,7 @@ export const goals: Goal[] = [
     category: "financial-security",
     current: 18000,
     target: 25000,
-    targetDate: "Mar 2027",
+    targetDate: "2027-03-01",
   },
   {
     id: "loans",
@@ -266,7 +266,7 @@ export const goals: Goal[] = [
     category: "financial-security",
     current: 14000,
     target: 22000,
-    targetDate: "Dec 2027",
+    targetDate: "2027-12-01",
   },
   {
     id: "home",
@@ -274,7 +274,7 @@ export const goals: Goal[] = [
     category: "life-milestone",
     current: 49200,
     target: 120000,
-    targetDate: "Jun 2028",
+    targetDate: "2028-06-01",
   },
   {
     id: "wedding",
@@ -282,7 +282,7 @@ export const goals: Goal[] = [
     category: "life-milestone",
     current: 12500,
     target: 40000,
-    targetDate: "Sep 2027",
+    targetDate: "2027-09-20",
   },
   {
     id: "car",
@@ -297,7 +297,7 @@ export const goals: Goal[] = [
     category: "experience",
     current: 3200,
     target: 9000,
-    targetDate: "Apr 2027",
+    targetDate: "2027-04-10",
   },
   {
     id: "giving",

@@ -311,6 +311,36 @@
   animation: calculator-result-icon-disclosure 380ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
 }
 
+/* `vh` is the fallback for older iOS Safari; dynamic viewport units prevent
+   the browser chrome from covering fixed dialog actions on current Safari. */
+@media (max-width: 1023px) {
+  .calculator-dialog-viewport {
+    height: 92vh;
+    max-height: 92vh;
+  }
+
+  @supports (height: 100dvh) {
+    .calculator-dialog-viewport {
+      height: 92dvh;
+      max-height: 92dvh;
+    }
+  }
+}
+
+@media (max-width: 639px) {
+  .goal-dialog-viewport {
+    height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+
+  @supports (height: 100dvh) {
+    .goal-dialog-viewport {
+      height: calc(100dvh - 2rem);
+      max-height: calc(100dvh - 2rem);
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .calculator-result-disclosure,
   .calculator-result-disclosure-icon {

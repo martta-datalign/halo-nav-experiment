@@ -2,6 +2,8 @@ import * as React from "react"
 import type { ElementType } from "react"
 import {
   RiAddLine,
+  RiCalendar2Line,
+  RiCloseLine,
   RiDeleteBinLine,
   RiFlag2Line,
   RiHeart3Line,
@@ -15,6 +17,7 @@ import { toast } from "sonner"
 
 import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import { Card } from "@/components/ui/card"
 import {
   Dialog,
@@ -32,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Field, NumberInput, SelectInput } from "@/components/calculators/fields"
 import {
   goalCategoryMeta,
@@ -41,7 +45,14 @@ import {
   type Goal,
   type GoalCategory,
 } from "@/lib/data"
-import { formatUSD } from "@/lib/format"
+import {
+  formatGoalDate,
+  formatUSD,
+  isoToMDY,
+  mdyToISO,
+  parseISODate,
+  toISODate,
+} from "@/lib/format"
 import { cn } from "@/lib/utils"
 
 /** Per-category icon + accent colour (accent drives the icon tint + progress bar). */
@@ -82,10 +93,6 @@ export default function Goals() {
   const [editing, setEditing] = React.useState<Goal | "new" | null>(null)
   const [deleting, setDeleting] = React.useState<Goal | null>(null)
 
-  const totalSaved = goals.reduce((sum, g) => sum + (g.current || 0), 0)
-  const totalTarget = goals.reduce((sum, g) => sum + (g.target || 0), 0)
-  const overallPct = goalPct({ current: totalSaved, target: totalTarget })
-
   const byCategory = GOAL_CATEGORY_ORDER.map((category) => ({
     category,
     goals: goals.filter((g) => g.category === category),
@@ -113,36 +120,25 @@ export default function Goals() {
 
   return (
     <>
-      <SiteHeader
-        actions={
+      <SiteHeader />
+
+      <div className="mx-auto w-full max-w-[1240px] px-4 py-6 sm:px-6 lg:px-8 xl:max-w-[1440px]">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Goals</h1>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+              Set what you're saving toward, track how far you've come, and keep the
+              amount you've saved so far up to date.
+            </p>
+          </div>
           <Button
-            className="gap-1.5 max-sm:size-9 max-sm:px-0"
+            className="shrink-0 gap-1.5 max-sm:size-9 max-sm:px-0"
             aria-label="Add goal"
             onClick={() => setEditing("new")}
           >
             <RiAddLine className="size-4" />
             <span className="max-sm:hidden">Add goal</span>
           </Button>
-        }
-      />
-
-      <div className="mx-auto w-full max-w-[1240px] px-4 py-6 sm:px-6 lg:px-8 xl:max-w-[1440px]">
-        <div className="min-w-0">
-          <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Goals</h1>
-          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-            Set what you're saving toward, track how far you've come, and keep the
-            amount you've saved so far up to date.
-          </p>
-        </div>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <SummaryCard label="Total saved" value={formatUSD(totalSaved)} />
-          <SummaryCard label="Total target" value={formatUSD(totalTarget)} />
-          <SummaryCard
-            label="Overall progress"
-            value={`${overallPct}%`}
-            hint={`${goals.length} active goal${goals.length === 1 ? "" : "s"}`}
-          />
         </div>
 
         {byCategory.length === 0 ? (
@@ -182,24 +178,6 @@ export default function Goals() {
   )
 }
 
-function SummaryCard({
-  label,
-  value,
-  hint,
-}: {
-  label: string
-  value: string
-  hint?: string
-}) {
-  return (
-    <Card className="gap-1 p-5">
-      <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
-      <p className="text-2xl font-semibold tracking-[-0.02em] tabular-nums">{value}</p>
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
-    </Card>
-  )
-}
-
 function CategorySection({
   category,
   goals,
@@ -213,8 +191,6 @@ function CategorySection({
 }) {
   const meta = goalCategoryMeta[category]
   const { icon: Icon, accent } = CATEGORY_STYLE[category]
-  const saved = goals.reduce((sum, g) => sum + (g.current || 0), 0)
-  const target = goals.reduce((sum, g) => sum + (g.target || 0), 0)
 
   return (
     <section>
@@ -226,17 +202,8 @@ function CategorySection({
           <Icon className="size-4.5" />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{meta.label}</h2>
-            <span className="text-xs text-muted-foreground">
-              {goals.length} goal{goals.length === 1 ? "" : "s"}
-            </span>
-          </div>
-          <p className="truncate text-xs text-muted-foreground">{meta.description}</p>
+          <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{meta.label}</h2>
         </div>
-        <p className="hidden shrink-0 text-right text-xs text-muted-foreground tabular-nums sm:block">
-          {formatUSD(saved)} of {formatUSD(target)}
-        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -292,7 +259,7 @@ function GoalCard({
             {goal.name}
           </h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {goal.targetDate ? `Target ${goal.targetDate}` : "No target date"}
+            {goal.targetDate ? `Target ${formatGoalDate(goal.targetDate)}` : "No target date"}
           </p>
         </div>
         <GoalMenu onEdit={onEdit} onDelete={onDelete} name={goal.name} />
@@ -365,6 +332,133 @@ function GoalMenu({
   )
 }
 
+/** Auto-insert slashes as digits are typed → up to `mm/dd/yyyy`. */
+function maskMDY(raw: string) {
+  const d = raw.replace(/\D/g, "").slice(0, 8)
+  if (d.length <= 2) return d
+  if (d.length <= 4) return `${d.slice(0, 2)}/${d.slice(2)}`
+  return `${d.slice(0, 2)}/${d.slice(2, 4)}/${d.slice(4)}`
+}
+
+/**
+ * Target-date field: type a date directly as `mm/dd/yyyy`, or pick one from the
+ * calendar popover. Both paths commit an ISO `YYYY-MM-DD` string (empty = unset).
+ * A live text buffer lets partial input read naturally while typing; on blur it
+ * snaps back to the committed value so invalid fragments never linger.
+ */
+function DateField({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (iso: string) => void
+}) {
+  const [open, setOpen] = React.useState(false)
+  const [text, setText] = React.useState(() => isoToMDY(value))
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const focused = React.useRef(false)
+  // Desired caret position expressed as "after N digits", restored post-render
+  // so auto-inserted slashes don't scramble the caret while typing/editing.
+  const caretDigits = React.useRef<number | null>(null)
+  const selected = value ? parseISODate(value) : undefined
+
+  // Reflect external changes (calendar pick, reset) unless mid-edit.
+  React.useEffect(() => {
+    if (!focused.current) setText(isoToMDY(value))
+  }, [value])
+
+  React.useLayoutEffect(() => {
+    const target = caretDigits.current
+    caretDigits.current = null
+    const el = inputRef.current
+    if (target == null || !el || !focused.current) return
+    let seen = 0
+    let idx = text.length
+    if (target === 0) idx = 0
+    else {
+      for (let i = 0; i < text.length; i++) {
+        if (text.charCodeAt(i) >= 48 && text.charCodeAt(i) <= 57) {
+          seen++
+          if (seen === target) {
+            idx = i + 1
+            break
+          }
+        }
+      }
+    }
+    el.setSelectionRange(idx, idx)
+  }, [text])
+
+  function handleInput(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value
+    const caret = e.target.selectionStart ?? raw.length
+    caretDigits.current = raw.slice(0, caret).replace(/\D/g, "").length
+    const masked = maskMDY(raw)
+    setText(masked)
+    if (masked === "") {
+      onChange("")
+      return
+    }
+    const iso = mdyToISO(masked)
+    if (iso) onChange(iso)
+  }
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <div
+        className={cn(
+          "flex h-9 w-full items-center rounded-md border border-input bg-transparent text-sm shadow-xs transition-[color,box-shadow]",
+          "focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 dark:bg-input/30"
+        )}
+      >
+        <input
+          ref={inputRef}
+          id="goal-date"
+          inputMode="numeric"
+          placeholder="mm/dd/yyyy"
+          value={text}
+          onChange={handleInput}
+          onFocus={() => (focused.current = true)}
+          onBlur={() => {
+            focused.current = false
+            caretDigits.current = null
+            setText(isoToMDY(value))
+          }}
+          className="h-full min-w-0 flex-1 bg-transparent pl-3 py-1 tabular-nums outline-none placeholder:font-normal placeholder:text-muted-foreground/45"
+        />
+        {value && (
+          <button
+            type="button"
+            aria-label="Clear date"
+            className="px-1 text-muted-foreground/70 transition-colors hover:text-foreground"
+            onClick={() => onChange("")}
+          >
+            <RiCloseLine className="size-3.5" />
+          </button>
+        )}
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            aria-label="Open calendar"
+            className="flex h-full items-center px-2.5 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <RiCalendar2Line className="size-4" />
+          </button>
+        </PopoverTrigger>
+      </div>
+      <PopoverContent align="end" className="w-auto">
+        <Calendar
+          selected={selected}
+          onSelect={(date) => {
+            onChange(toISODate(date))
+            setOpen(false)
+          }}
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 function GoalDialog({
   open,
   goal,
@@ -407,7 +501,7 @@ function GoalDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="h-[calc(100dvh-2rem)] max-h-[calc(100dvh-2rem)] grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden sm:h-auto sm:max-w-md">
+      <DialogContent className="goal-dialog-viewport grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden sm:h-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{goal ? "Edit goal" : "Add a goal"}</DialogTitle>
           <DialogDescription>
@@ -469,14 +563,12 @@ function GoalDialog({
 
           <Field
             label="Target date"
-            hint="Optional — a month/year you'd like to reach this by."
+            hint="Optional — the date you'd like to reach this by."
             htmlFor="goal-date"
           >
-            <Input
-              id="goal-date"
-              placeholder="e.g. Jun 2028"
+            <DateField
               value={draft.targetDate}
-              onChange={(e) => set("targetDate", e.target.value)}
+              onChange={(v) => set("targetDate", v)}
             />
           </Field>
 

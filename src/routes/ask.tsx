@@ -397,7 +397,7 @@ export default function AskHalo() {
                       }
                     }}
                     aria-label="Chat title"
-                    className="h-7 w-full min-w-0 rounded-md border border-ring bg-background px-2 text-[13px] outline-none ring-2 ring-ring/15"
+                    className="h-7 w-full min-w-0 rounded-md border border-ring bg-background px-2 text-base outline-none ring-2 ring-ring/15 md:text-[13px]"
                   />
                 </form>
               ) : (
@@ -429,7 +429,7 @@ export default function AskHalo() {
                         <RiMore2Line className="size-4" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="right" align="start" className="w-36">
+                    <DropdownMenuContent side="bottom" align="end" className="w-36">
                       <DropdownMenuItem onSelect={() => startRenaming(c)}>
                         <RiPencilLine />
                         Rename
@@ -557,7 +557,7 @@ export default function AskHalo() {
           </div>
 
           <div className="bg-background/80 backdrop-blur-md">
-            <div className="mx-auto w-full max-w-3xl px-4 pb-3 pt-2 sm:px-6">
+            <div className="mx-auto w-full max-w-3xl px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
               <div className="mb-2 flex w-fit rounded-lg bg-secondary p-0.5 text-[12px]">
                 {(["simple", "deep"] as const).map((m) => (
                   <Tooltip key={m} delayDuration={500}>
@@ -611,7 +611,7 @@ export default function AskHalo() {
                       }}
                       rows={1}
                       placeholder="Ask me anything about your finances"
-                      className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-sm leading-relaxed outline-none placeholder:text-muted-foreground"
+                      className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-base leading-relaxed outline-none placeholder:text-muted-foreground md:text-sm"
                     />
                     <Button
                       type="submit"

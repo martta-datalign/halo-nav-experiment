@@ -149,7 +149,7 @@ function CalculatorDialog({
 
   return (
     <DialogContent
-      className="h-[92dvh] max-h-[92dvh] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-3xl lg:h-auto lg:max-h-[92vh] lg:max-w-6xl lg:!w-[min(94vw,1200px)]"
+      className="calculator-dialog-viewport grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-3xl lg:h-auto lg:max-h-[92vh] lg:max-w-6xl lg:!w-[min(94vw,1200px)]"
       showCloseButton
     >
       <div className="flex items-start gap-3 border-b border-border px-6 py-5">

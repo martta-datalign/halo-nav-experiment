@@ -11,8 +11,16 @@ export function useReducedMotion() {
     const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY)
     const updatePreference = () => setReducedMotion(mediaQuery.matches)
 
-    mediaQuery.addEventListener("change", updatePreference)
-    return () => mediaQuery.removeEventListener("change", updatePreference)
+    // Safari versions before MediaQueryList adopted EventTarget use the
+    // legacy listener API. Keep the fallback so motion preferences still
+    // update without requiring a reload on older iOS devices.
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", updatePreference)
+      return () => mediaQuery.removeEventListener("change", updatePreference)
+    }
+
+    mediaQuery.addListener(updatePreference)
+    return () => mediaQuery.removeListener(updatePreference)
   }, [])
 
   return reducedMotion
