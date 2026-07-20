@@ -4,7 +4,7 @@ An AI-native rethink of Datalign's Halo AI, moving navigation from the top bar t
 persistent side nav so the Ask Halo conversation gets the full canvas. Same
 functionality as the current product — a UX/IA enhancement.
 
-**Design voice:** Mercury / Willow — refined, minimal, typographic. White content
+**Design voice:**  refined, minimal, typographic. White content
 surface with a faint-blue sidebar, hairline borders, near-black primary buttons, and
 a restrained violet "Halo" accent reserved for AI affordances. Font: Instrument Sans.
 
