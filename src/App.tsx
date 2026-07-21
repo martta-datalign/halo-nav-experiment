@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
 import { AppSidebar } from "@/components/app-sidebar"
+import { AccountsProvider } from "@/components/accounts-provider"
 import { AskHaloProvider } from "@/components/ask-halo"
 import Home from "@/routes/home"
 import AskHalo from "@/routes/ask"
@@ -15,11 +16,12 @@ import Placeholder from "@/routes/placeholder"
 export default function App() {
   return (
     <TooltipProvider delayDuration={200}>
-      <AskHaloProvider>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset className="min-w-0">
-            <Routes>
+      <AccountsProvider>
+        <AskHaloProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset className="min-w-0">
+              <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/accounts" element={<Accounts />} />
               <Route path="/ask" element={<AskHalo />} />
@@ -71,11 +73,12 @@ export default function App() {
                 }
               />
               <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </SidebarInset>
-        </SidebarProvider>
-        <Toaster />
-      </AskHaloProvider>
+              </Routes>
+            </SidebarInset>
+          </SidebarProvider>
+          <Toaster />
+        </AskHaloProvider>
+      </AccountsProvider>
     </TooltipProvider>
   )
 }

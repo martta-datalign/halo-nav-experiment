@@ -109,6 +109,7 @@ export type Account = {
   id: string
   name: string
   kind: AccountKind
+  source?: "connected" | "manual"
   institution: string
   typeLabel: string
   mask: string

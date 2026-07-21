@@ -1,10 +1,13 @@
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { RiNotification3Line, RiAddLine, RiSparkling2Line } from "@remixicon/react"
 
 import { cn } from "@/lib/utils"
+import { ConnectAccountDialog } from "@/components/connect-account-dialog"
+import { useAccounts } from "@/components/accounts-provider"
 import { Button } from "@/components/ui/button"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   Avatar,
   AvatarFallback,
@@ -77,10 +80,12 @@ export function SiteHeader({
   hideAddAccounts?: boolean
 }) {
   const { ask } = useAskHalo()
+  const { addAccount } = useAccounts()
   const crumbs = useCrumbs()
+  const [connectOpen, setConnectOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/80 px-3 backdrop-blur-md sm:px-4">
+    <header className="site-header sticky top-0 z-20 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/80 px-3 backdrop-blur-md sm:px-4">
       {/* Desktop collapses via the toggle inside the sidebar; on mobile the
           sidebar is an off-canvas sheet, so it still needs a trigger here. */}
       <SidebarTrigger className="size-10 text-muted-foreground md:hidden" />
@@ -93,17 +98,18 @@ export function SiteHeader({
         // Breadcrumb is desktop-only; on mobile the page owns its own title.
         <nav
           aria-label="Breadcrumb"
-          className="hidden min-w-0 items-center gap-1.5 text-sm md:flex"
+          className="hidden min-w-0 flex-1 items-center gap-1.5 overflow-hidden text-sm md:flex"
         >
           {crumbs.map((c, i) => (
-            <span key={i} className="flex items-center gap-1.5">
+            <span key={i} className="flex min-w-0 items-center gap-1.5">
               {i > 0 && <span className="text-border">/</span>}
               <span
-                className={
+                className={cn(
+                  "block truncate",
                   i === crumbs.length - 1
                     ? "font-medium text-foreground"
                     : "text-muted-foreground"
-                }
+                )}
               >
                 {c.label}
               </span>
@@ -118,7 +124,7 @@ export function SiteHeader({
         <button
           type="button"
           onClick={() => ask()}
-          className="group flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 text-left text-muted-foreground shadow-xs transition-colors hover:border-halo-border hover:bg-halo-subtle/40 md:ml-auto md:w-96 md:flex-none"
+          className="group flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg border border-border bg-card px-3 text-left text-muted-foreground shadow-xs transition-colors hover:border-halo-border hover:bg-halo-subtle/40 md:ml-auto md:w-72 md:flex-none lg:w-80 2xl:w-96"
         >
           <RiSparkling2Line className="size-4 shrink-0 text-halo" />
           <span className="truncate text-[13px]">Ask Halo anything…</span>
@@ -136,12 +142,21 @@ export function SiteHeader({
       >
         {actions}
         {!hideAddAccounts && (
-          <Button asChild className="hidden gap-1.5 sm:flex">
-            <Link to="/accounts">
-              <RiAddLine className="size-4" />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="header-responsive-action hidden gap-1.5 sm:flex"
+                aria-label="Connect accounts"
+                onClick={() => setConnectOpen(true)}
+              >
+                <RiAddLine className="size-4" />
+                <span className="header-action-label">Connect accounts</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent portalled={false} side="bottom" sideOffset={8} className="header-action-tooltip">
               Connect accounts
-            </Link>
-          </Button>
+            </TooltipContent>
+          </Tooltip>
         )}
 
         <Button
@@ -192,6 +207,12 @@ export function SiteHeader({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <ConnectAccountDialog
+        open={connectOpen}
+        onOpenChange={setConnectOpen}
+        onAccountAdded={addAccount}
+      />
     </header>
   )
 }

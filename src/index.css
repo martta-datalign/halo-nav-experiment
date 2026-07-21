@@ -171,6 +171,39 @@
   }
 }
 
+/* Header actions respond to the space left after the sidebar, not the viewport.
+   This keeps compact desktop shells from crowding the Ask Halo field. */
+.site-header {
+  container: site-header / inline-size;
+}
+
+.header-action-tooltip {
+  display: none;
+}
+
+@container site-header (max-width: 75rem) {
+  .header-responsive-action {
+    width: 2.25rem;
+    padding-inline: 0;
+  }
+
+  .header-action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .header-action-tooltip {
+    display: block;
+  }
+}
+
 @keyframes halo-thinking-dot {
   0%,
   60%,

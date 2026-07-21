@@ -12,6 +12,8 @@ import {
 } from "@remixicon/react"
 import { toast } from "sonner"
 
+import { ConnectAccountDialog } from "@/components/connect-account-dialog"
+import { useAccounts } from "@/components/accounts-provider"
 import { SiteHeader } from "@/components/site-header"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -31,7 +33,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { accounts, type Account, type AccountKind } from "@/lib/data"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { type Account, type AccountKind } from "@/lib/data"
 import { formatUSD } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
@@ -61,7 +64,7 @@ function groupByInstitution(accountList: Account[]) {
 
 export default function Accounts() {
   const [connectOpen, setConnectOpen] = React.useState(false)
-  const [connectedAccounts, setConnectedAccounts] = React.useState<Account[]>(accounts)
+  const { accounts: connectedAccounts, addAccount, removeAccount } = useAccounts()
   const [disconnecting, setDisconnecting] = React.useState<Account | null>(null)
   const institutions = groupByInstitution(connectedAccounts)
 
@@ -70,14 +73,21 @@ export default function Accounts() {
       <SiteHeader
         hideAddAccounts
         actions={
-          <Button
-            className="gap-1.5 max-sm:size-9 max-sm:px-0"
-            aria-label="Connect accounts"
-            onClick={() => setConnectOpen(true)}
-          >
-            <RiAddLine className="size-4" />
-            <span className="max-sm:hidden">Connect accounts</span>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                className="header-responsive-action gap-1.5 max-sm:size-9 max-sm:px-0"
+                aria-label="Connect accounts"
+                onClick={() => setConnectOpen(true)}
+              >
+                <RiAddLine className="size-4" />
+                <span className="header-action-label max-sm:sr-only">Connect accounts</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent portalled={false} side="bottom" sideOffset={8} className="header-action-tooltip">
+              Connect accounts
+            </TooltipContent>
+          </Tooltip>
         }
       />
 
@@ -86,23 +96,23 @@ export default function Accounts() {
           <div>
             <h1 className="text-[26px] font-semibold tracking-[-0.02em]">My Accounts</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Manage your connected institutions and accounts.
+              Manage connected institutions and manually added accounts.
             </p>
           </div>
           <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <SummaryCard label="Connected institutions" value={String(institutions.length)} />
-          <SummaryCard label="Connected accounts" value={String(connectedAccounts.length)} />
+          <SummaryCard label="Institutions" value={String(institutions.length)} />
+          <SummaryCard label="Accounts" value={String(connectedAccounts.length)} />
           <SummaryCard label="Sync status" value="Up to date" positive />
         </div>
 
         <section className="mt-6">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold">Connected institutions</h2>
+            <h2 className="text-base font-semibold">Accounts</h2>
             <span className="text-xs text-muted-foreground">
-              Balances sync automatically through Plaid
+              Connected balances sync through Plaid; manual balances update here
             </span>
           </div>
 
@@ -119,11 +129,15 @@ export default function Accounts() {
         </section>
 
         <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-          Halo uses Plaid for secure, read-only access to balances and account details; it cannot move money, change your accounts, or see your login credentials.
+          Halo uses Plaid for secure, read-only access to connected balances. Manually added accounts stay under your control and do not sync automatically.
         </p>
       </div>
 
-      <ConnectAccountDialog open={connectOpen} onOpenChange={setConnectOpen} />
+      <ConnectAccountDialog
+        open={connectOpen}
+        onOpenChange={setConnectOpen}
+        onAccountAdded={addAccount}
+      />
       <DisconnectAccountDialog
         account={disconnecting}
         onOpenChange={(open) => !open && setDisconnecting(null)}
@@ -131,13 +145,14 @@ export default function Accounts() {
           const otherInstitutionAccounts = connectedAccounts.filter(
             (item) => item.institution === account.institution && item.id !== account.id
           ).length
-          setConnectedAccounts((current) =>
-            current.filter((item) => item.id !== account.id)
-          )
+          removeAccount(account.id)
           setDisconnecting(null)
-          toast.success(`${account.name} disconnected`, {
+          const manual = account.source === "manual"
+          toast.success(`${account.name} ${manual ? "removed" : "disconnected"}`, {
             description:
-              otherInstitutionAccounts > 0
+              manual
+                ? "The manual account was removed from Halo."
+                : otherInstitutionAccounts > 0
                 ? `${account.institution}'s other accounts remain connected.`
                 : `${account.institution} has no remaining connected accounts.`,
           })
@@ -177,34 +192,43 @@ function InstitutionCard({
 }) {
   const lastUpdated = accounts[0]?.updatedAt
   const netBalance = accounts.reduce((total, account) => total + account.balance, 0)
+  const manualGroup = accounts.every((account) => account.source === "manual")
+  const institutionLogo = INSTITUTION_LOGOS[institution]
 
   return (
     <Card className="gap-0 overflow-hidden p-0">
       <div className="flex items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
         <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-1.5">
-          <img
-            src={INSTITUTION_LOGOS[institution]}
-            alt=""
-            className="size-full object-contain"
-          />
+          {institutionLogo ? (
+            <img src={institutionLogo} alt="" className="size-full object-contain" />
+          ) : (
+            <RiBankLine className="size-5 text-muted-foreground" />
+          )}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-[15px] font-semibold">{institution}</h3>
-            <Badge className="border-positive/20 bg-positive/10 text-positive" variant="outline">
-              <span className="size-1.5 rounded-full bg-positive" />
-              Connected
+            <Badge
+              className={cn(
+                manualGroup
+                  ? "border-halo-border bg-halo-subtle text-halo"
+                  : "border-positive/20 bg-positive/10 text-positive"
+              )}
+              variant="outline"
+            >
+              <span className={cn("size-1.5 rounded-full", manualGroup ? "bg-halo" : "bg-positive")} />
+              {manualGroup ? "Manual" : "Connected"}
             </Badge>
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {accounts.length} account{accounts.length === 1 ? "" : "s"} · Last synced {lastUpdated?.toLowerCase()}
+            {accounts.length} account{accounts.length === 1 ? "" : "s"} · {manualGroup ? "Added" : "Last synced"} {lastUpdated?.toLowerCase()}
           </p>
         </div>
         <div className="hidden text-right sm:block">
           <p className="text-xs text-muted-foreground">Net balance</p>
           <p className="mt-0.5 text-sm font-semibold tabular-nums">{formatUSD(netBalance)}</p>
         </div>
-        <InstitutionMenu institution={institution} />
+        {!manualGroup && <InstitutionMenu institution={institution} />}
       </div>
 
       <ul className="px-5 sm:px-6">
@@ -221,7 +245,7 @@ function InstitutionCard({
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{account.name}</p>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {account.typeLabel} · •••• {account.mask}
+                  {account.typeLabel} · {account.source === "manual" ? "Manual entry" : `•••• ${account.mask}`}
                 </p>
               </div>
               <p
@@ -251,6 +275,7 @@ function AccountMenu({
   account: Account
   onDisconnect: () => void
 }) {
+  const manual = account.source === "manual"
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -264,7 +289,7 @@ function AccountMenu({
           onSelect={onDisconnect}
           className="whitespace-nowrap"
         >
-          <RiDeleteBinLine /> Disconnect account
+          <RiDeleteBinLine /> {manual ? "Remove account" : "Disconnect account"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -314,10 +339,14 @@ function DisconnectAccountDialog({
     <Dialog open={account !== null} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Disconnect account?</DialogTitle>
+          <DialogTitle>
+            {account?.source === "manual" ? "Remove account?" : "Disconnect account?"}
+          </DialogTitle>
           <DialogDescription>
-            {account
-              ? `${account.name} •••• ${account.mask} will no longer sync in Halo. Other accounts connected through ${account.institution} won’t be affected.`
+            {account?.source === "manual"
+              ? `${account.name} will be removed from Halo. This does not affect any external financial account.`
+              : account
+                ? `${account.name} •••• ${account.mask} will no longer sync in Halo. Other accounts connected through ${account.institution} won’t be affected.`
               : "This account will no longer sync in Halo."}
           </DialogDescription>
         </DialogHeader>
@@ -330,47 +359,7 @@ function DisconnectAccountDialog({
             disabled={!account}
             onClick={() => account && onConfirm(account)}
           >
-            Disconnect account
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
-}
-
-function ConnectAccountDialog({
-  open,
-  onOpenChange,
-}: {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-halo-subtle text-halo">
-            <RiBankLine className="size-5" />
-          </span>
-          <DialogTitle>Connect accounts</DialogTitle>
-          <DialogDescription>
-            Connect a financial institution through Plaid to sync eligible account balances automatically.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="rounded-lg border border-border bg-muted/35 p-3 text-xs leading-relaxed text-muted-foreground">
-          You’ll sign in securely with Plaid and choose which accounts to share; Halo receives read-only account data, never your login credentials.
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              onOpenChange(false)
-              toast.success("Plaid connection flow started")
-            }}
-          >
-            Continue to Plaid
+            {account?.source === "manual" ? "Remove account" : "Disconnect account"}
           </Button>
         </DialogFooter>
       </DialogContent>

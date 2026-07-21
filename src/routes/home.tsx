@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { user } from "@/lib/data"
 import { SiteHeader } from "@/components/site-header"
@@ -162,12 +163,19 @@ function CustomizeMenu({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="gap-1.5">
-          <RiEqualizerLine className="size-4 text-muted-foreground" />
-          Customize
-        </Button>
-      </DropdownMenuTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="header-responsive-action gap-1.5" aria-label="Customize dashboard">
+              <RiEqualizerLine className="size-4 text-muted-foreground" />
+              <span className="header-action-label">Customize</span>
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipTrigger>
+        <TooltipContent portalled={false} side="bottom" sideOffset={8} className="header-action-tooltip">
+          Customize dashboard
+        </TooltipContent>
+      </Tooltip>
       <DropdownMenuContent align="end" className="w-72 p-3">
         <div className="px-1 pb-2">
           <p className="text-sm font-semibold">Customize overview</p>
