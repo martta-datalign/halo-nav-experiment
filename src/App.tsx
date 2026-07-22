@@ -1,3 +1,4 @@
+import * as React from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -6,6 +7,8 @@ import { Toaster } from "@/components/ui/sonner"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AccountsProvider } from "@/components/accounts-provider"
 import { AskHaloProvider } from "@/components/ask-halo"
+import { AdvisorMatchOnboarding } from "@/components/advisor-match-onboarding"
+import type { AdvisorAppointment } from "@/lib/advisor-match"
 import Home from "@/routes/home"
 import AskHalo from "@/routes/ask"
 import Calculators from "@/routes/calculators"
@@ -13,9 +16,25 @@ import Goals from "@/routes/goals"
 import Accounts from "@/routes/accounts"
 import Disclosures from "@/routes/disclosures"
 import FAQ from "@/routes/faq"
+import Advisors from "@/routes/advisors"
 import Placeholder from "@/routes/placeholder"
 
 export default function App() {
+  const [advisorIntroOpen, setAdvisorIntroOpen] = React.useState(true)
+  const [appointment, setAppointment] = React.useState<AdvisorAppointment | null>(null)
+
+  function dismissAdvisorIntro() {
+    setAdvisorIntroOpen(false)
+  }
+
+  function confirmAdvisorAppointment(nextAppointment: AdvisorAppointment) {
+    setAppointment(nextAppointment)
+  }
+
+  function completeAdvisorIntro() {
+    setAdvisorIntroOpen(false)
+  }
+
   return (
     <TooltipProvider delayDuration={200}>
       <AccountsProvider>
@@ -41,9 +60,9 @@ export default function App() {
               <Route
                 path="/advisors"
                 element={
-                  <Placeholder
-                    title="Advisor Match"
-                    description="Get matched with a fiduciary advisor from Barron's top 100. Coming in a later pass."
+                  <Advisors
+                    appointment={appointment}
+                    onOpenMatch={() => setAdvisorIntroOpen(true)}
                   />
                 }
               />
@@ -61,6 +80,13 @@ export default function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </SidebarInset>
+            <AdvisorMatchOnboarding
+              open={advisorIntroOpen}
+              appointment={appointment}
+              onDismiss={dismissAdvisorIntro}
+              onConfirm={confirmAdvisorAppointment}
+              onComplete={completeAdvisorIntro}
+            />
           </SidebarProvider>
           <Toaster />
         </AskHaloProvider>

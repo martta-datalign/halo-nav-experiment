@@ -81,7 +81,7 @@ function ChooseStep({ onSelect }: { onSelect: (mode: Mode) => void }) {
   return (
     <>
       <DialogHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
           <RiBankLine className="size-5" />
         </span>
         <DialogTitle>Connect accounts</DialogTitle>
@@ -123,9 +123,9 @@ function OptionRow({
     <button
       type="button"
       onClick={onClick}
-      className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-colors hover:border-halo-border hover:bg-halo-subtle/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3 text-left transition-[color,background-color,border-color,transform] duration-150 ease-out hover:border-input hover:bg-secondary/40 active:scale-[0.99] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground transition-colors group-hover:bg-halo-subtle group-hover:text-halo">
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground transition-colors group-hover:text-foreground">
         <Icon className="size-[18px]" />
       </span>
       <span className="min-w-0 flex-1">
@@ -149,7 +149,7 @@ function PlaidStep({
   return (
     <>
       <DialogHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
           <RiShieldCheckLine className="size-5" />
         </span>
         <DialogTitle>Connect with Plaid</DialogTitle>
@@ -346,7 +346,7 @@ function AnimatedHeight({
     <div
       aria-hidden={!open}
       className={cn(
-        "overflow-hidden transition-[height,opacity] duration-[340ms] [transition-timing-function:cubic-bezier(0.22,0.61,0.36,1)] motion-reduce:transition-none",
+        "overflow-hidden transition-[height,opacity] duration-[260ms] [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none",
         open ? "opacity-100" : "pointer-events-none opacity-0"
       )}
       style={{ height: open ? height : 0 }}
@@ -431,7 +431,7 @@ function ManualStep({
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <DialogHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
           <RiPencilLine className="size-5" />
         </span>
         <DialogTitle>Add account manually</DialogTitle>
@@ -451,9 +451,9 @@ function ManualStep({
                 onClick={() => selectCategory(index)}
                 aria-pressed={categoryIndex === index}
                 className={cn(
-                  "flex flex-col items-center gap-1.5 rounded-lg border p-2.5 text-center text-xs font-medium leading-tight transition-colors",
+                  "flex flex-col items-center gap-1.5 rounded-lg border p-2.5 text-center text-xs font-medium leading-tight transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
                   categoryIndex === index
-                    ? "border-halo-border bg-halo-subtle/50 text-halo"
+                    ? "border-foreground bg-secondary text-foreground"
                     : "border-border bg-card text-muted-foreground hover:bg-muted/50"
                 )}
               >
@@ -493,7 +493,7 @@ function ManualStep({
             {fields.length > 0 && (
               <div
                 key={`${category?.category}:${type}`}
-                className="grid gap-4 animate-in fade-in-0 duration-300 [animation-timing-function:cubic-bezier(0.22,0.61,0.36,1)] motion-reduce:animate-none"
+                className="grid gap-4 animate-in fade-in-0 duration-200 [animation-timing-function:var(--motion-ease-out)] motion-reduce:animate-none"
               >
                 {fields.map((field, index) => {
                   const id = `manual-field-${index}`
@@ -579,7 +579,7 @@ function FieldLabel({
   return (
     <label htmlFor={htmlFor} className="text-xs font-medium text-muted-foreground">
       {text}
-      {required && <span className="text-halo"> *</span>}
+      {required && <span className="text-destructive"> *</span>}
     </label>
   )
 }

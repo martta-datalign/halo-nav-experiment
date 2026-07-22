@@ -110,7 +110,13 @@ export function AppSidebar() {
                     isActive={isActive(pathname, item.to)}
                     tooltip={item.title}
                   >
-                    <Link to={item.to} onClick={closeMobile}>
+                    <Link
+                      to={item.to}
+                      onClick={closeMobile}
+                      data-advisor-match-nav={
+                        item.to === "/advisors" ? "true" : undefined
+                      }
+                    >
                       <item.icon />
                       <span>{item.title}</span>
                     </Link>

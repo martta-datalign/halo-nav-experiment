@@ -27,7 +27,7 @@ export default function Calculators() {
   return (
     <>
       <SiteHeader />
-      <div className="mx-auto w-full max-w-[1240px] px-4 py-6 sm:px-6 lg:px-8 xl:max-w-[1440px]">
+      <div className="app-page max-w-[1240px] xl:max-w-[1440px]">
         <div className="min-w-0">
           <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Calculators</h1>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
@@ -93,13 +93,13 @@ function CalculatorCard({
         }
       }}
       className={cn(
-        "group cursor-pointer gap-0 p-5 outline-none transition-all",
-        "hover:-translate-y-0.5 hover:border-halo-border hover:bg-halo-subtle/30 hover:shadow-md",
+        "group cursor-pointer gap-0 p-5 outline-none transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out",
+        "hover:-translate-y-0.5 hover:border-input hover:bg-secondary/30 hover:shadow-md active:translate-y-0 active:scale-[0.99] motion-reduce:transform-none motion-reduce:transition-none",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       )}
     >
       <div className="flex items-start gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
           <Icon className="size-5" />
         </span>
         <div className="min-w-0 flex-1">
@@ -153,7 +153,7 @@ function CalculatorDialog({
       showCloseButton
     >
       <div className="flex items-start gap-3 border-b border-border px-6 py-5">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
           <Icon className="size-5" />
         </span>
         <div className="min-w-0 pr-8">

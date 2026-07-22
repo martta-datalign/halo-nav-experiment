@@ -21,7 +21,6 @@ const OPPORTUNITIES = [
     image: "/geico-logo.png",
     imageAlt: "GEICO",
     imageClassName: "max-h-12 max-w-[150px]",
-    tone: "blue",
   },
   {
     eyebrow: "Highest rewards potential",
@@ -34,7 +33,6 @@ const OPPORTUNITIES = [
     image: "/prime-visa.png",
     imageAlt: "Prime Visa credit card",
     imageClassName: "max-h-16 max-w-[130px]",
-    tone: "violet",
   },
   {
     eyebrow: "Low-effort switch",
@@ -47,15 +45,8 @@ const OPPORTUNITIES = [
     image: "/disney-bundle.jpeg",
     imageAlt: "Disney Bundle with Hulu, Disney Plus, and ESPN Plus",
     imageClassName: "max-h-16 max-w-[160px] rounded-md",
-    tone: "teal",
   },
 ] as const
-
-const TONES = {
-  blue: "from-blue-50 via-indigo-50/60 to-card text-blue-700 dark:from-blue-950/30 dark:via-indigo-950/20 dark:text-blue-300",
-  violet: "from-violet-50 via-fuchsia-50/50 to-card text-violet-700 dark:from-violet-950/30 dark:via-fuchsia-950/20 dark:text-violet-300",
-  teal: "from-emerald-50 via-cyan-50/50 to-card text-emerald-700 dark:from-emerald-950/30 dark:via-cyan-950/20 dark:text-emerald-300",
-} as const
 
 export function OpportunitiesCard() {
   const [opportunities, setOpportunities] = React.useState(() => [...OPPORTUNITIES])
@@ -73,7 +64,7 @@ export function OpportunitiesCard() {
   return (
     <Card className="gap-0 overflow-hidden p-0">
       <div
-        className={cn("flex h-[410px] flex-col bg-gradient-to-br px-5 py-5", TONES[opportunity.tone])}
+        className="flex h-[410px] flex-col px-5 py-5"
         onTouchStart={(event) => {
           touchStartX.current = event.touches[0]?.clientX ?? null
         }}
@@ -86,7 +77,7 @@ export function OpportunitiesCard() {
           goTo(current + (distance < 0 ? 1 : -1))
         }}
       >
-        <div className="text-xs font-medium">
+        <div className="text-xs font-medium text-muted-foreground">
           {opportunity.eyebrow}
         </div>
 
@@ -106,7 +97,7 @@ export function OpportunitiesCard() {
           {opportunity.detail}
         </p>
 
-        <div className="mt-auto rounded-xl bg-white/80 p-3.5 shadow-xs backdrop-blur-sm dark:bg-black/15">
+        <div className="mt-auto rounded-xl bg-secondary/55 p-3.5">
           <p className="text-xs font-medium text-muted-foreground">
             {opportunity.valueLabel}
           </p>
@@ -157,7 +148,7 @@ export function OpportunitiesCard() {
               aria-current={index === current ? "true" : undefined}
               onClick={() => goTo(index)}
               className={cn(
-                "h-1.5 rounded-full transition-all",
+                "h-1.5 rounded-full transition-[width,background-color] duration-300 ease-out motion-reduce:transition-none",
                 index === current ? "w-5 bg-foreground" : "w-1.5 bg-border hover:bg-muted-foreground/50"
               )}
             />

@@ -22,11 +22,6 @@ export function AnalysisCard({
         className
       )}
     >
-      {/* soft halo glow, kept subtle for the Mercury voice */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-16 -top-16 size-52 rounded-full bg-halo/25 blur-3xl"
-      />
       {onDismiss && (
         <button
           type="button"
@@ -37,7 +32,7 @@ export function AnalysisCard({
           <RiCloseLine className="size-4" />
         </button>
       )}
-      <div className="relative">
+      <div>
         <span className="flex size-9 items-center justify-center rounded-lg bg-white/10 text-white">
           <RiLineChartLine className="size-4.5" />
         </span>
@@ -50,14 +45,14 @@ export function AnalysisCard({
         </p>
 
         <div className="mt-5 grid w-fit max-w-full gap-2.5">
-          <button className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-primary transition-colors hover:bg-white/90">
+          <button className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-primary transition-[background-color,transform] duration-150 ease-out hover:bg-white/90 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100">
             <RiFileTextLine className="size-4" />
             Open full report
             <RiArrowRightLine className="size-3.5" />
           </button>
           <button
             onClick={() => ask("Walk me through my financial analysis report.")}
-            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-white/10"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 px-4 py-2 text-[13px] font-semibold text-white transition-[background-color,transform] duration-150 ease-out hover:bg-white/10 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
           >
             Talk it through with Halo
           </button>

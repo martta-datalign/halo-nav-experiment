@@ -28,7 +28,7 @@ export function AskHaloAction({
         className
       )}
     >
-      <RiSparkling2Line className="size-3.5 shrink-0 transition-transform duration-300 ease-out group-hover/ask:rotate-180" />
+      <RiSparkling2Line className="size-3.5 shrink-0 transition-transform duration-150 ease-out group-hover/ask:rotate-12 group-hover/ask:scale-105 motion-reduce:transform-none motion-reduce:transition-none" />
       <span className="truncate">{text}</span>
     </button>
   )

@@ -25,9 +25,9 @@ import { formatUSD } from "@/lib/format"
 // Color follows the flow *stage* (an entity property, not rank). Labels are
 // drawn in ink — never the series color — so identity isn't color-alone.
 const STAGE_COLOR: Record<FlowStage, string> = {
-  income: "var(--halo)",
+  income: "var(--chart-4)",
   budget: "var(--chart-3)",
-  expense: "var(--positive)",
+  expense: "var(--chart-2)",
 }
 
 const CHART_HEIGHT = 560

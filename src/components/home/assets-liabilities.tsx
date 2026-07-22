@@ -191,8 +191,22 @@ const INITIAL_ITEMS: BalanceItem[] = [
   },
 ]
 
-const ASSET_COLORS = ["#2453d4", "#3478e5", "#4f9be8", "#75b4ec", "#a2ccf2", "#d2e5fa"]
-const DEBT_COLORS = ["#8f4c08", "#b56c00", "#dd9700", "#f1ba00", "#f6d65d", "#fae8a7"]
+const ASSET_COLORS = [
+  "oklch(0.47 0.2 260)",
+  "oklch(0.58 0.18 250)",
+  "oklch(0.67 0.14 240)",
+  "oklch(0.75 0.1 235)",
+  "oklch(0.84 0.07 235)",
+  "oklch(0.92 0.035 240)",
+]
+const DEBT_COLORS = [
+  "oklch(0.45 0.11 60)",
+  "oklch(0.53 0.13 65)",
+  "oklch(0.64 0.15 75)",
+  "oklch(0.75 0.15 85)",
+  "oklch(0.84 0.12 92)",
+  "oklch(0.92 0.07 90)",
+]
 
 function sum(items: BalanceItem[], side: Side) {
   return items.filter((item) => item.side === side).reduce((total, item) => total + item.amount, 0)
@@ -352,7 +366,7 @@ export function AssetsLiabilities() {
 
 function Summary({ label, value, emphasis = false }: { label: string; value: number; emphasis?: boolean }) {
   return (
-    <Card className={cn("gap-1 p-5", emphasis && "border-halo-border bg-halo-subtle/30")}>
+    <Card className={cn("gap-1 p-5", emphasis && "border-input bg-secondary/30")}>
       <p className={cn("text-[13px] font-medium", emphasis ? "text-foreground" : "text-muted-foreground")}>
         {label}
       </p>

@@ -122,7 +122,7 @@ export default function Goals() {
     <>
       <SiteHeader />
 
-      <div className="mx-auto w-full max-w-[1240px] px-4 py-6 sm:px-6 lg:px-8 xl:max-w-[1440px]">
+      <div className="app-page max-w-[1240px] xl:max-w-[1440px]">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Goals</h1>
@@ -248,8 +248,8 @@ function GoalCard({
         }
       }}
       className={cn(
-        "group cursor-pointer gap-0 p-5 outline-none transition-all",
-        "hover:-translate-y-0.5 hover:border-halo-border hover:shadow-md",
+        "group cursor-pointer gap-0 p-5 outline-none transition-[transform,border-color,box-shadow] duration-200 ease-out",
+        "hover:-translate-y-0.5 hover:border-input hover:shadow-md active:translate-y-0 active:scale-[0.99] motion-reduce:transform-none motion-reduce:transition-none",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       )}
     >
@@ -276,7 +276,7 @@ function GoalCard({
 
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
         <div
-          className="h-full rounded-full transition-[width]"
+          className="h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
           style={{ width: `${pct}%`, background: accent }}
         />
       </div>
@@ -582,7 +582,7 @@ function GoalDialog({
             </div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
               <div
-                className="h-full rounded-full transition-[width]"
+                className="h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
                 style={{ width: `${previewPct}%`, background: accent }}
               />
             </div>
@@ -642,7 +642,7 @@ function DeleteGoalDialog({
 function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
     <div className="mt-10 flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
-      <span className="flex size-11 items-center justify-center rounded-xl bg-halo-subtle text-halo">
+      <span className="flex size-11 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
         <RiFlag2Line className="size-5" />
       </span>
       <p className="mt-4 text-sm font-medium">No goals yet</p>

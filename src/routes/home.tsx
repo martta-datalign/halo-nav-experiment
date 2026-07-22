@@ -82,7 +82,7 @@ export default function Home() {
   return (
     <>
       <SiteHeader actions={<CustomizeMenu visible={visible} toggle={toggle} />} />
-      <div className="mx-auto w-full max-w-[1240px] px-4 py-6 sm:px-6 lg:px-8 xl:max-w-[1440px] 2xl:max-w-[1600px]">
+      <div className="app-page max-w-[1240px] xl:max-w-[1440px] 2xl:max-w-[1600px]">
         {/* Greeting */}
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-[0.06em] text-muted-foreground">

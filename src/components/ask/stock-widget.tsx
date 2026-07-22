@@ -189,7 +189,7 @@ export function StockWidget({ symbol }: { symbol: StockSymbol }) {
               onClick={() => setRange(item)}
               aria-pressed={range === item}
               className={cn(
-                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-[color,background-color,transform] duration-150 ease-out active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100",
                 range === item
                   ? "bg-secondary text-foreground"
                   : "text-muted-foreground hover:bg-secondary/60 hover:text-foreground"

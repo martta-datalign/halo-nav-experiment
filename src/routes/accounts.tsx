@@ -91,7 +91,7 @@ export default function Accounts() {
         }
       />
 
-      <div className="mx-auto w-full max-w-[1100px] px-4 py-6 sm:px-6 lg:px-8">
+      <div className="app-page max-w-[1100px]">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-[26px] font-semibold tracking-[-0.02em]">My Accounts</h1>
@@ -211,12 +211,12 @@ function InstitutionCard({
             <Badge
               className={cn(
                 manualGroup
-                  ? "border-halo-border bg-halo-subtle text-halo"
-                  : "border-positive/20 bg-positive/10 text-positive"
+                  ? "border-border bg-secondary text-secondary-foreground"
+                  : "border-positive-border bg-positive-subtle text-positive"
               )}
               variant="outline"
             >
-              <span className={cn("size-1.5 rounded-full", manualGroup ? "bg-halo" : "bg-positive")} />
+              <span className={cn("size-1.5 rounded-full", manualGroup ? "bg-muted-foreground" : "bg-positive")} />
               {manualGroup ? "Manual" : "Connected"}
             </Badge>
           </div>

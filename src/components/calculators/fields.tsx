@@ -26,7 +26,7 @@ export function FieldLabel({
       className="flex items-center gap-1 text-[13px] font-medium text-foreground"
     >
       {children}
-      {required && <span className="text-halo">*</span>}
+      {required && <span className="text-destructive">*</span>}
       {hint && (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -232,7 +232,7 @@ export function Stat({
         className={cn(
           "mt-1 font-semibold tabular-nums tracking-[-0.01em]",
           large ? "text-[28px] leading-none" : "text-lg",
-          accent ? "text-halo" : "text-foreground"
+          accent ? "text-primary" : "text-foreground"
         )}
       >
         {value}

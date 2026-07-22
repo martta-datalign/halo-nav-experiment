@@ -104,8 +104,8 @@ export function Calendar({
                 "hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring",
                 !inMonth && "text-muted-foreground/40",
                 inMonth && !isSelected && "text-foreground",
-                isToday && !isSelected && "font-semibold text-halo",
-                isSelected && "bg-halo font-semibold text-halo-foreground hover:bg-halo"
+                isToday && !isSelected && "font-semibold text-foreground",
+                isSelected && "bg-primary font-semibold text-primary-foreground hover:bg-primary"
               )}
             >
               {d.getDate()}

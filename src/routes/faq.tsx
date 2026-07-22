@@ -113,7 +113,7 @@ export default function FAQ() {
   return (
     <>
       <SiteHeader />
-      <main className="w-full px-4 py-8 sm:px-6 sm:py-10">
+      <main className="app-page">
         <h1 className="text-[26px] font-semibold tracking-[-0.02em]">
           Frequently Asked Questions
         </h1>
@@ -128,10 +128,10 @@ export default function FAQ() {
               type="button"
               aria-pressed={activeIndex === index}
               onClick={() => setActiveIndex(index)}
-              className={`rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 activeIndex === index
                   ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-card text-muted-foreground hover:border-halo-border hover:bg-halo-subtle/40 hover:text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:border-input hover:bg-secondary/45 hover:text-foreground"
               }`}
             >
               {category.title}
@@ -143,6 +143,7 @@ export default function FAQ() {
           <section
             key={activeCategory.title}
             aria-label={activeCategory.title}
+            className="animate-in fade-in-0 duration-150 motion-reduce:animate-none"
           >
             <div>
               {activeCategory.questions.map((item, index) => (
@@ -181,7 +182,7 @@ function FAQItem({
         aria-controls={contentId}
         onClick={() => setOpen((current) => !current)}
         className={cn(
-          "flex w-full items-center justify-between gap-6 text-left text-sm font-medium transition-[padding] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
+          "flex w-full items-center justify-between gap-6 text-left text-sm font-medium transition-[padding] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
           open ? "py-4" : "py-5"
         )}
       >
@@ -190,7 +191,7 @@ function FAQItem({
           <span className="absolute left-0.5 right-0.5 top-1/2 h-px -translate-y-1/2 bg-current" />
           <span
             className={cn(
-              "absolute bottom-0.5 left-1/2 top-0.5 w-px -translate-x-1/2 bg-current transition-transform duration-200 ease-out motion-reduce:transition-none",
+              "absolute bottom-0.5 left-1/2 top-0.5 w-px -translate-x-1/2 bg-current transition-transform duration-150 ease-out motion-reduce:transition-none",
               open && "scale-y-0"
             )}
           />
@@ -200,7 +201,7 @@ function FAQItem({
         id={contentId}
         aria-hidden={!open}
         className={cn(
-          "grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+          "grid transition-[grid-template-rows,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
           open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         )}
       >

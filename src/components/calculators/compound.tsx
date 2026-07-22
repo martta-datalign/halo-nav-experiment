@@ -134,7 +134,7 @@ export function CompoundResultView({ result }: { result: CompoundResult }) {
     <div className="flex flex-col gap-4">
       <ResultPanel>
         <p className="text-[13px] text-muted-foreground">Final value</p>
-        <p className="mt-1 text-[28px] font-semibold leading-none tabular-nums text-halo">
+        <p className="mt-1 text-[28px] font-semibold leading-none tabular-nums text-foreground">
           {formatUSD(result.finalValue)}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5">

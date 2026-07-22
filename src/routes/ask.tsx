@@ -551,7 +551,7 @@ export default function AskHalo() {
                       <button
                         key={p}
                         onClick={() => send(p)}
-                        className="rounded-full border border-border bg-card px-4 py-2 text-[13px] text-foreground transition-colors hover:border-halo-border hover:bg-halo-subtle/40"
+                        className="rounded-full border border-border bg-card px-4 py-2 text-[13px] text-foreground transition-[background-color,border-color,transform] duration-150 ease-out hover:border-halo-border hover:bg-halo-subtle/40 active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
                       >
                         {p}
                       </button>
@@ -578,7 +578,7 @@ export default function AskHalo() {
                         type="button"
                         onClick={() => setMode(m)}
                         className={cn(
-                          "rounded-md px-2.5 py-1 font-medium capitalize transition-colors",
+                          "rounded-md px-2.5 py-1 font-medium capitalize transition-[color,background-color,box-shadow,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
                           mode === m
                             ? "bg-card text-foreground shadow-xs"
                             : "text-muted-foreground hover:text-foreground"
@@ -790,7 +790,7 @@ function HaloMessage({
       )}
 
       {status === "complete" && vote === "down" && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5 duration-200 animate-in fade-in-0 slide-in-from-top-1">
+        <div className="mt-2 flex flex-wrap items-center gap-1.5 duration-200 animate-in fade-in-0 slide-in-from-top-1 motion-reduce:slide-in-from-top-0">
           {reasonSent ? (
             <span className="text-[12px] text-muted-foreground">
               Thanks — this helps Halo improve.

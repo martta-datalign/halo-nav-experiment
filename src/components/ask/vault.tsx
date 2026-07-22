@@ -123,7 +123,7 @@ export function VaultDialog({
                     type="button"
                     onClick={() => onDelete(d.id)}
                     aria-label={`Delete ${d.name}`}
-                    className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-all hover:bg-negative/10 hover:text-negative focus-visible:opacity-100 group-hover:opacity-100"
+                    className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[color,background-color,opacity,transform] duration-150 ease-out hover:bg-negative/10 hover:text-negative active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:opacity-100 group-hover:opacity-100"
                   >
                     <RiDeleteBinLine className="size-4" />
                   </button>

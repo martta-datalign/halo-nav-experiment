@@ -11,95 +11,113 @@
 :root {
   --radius: 0.625rem;
 
-  --background: #ffffff;            /* white content field */
-  --foreground: #1a1c22;           /* cool near-black text */
+  /* Motion system: quick feedback, calm state changes, no playful bounce. */
+  --motion-fast: 160ms;
+  --motion-base: 220ms;
+  --motion-slow: 300ms;
+  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
 
-  --card: #ffffff;
-  --card-foreground: #1a1c22;
-  --popover: #ffffff;
-  --popover-foreground: #1a1c22;
+  --background: oklch(1 0 0);            /* white content field */
+  --foreground: oklch(0.22 0.015 270);   /* cool near-black text */
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.015 270);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.015 270);
 
   /* Primary = near-black (Mercury-style dark buttons), faintly cool */
-  --primary: #1d2026;
-  --primary-foreground: #f8f9fa;
+  --primary: oklch(0.23 0.015 265);
+  --primary-foreground: oklch(0.98 0.003 265);
 
-  --secondary: #eceef1;
-  --secondary-foreground: #1d2026;
-  --muted: #eceef1;
-  --muted-foreground: #6b6f78;
-  --accent: #eceef1;
-  --accent-foreground: #1d2026;
+  --secondary: oklch(0.95 0.007 265);
+  --secondary-foreground: oklch(0.23 0.015 265);
+  --muted: oklch(0.95 0.007 265);
+  --muted-foreground: oklch(0.5 0.015 265);
+  --accent: oklch(0.95 0.007 265);
+  --accent-foreground: oklch(0.23 0.015 265);
 
-  --destructive: #c4453d;
+  --destructive: oklch(0.56 0.17 27);
 
-  --border: #e6e8ec;               /* cool hairline */
-  --input: #dee1e6;
-  --ring: #1d2026;                 /* focus = theme dark */
+  --border: oklch(0.92 0.007 265);       /* cool hairline */
+  --input: oklch(0.89 0.009 265);
+  --ring: oklch(0.23 0.015 265);         /* focus = neutral, never semantic */
 
   /* Halo AI accent — a refined, dusty periwinkle. Reserved for genuine AI/Halo
      moments (brand mark, Ask Halo affordances, insights) and used sparingly. */
-  --halo: #6d6ab5;
-  --halo-foreground: #ffffff;
-  --halo-subtle: #f2f1fa;
-  --halo-border: #e7e6f3;
+  --halo: oklch(0.56 0.12 285);
+  --halo-foreground: oklch(1 0 0);
+  --halo-subtle: oklch(0.97 0.016 285);
+  --halo-border: oklch(0.91 0.03 285);
 
-  /* Money semantics */
-  --positive: #1f8a5b;
-  --negative: #c4453d;
+  /* Status semantics — green is reserved for success, confirmation, and gains. */
+  --positive: oklch(0.56 0.13 155);
+  --positive-subtle: oklch(0.97 0.025 155);
+  --positive-border: oklch(0.88 0.055 155);
+  --negative: oklch(0.56 0.17 27);
+  --warning: oklch(0.66 0.13 78);
+  --warning-subtle: oklch(0.97 0.025 78);
+  --info: oklch(0.57 0.12 250);
 
   /* Data viz */
-  --chart-1: #6461ad;
-  --chart-2: #1f8a5b;
-  --chart-3: #c99a3f;
-  --chart-4: #4a86c5;
-  --chart-5: #a35bd6;
+  --chart-1: oklch(0.55 0.12 285);
+  --chart-2: oklch(0.62 0.1 205);
+  --chart-3: oklch(0.67 0.12 78);
+  --chart-4: oklch(0.59 0.13 250);
+  --chart-5: oklch(0.6 0.12 330);
 
   /* Sidebar */
-  --sidebar: #f7f9fe;               /* very faint Mercury-like blue panel */
-  --sidebar-foreground: #45505f;
-  --sidebar-primary: #1d2026;
-  --sidebar-primary-foreground: #f8f9fa;
-  --sidebar-accent: #e0e8f5;        /* active/selected fill (blue-tinted, > hover) */
-  --sidebar-accent-foreground: #1d2026;
-  --sidebar-hover: #ecf1fb;          /* hover tint (barely-there blue) */
-  --sidebar-border: #e8edf6;
-  --sidebar-ring: #1d2026;
+  --sidebar: oklch(0.98 0.008 255);
+  --sidebar-foreground: oklch(0.42 0.025 260);
+  --sidebar-primary: oklch(0.23 0.015 265);
+  --sidebar-primary-foreground: oklch(0.98 0.003 265);
+  --sidebar-accent: oklch(0.92 0.025 255);
+  --sidebar-accent-foreground: oklch(0.23 0.015 265);
+  --sidebar-hover: oklch(0.96 0.015 255);
+  --sidebar-border: oklch(0.93 0.014 255);
+  --sidebar-ring: oklch(0.23 0.015 265);
 }
 
 .dark {
-  --background: #17151a;
-  --foreground: #f3f1ee;
-  --card: #201d24;
-  --card-foreground: #f3f1ee;
-  --popover: #201d24;
-  --popover-foreground: #f3f1ee;
-  --primary: #f3f1ee;
-  --primary-foreground: #201d1a;
-  --secondary: #2a2730;
-  --secondary-foreground: #f3f1ee;
-  --muted: #2a2730;
-  --muted-foreground: #a7a29b;
-  --accent: #2a2730;
-  --accent-foreground: #f3f1ee;
-  --destructive: #e06a62;
-  --border: #302c37;
-  --input: #35313d;
-  --ring: #e8e6f0;
-  --halo: #8c85e6;
-  --halo-foreground: #17151a;
-  --halo-subtle: #26233250;
-  --halo-border: #3a3550;
-  --positive: #4fbf8a;
-  --negative: #e06a62;
-  --sidebar: #1c1a20;
-  --sidebar-foreground: #c7c3bc;
-  --sidebar-primary: #f3f1ee;
-  --sidebar-primary-foreground: #201d1a;
-  --sidebar-accent: #29262f;
-  --sidebar-accent-foreground: #f3f1ee;
-  --sidebar-hover: #211f27;
-  --sidebar-border: #302c37;
-  --sidebar-ring: #e8e6f0;
+  --background: oklch(0.18 0.012 285);
+  --foreground: oklch(0.96 0.006 75);
+  --card: oklch(0.22 0.014 285);
+  --card-foreground: oklch(0.96 0.006 75);
+  --popover: oklch(0.22 0.014 285);
+  --popover-foreground: oklch(0.96 0.006 75);
+  --primary: oklch(0.96 0.006 75);
+  --primary-foreground: oklch(0.22 0.014 285);
+  --secondary: oklch(0.28 0.016 285);
+  --secondary-foreground: oklch(0.96 0.006 75);
+  --muted: oklch(0.28 0.016 285);
+  --muted-foreground: oklch(0.72 0.012 75);
+  --accent: oklch(0.28 0.016 285);
+  --accent-foreground: oklch(0.96 0.006 75);
+  --destructive: oklch(0.68 0.16 27);
+  --border: oklch(0.31 0.016 285);
+  --input: oklch(0.34 0.018 285);
+  --ring: oklch(0.92 0.01 285);
+  --halo: oklch(0.7 0.13 285);
+  --halo-foreground: oklch(0.18 0.012 285);
+  --halo-subtle: oklch(0.25 0.025 285);
+  --halo-border: oklch(0.38 0.045 285);
+  --positive: oklch(0.7 0.13 155);
+  --positive-subtle: oklch(0.25 0.025 155);
+  --positive-border: oklch(0.4 0.05 155);
+  --negative: oklch(0.68 0.16 27);
+  --warning: oklch(0.75 0.12 78);
+  --warning-subtle: oklch(0.27 0.025 78);
+  --info: oklch(0.72 0.11 250);
+  --sidebar: oklch(0.2 0.012 285);
+  --sidebar-foreground: oklch(0.8 0.01 75);
+  --sidebar-primary: oklch(0.96 0.006 75);
+  --sidebar-primary-foreground: oklch(0.22 0.014 285);
+  --sidebar-accent: oklch(0.29 0.016 285);
+  --sidebar-accent-foreground: oklch(0.96 0.006 75);
+  --sidebar-hover: oklch(0.25 0.014 285);
+  --sidebar-border: oklch(0.31 0.016 285);
+  --sidebar-ring: oklch(0.92 0.01 285);
 }
 
 @theme inline {
@@ -132,7 +150,12 @@
   --color-halo-subtle: var(--halo-subtle);
   --color-halo-border: var(--halo-border);
   --color-positive: var(--positive);
+  --color-positive-subtle: var(--positive-subtle);
+  --color-positive-border: var(--positive-border);
   --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-info: var(--info);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -168,6 +191,25 @@
   /* Financial figures read as aligned columns everywhere */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Shared application-page rhythm. Surface-specific max-widths remain local. */
+.app-page {
+  width: 100%;
+  margin-inline: auto;
+  padding: 1.5rem 1rem;
+}
+
+@media (min-width: 40rem) {
+  .app-page {
+    padding-inline: 1.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .app-page {
+    padding-inline: 2rem;
   }
 }
 
@@ -228,18 +270,6 @@
   }
 }
 
-@keyframes halo-composer-flow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
 .halo-thinking-dots {
   display: inline-flex;
   gap: 3px;
@@ -289,31 +319,19 @@
   inset: -3px;
   pointer-events: none;
   border-radius: 0.9rem;
-  background: linear-gradient(
-    110deg,
-    #655d9f 0%,
-    #756aa8 24%,
-    #8a78ad 46%,
-    #665b91 70%,
-    #655d9f 100%
-  );
-  background-size: 220% 220%;
-  filter: blur(6px);
+  background: var(--halo);
   opacity: 0;
   transform: scale(0.9, 0.78);
   transform-origin: center;
-  animation: halo-composer-flow 7s ease-in-out infinite;
-  animation-play-state: paused;
   transition:
-    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: background-position, opacity, transform;
+    opacity var(--motion-base) var(--motion-ease-out),
+    transform var(--motion-slow) var(--motion-ease-out);
+  will-change: opacity, transform;
 }
 
 .halo-composer-shell.is-thinking .halo-composer-gradient {
-  opacity: 0.48;
+  opacity: 0.55;
   transform: scale(1);
-  animation-play-state: running;
 }
 
 @keyframes calculator-result-disclosure {
@@ -336,12 +354,27 @@
   }
 }
 
+@keyframes advisor-onboarding-step {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.advisor-onboarding-step {
+  animation: advisor-onboarding-step var(--motion-base) var(--motion-ease-out) both;
+}
+
 .calculator-result-disclosure {
-  animation: calculator-result-disclosure 480ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both;
+  animation: calculator-result-disclosure 240ms var(--motion-ease-out) both;
 }
 
 .calculator-result-disclosure-icon {
-  animation: calculator-result-icon-disclosure 380ms cubic-bezier(0.22, 1, 0.36, 1) 260ms both;
+  animation: calculator-result-icon-disclosure 200ms var(--motion-ease-out) 40ms both;
 }
 
 /* `vh` is the fallback for older iOS Safari; dynamic viewport units prevent
@@ -377,7 +410,11 @@
 @media (prefers-reduced-motion: reduce) {
   .calculator-result-disclosure,
   .calculator-result-disclosure-icon {
-    animation: none;
+    animation: calculator-result-disclosure 150ms ease-out both;
+  }
+
+  .advisor-onboarding-step {
+    animation: calculator-result-disclosure 150ms ease-out both;
   }
 
   .halo-thinking-dots > span {
@@ -393,6 +430,8 @@
 
   .halo-composer-gradient {
     animation: none;
-    transition: none;
+    transform: scale(1);
+    transition: opacity 150ms ease-out;
+    will-change: auto;
   }
 }

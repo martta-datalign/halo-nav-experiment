@@ -7,7 +7,7 @@ import { insights, type Insight } from "@/lib/data"
 
 const TONE_DOT: Record<Insight["tone"], string> = {
   positive: "bg-positive",
-  attention: "bg-chart-3",
+  attention: "bg-warning",
   neutral: "bg-muted-foreground/45",
 }
 

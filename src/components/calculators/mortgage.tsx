@@ -134,7 +134,7 @@ export function MortgageResultView({ result }: { result: MortgageResult }) {
     <div className="flex flex-col gap-4">
       <ResultPanel className="text-center">
         <p className="text-[13px] font-medium text-muted-foreground">Total monthly payment</p>
-        <p className="mt-1.5 text-[32px] font-semibold leading-none tabular-nums text-halo">
+        <p className="mt-1.5 text-[32px] font-semibold leading-none tabular-nums text-foreground">
           {formatUSD(result.totalMonthly)}
         </p>
       </ResultPanel>

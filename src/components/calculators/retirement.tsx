@@ -197,8 +197,8 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
         </div>
       </ResultPanel>
 
-      <div className="rounded-xl border border-halo-border bg-halo-subtle p-5">
-        <p className="text-sm font-semibold text-halo">Safe withdrawal ideas</p>
+      <div className="rounded-xl border border-border bg-secondary/45 p-5">
+        <p className="text-sm font-semibold text-foreground">Safe withdrawal ideas</p>
         <p className="mt-1 text-[13px] text-muted-foreground">
           Estimated level income that draws your balance to zero by age {result.untilAge}.
         </p>

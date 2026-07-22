@@ -27,7 +27,7 @@ export default function Disclosures() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+      <main className="app-page max-w-3xl">
         <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Disclosures</h1>
 
         <div className="mt-7 border-t border-border">
@@ -37,7 +37,7 @@ export default function Disclosures() {
               href={item.href}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-between gap-4 border-b border-border py-4 text-sm transition-colors hover:text-halo focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex items-center justify-between gap-4 border-b border-border py-4 text-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="font-medium">{item.title}</span>
               <span className="text-xs text-muted-foreground">{item.label}</span>

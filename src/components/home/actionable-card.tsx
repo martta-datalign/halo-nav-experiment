@@ -35,7 +35,7 @@ export function ActionableCard({ onDismiss }: { onDismiss?: () => void }) {
         <h2 className="text-[15px] font-semibold tracking-[-0.005em]">
           Make it actionable
         </h2>
-        <Badge variant="secondary" className="bg-halo-subtle text-halo">
+        <Badge variant="secondary">
           Recommended
         </Badge>
       </div>
