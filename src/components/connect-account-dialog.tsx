@@ -1,6 +1,7 @@
 import * as React from "react"
 import {
   RiArrowLeftLine,
+  RiArrowDownSLine,
   RiArrowRightSLine,
   RiBankCardLine,
   RiBankLine,
@@ -350,7 +351,9 @@ function AnimatedHeight({
       )}
       style={{ height: open ? height : 0 }}
     >
-      <div ref={contentRef}>{children}</div>
+      <div ref={contentRef} className="p-1">
+        {children}
+      </div>
     </div>
   )
 }
@@ -462,25 +465,28 @@ function ManualStep({
         </div>
 
         <AnimatedHeight open={category !== null}>
-          <div className="grid gap-4 pt-0.5">
+          <div className="grid gap-4">
             {category && category.types.length > 1 && (
               <div className="grid gap-1.5">
                 <FieldLabel htmlFor="manual-type" text="Account type" required />
-                <select
-                  id="manual-type"
-                  value={type}
-                  onChange={(event) => selectType(event.target.value)}
-                  className={SELECT_CLASS}
-                >
-                  <option value="" disabled>
-                    Select an account type
-                  </option>
-                  {category.types.map((entry) => (
-                    <option key={entry.type} value={entry.type}>
-                      {entry.type}
+                <div className="relative">
+                  <select
+                    id="manual-type"
+                    value={type}
+                    onChange={(event) => selectType(event.target.value)}
+                    className={SELECT_CLASS}
+                  >
+                    <option value="" disabled>
+                      Select an account type
                     </option>
-                  ))}
-                </select>
+                    {category.types.map((entry) => (
+                      <option key={entry.type} value={entry.type}>
+                        {entry.type}
+                      </option>
+                    ))}
+                  </select>
+                  <RiArrowDownSLine className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                </div>
               </div>
             )}
 
@@ -510,21 +516,24 @@ function ManualStep({
                           />
                         </div>
                       ) : field.kind === "select" ? (
-                        <select
-                          id={id}
-                          value={values[field.label] ?? ""}
-                          onChange={(event) => setValue(field.label, event.target.value)}
-                          className={SELECT_CLASS}
-                        >
-                          <option value="" disabled>
-                            {field.placeholder}
-                          </option>
-                          {field.options?.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
+                        <div className="relative">
+                          <select
+                            id={id}
+                            value={values[field.label] ?? ""}
+                            onChange={(event) => setValue(field.label, event.target.value)}
+                            className={SELECT_CLASS}
+                          >
+                            <option value="" disabled>
+                              {field.placeholder}
                             </option>
-                          ))}
-                        </select>
+                            {field.options?.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                          <RiArrowDownSLine className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        </div>
                       ) : (
                         <Input
                           id={id}
@@ -556,7 +565,7 @@ function ManualStep({
 }
 
 const SELECT_CLASS =
-  "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30"
+  "h-9 w-full appearance-none rounded-md border border-input bg-transparent py-1 pl-3 pr-9 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30"
 
 function FieldLabel({
   htmlFor,

@@ -11,6 +11,8 @@ import AskHalo from "@/routes/ask"
 import Calculators from "@/routes/calculators"
 import Goals from "@/routes/goals"
 import Accounts from "@/routes/accounts"
+import Disclosures from "@/routes/disclosures"
+import FAQ from "@/routes/faq"
 import Placeholder from "@/routes/placeholder"
 
 export default function App() {
@@ -45,24 +47,8 @@ export default function App() {
                   />
                 }
               />
-              <Route
-                path="/faq"
-                element={
-                  <Placeholder
-                    title="Frequently Asked Questions"
-                    description="Find answers to common questions about Halo AI, your accounts, and financial planning."
-                  />
-                }
-              />
-              <Route
-                path="/disclosures"
-                element={
-                  <Placeholder
-                    title="Disclosures"
-                    description="Form ADV 2A, Form CRS, and privacy disclosures. Coming in a later pass."
-                  />
-                }
-              />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/disclosures" element={<Disclosures />} />
               <Route
                 path="/settings"
                 element={

@@ -49,15 +49,15 @@ export function AnalysisCard({
           choices shape your future, and where to focus next.
         </p>
 
-        <div className="mt-5 flex flex-wrap items-center gap-2.5">
-          <button className="inline-flex items-center gap-1.5 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-primary transition-colors hover:bg-white/90">
+        <div className="mt-5 grid w-fit max-w-full gap-2.5">
+          <button className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-white px-4 py-2 text-[13px] font-semibold text-primary transition-colors hover:bg-white/90">
             <RiFileTextLine className="size-4" />
             Open full report
             <RiArrowRightLine className="size-3.5" />
           </button>
           <button
             onClick={() => ask("Walk me through my financial analysis report.")}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-white/10"
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/20 px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-white/10"
           >
             Talk it through with Halo
           </button>

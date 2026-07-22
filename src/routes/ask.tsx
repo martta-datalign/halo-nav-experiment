@@ -46,10 +46,18 @@ import { cn } from "@/lib/utils"
 import { suggestedPrompts } from "@/lib/data"
 import { SiteHeader } from "@/components/site-header"
 import { SEED_VAULT_DOCS, VaultDialog, type VaultDoc } from "@/components/ask/vault"
+import { StockWidget } from "@/components/ask/stock-widget"
+import { STOCKS, detectStockQuery, type StockSymbol } from "@/lib/stocks"
 
 type Role = "user" | "halo"
 type HaloStatus = "thinking" | "streaming" | "complete"
-type Message = { id: number; role: Role; text: string; status?: HaloStatus }
+type Message = {
+  id: number
+  role: Role
+  text: string
+  status?: HaloStatus
+  stock?: StockSymbol
+}
 type Chat = { id: string; title: string; when: string; messages: Message[] }
 
 type Mode = "simple" | "deep"
@@ -210,7 +218,10 @@ export default function AskHalo() {
     const chatId = activeIdRef.current
     const userMessageId = msgId.current++
     const haloMessageId = msgId.current++
-    const reply = REPLIES[modeRef.current]
+    const stockSymbol = detectStockQuery(value)
+    const reply = stockSymbol
+      ? `${STOCKS[stockSymbol].name} (${stockSymbol}) is shown below. You can switch the chart range to compare its recent direction. This prototype uses illustrative prices; a live market-data provider can plug into the same widget.`
+      : REPLIES[modeRef.current]
     setChats((prev) =>
       prev.map((c) =>
         c.id === chatId
@@ -228,6 +239,7 @@ export default function AskHalo() {
                   role: "halo",
                   text: "",
                   status: "thinking",
+                  stock: stockSymbol ?? undefined,
                 },
               ],
             }
@@ -535,7 +547,7 @@ export default function AskHalo() {
                     next. Halo sees the full picture from your connected accounts.
                   </p>
                   <div className="mt-6 flex max-w-xl flex-wrap justify-center gap-2">
-                    {suggestedPrompts.slice(0, 4).map((p) => (
+                    {[...suggestedPrompts.slice(0, 3), "Show me Apple stock"].map((p) => (
                       <button
                         key={p}
                         onClick={() => send(p)}
@@ -686,11 +698,25 @@ function MessageRow({ message }: { message: Message }) {
       </div>
     )
   }
-  return <HaloMessage text={message.text} status={message.status ?? "complete"} />
+  return (
+    <HaloMessage
+      text={message.text}
+      status={message.status ?? "complete"}
+      stock={message.stock}
+    />
+  )
 }
 
 // Halo replies are plain (no bubble) and carry copy + feedback actions.
-function HaloMessage({ text, status }: { text: string; status: HaloStatus }) {
+function HaloMessage({
+  text,
+  status,
+  stock,
+}: {
+  text: string
+  status: HaloStatus
+  stock?: StockSymbol
+}) {
   const [vote, setVote] = React.useState<"up" | "down" | null>(null)
   const [copied, setCopied] = React.useState(false)
   const [reasonSent, setReasonSent] = React.useState(false)
@@ -742,6 +768,8 @@ function HaloMessage({ text, status }: { text: string; status: HaloStatus }) {
         </span>
         {streaming && <span className="sr-only">Halo is writing a response.</span>}
       </div>
+
+      {status === "complete" && stock && <StockWidget symbol={stock} />}
 
       {status === "complete" && (
         <div className="mt-2 flex items-center gap-0.5">
