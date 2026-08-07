@@ -10,10 +10,26 @@ type AccountsContextValue = {
 
 const AccountsContext = React.createContext<AccountsContextValue | null>(null)
 
-export function AccountsProvider({ children }: { children: React.ReactNode }) {
+const seededAccounts = () =>
+  initialAccounts.map((account) => ({
+    ...account,
+    source: account.source ?? "connected",
+  }))
+
+export function AccountsProvider({
+  children,
+  filled = true,
+}: {
+  children: React.ReactNode
+  filled?: boolean
+}) {
   const [accounts, setAccounts] = React.useState<Account[]>(() =>
-    initialAccounts.map((account) => ({ ...account, source: account.source ?? "connected" }))
+    filled ? seededAccounts() : []
   )
+
+  React.useEffect(() => {
+    setAccounts(filled ? seededAccounts() : [])
+  }, [filled])
 
   const addAccount = React.useCallback((account: Account) => {
     setAccounts((current) => [account, ...current])

@@ -17,7 +17,7 @@
   --motion-slow: 300ms;
   --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1); /* never for UI enter/exit — delays the moment the user watches; reserve for exits that leave the screen */
 
   --background: oklch(1 0 0);            /* white content field */
   --foreground: oklch(0.22 0.015 270);   /* cool near-black text */
@@ -326,12 +326,13 @@
   transition:
     opacity var(--motion-base) var(--motion-ease-out),
     transform var(--motion-slow) var(--motion-ease-out);
-  will-change: opacity, transform;
 }
 
 .halo-composer-shell.is-thinking .halo-composer-gradient {
   opacity: 0.55;
   transform: scale(1);
+  /* Promote to its own layer only while animating, not permanently. */
+  will-change: opacity, transform;
 }
 
 @keyframes calculator-result-disclosure {

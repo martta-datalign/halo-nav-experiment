@@ -175,7 +175,7 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
                 fill="url(#fillRetireBalance)"
                 isAnimationActive={!reducedMotion}
                 animationBegin={180}
-                animationDuration={900}
+                animationDuration={500}
                 animationEasing="ease-out"
                 dot={false}
               />
@@ -188,7 +188,7 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
                 fillOpacity={0.18}
                 isAnimationActive={!reducedMotion}
                 animationBegin={260}
-                animationDuration={820}
+                animationDuration={500}
                 animationEasing="ease-out"
                 dot={false}
               />

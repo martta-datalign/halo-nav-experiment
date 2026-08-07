@@ -65,7 +65,13 @@ function todayLabel() {
   }
 }
 
-export default function Home() {
+export default function Home({
+  analysisReady,
+  onConnectAccounts,
+}: {
+  analysisReady: boolean
+  onConnectAccounts: () => void
+}) {
   const [subtab, setSubtab] = React.useState<Subtab>("Overview")
   const [visible, setVisible] = React.useState<Record<CardKey, boolean>>({
     analysis: true,
@@ -81,7 +87,12 @@ export default function Home() {
 
   return (
     <>
-      <SiteHeader actions={<CustomizeMenu visible={visible} toggle={toggle} />} />
+      <SiteHeader
+        actions={
+          analysisReady ? <CustomizeMenu visible={visible} toggle={toggle} /> : undefined
+        }
+        hideAddAccounts={!analysisReady}
+      />
       <div className="app-page max-w-[1240px] xl:max-w-[1440px] 2xl:max-w-[1600px]">
         {/* Greeting */}
         <div className="min-w-0">
@@ -115,27 +126,49 @@ export default function Home() {
       </div>
 
       {subtab === "Overview" ? (
-        <div className="mt-6 grid gap-5 lg:grid-cols-3">
-          <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
-            <NetWorthCard />
-            {(visible.accounts || visible.goals) && (
-              <div className="grid gap-5 sm:grid-cols-2">
-                {visible.accounts && <AccountsCard />}
-                {visible.goals && <GoalsCard />}
-              </div>
-            )}
-            {visible.activity && <ActivityCard />}
-          </div>
+        analysisReady ? (
+          <div className="mt-6 grid gap-5 lg:grid-cols-3">
+            <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
+              <NetWorthCard />
+              {(visible.accounts || visible.goals) && (
+                <div className="grid gap-5 sm:grid-cols-2">
+                  {visible.accounts && <AccountsCard />}
+                  {visible.goals && <GoalsCard />}
+                </div>
+              )}
+              {visible.activity && <ActivityCard />}
+            </div>
 
-          <div className="flex min-w-0 flex-col gap-5">
-            <OpportunitiesCard />
-            {visible.analysis && <AnalysisCard onDismiss={() => toggle("analysis")} />}
-            {visible.insights && <InsightsCard onDismiss={() => toggle("insights")} />}
-            {visible.actionable && (
-              <ActionableCard onDismiss={() => toggle("actionable")} />
-            )}
+            <div className="flex min-w-0 flex-col gap-5">
+              <OpportunitiesCard />
+              {visible.analysis && (
+                <AnalysisCard
+                  ready
+                  onDismiss={() => toggle("analysis")}
+                />
+              )}
+              {visible.insights && <InsightsCard onDismiss={() => toggle("insights")} />}
+              {visible.actionable && (
+                <ActionableCard onDismiss={() => toggle("actionable")} />
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-6">
+            <section className="flex min-h-80 items-center justify-center rounded-xl border border-dashed border-border bg-card/40 p-8 text-center">
+              <div className="max-w-sm">
+                <h2 className="text-lg font-semibold">Your dashboard is ready for data</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Connect at least one account to populate balances, cash flow, and
+                  planning insights.
+                </p>
+                <Button className="mt-5" onClick={onConnectAccounts}>
+                  Connect accounts
+                </Button>
+              </div>
+            </section>
+          </div>
+        )
       ) : subtab === "Money flow" ? (
         <div className="mt-6">
           <MoneyFlowCard />

@@ -15,6 +15,8 @@ import {
 } from "@remixicon/react"
 
 import { Button } from "@/components/ui/button"
+import { useAccounts } from "@/components/accounts-provider"
+import { ConnectAccountFlow } from "@/components/connect-account-dialog"
 import { DatalignAdvisorDisclosure } from "@/components/datalign-advisor-disclosure"
 import {
   Dialog,
@@ -33,70 +35,14 @@ import {
 } from "@/lib/advisor-match"
 import { cn } from "@/lib/utils"
 
-type Step = "match" | "schedule" | "next"
+type Step = "match" | "schedule" | "accounts" | "next"
 
 const STEP_LABELS: Array<{ id: Step; label: string }> = [
   { id: "match", label: "Firm" },
   { id: "schedule", label: "Schedule" },
   { id: "next", label: "Next steps" },
+  { id: "accounts", label: "Add account" },
 ]
-
-function createVelocityTrails(
-  start: { x: number; y: number },
-  delta: { x: number; y: number }
-) {
-  const distance = Math.hypot(delta.x, delta.y) || 1
-  const perpendicular = { x: -delta.y / distance, y: delta.x / distance }
-  const offsets = [-12, 0, 12]
-
-  return offsets.map((offset, index) => {
-    const node = document.createElement("span")
-    const length = 54 - index * 10
-    Object.assign(node.style, {
-      position: "fixed",
-      left: `${start.x - length / 2 + perpendicular.x * offset}px`,
-      top: `${start.y - 1 + perpendicular.y * offset}px`,
-      width: `${length}px`,
-      height: index === 1 ? "2px" : "1px",
-      borderRadius: "999px",
-      background: "var(--foreground)",
-      pointerEvents: "none",
-      zIndex: "60",
-      transformOrigin: "right center",
-    })
-    document.body.appendChild(node)
-
-    const angle = Math.atan2(delta.y, delta.x) * (180 / Math.PI)
-    const animation = node.animate(
-      [
-        {
-          transform: `translate3d(0, 0, 0) rotate(${angle}deg) scaleX(0.12)`,
-          opacity: 0,
-        },
-        {
-          offset: 0.2,
-          transform: `translate3d(${delta.x * 0.16}px, ${delta.y * 0.16}px, 0) rotate(${angle}deg) scaleX(1)`,
-          opacity: 0.18 - index * 0.035,
-        },
-        {
-          transform: `translate3d(${delta.x * 0.92}px, ${delta.y * 0.92}px, 0) rotate(${angle}deg) scaleX(0.15)`,
-          opacity: 0,
-        },
-      ],
-      {
-        delay: 72 + index * 24,
-        duration: 320,
-        easing: "cubic-bezier(0.77, 0, 0.175, 1)",
-        fill: "forwards",
-      }
-    )
-    void animation.finished.then(
-      () => node.remove(),
-      () => node.remove()
-    )
-    return node
-  })
-}
 
 export function AdvisorMatchOnboarding({
   open,
@@ -104,18 +50,23 @@ export function AdvisorMatchOnboarding({
   onDismiss,
   onConfirm,
   onComplete,
+  onAnalysisReady,
+  onAccountsSkipped,
 }: {
   open: boolean
   appointment: AdvisorAppointment | null
   onDismiss: () => void
   onConfirm: (appointment: AdvisorAppointment) => void
   onComplete: () => void
+  onAnalysisReady: () => void
+  onAccountsSkipped: () => void
 }) {
   const navigate = useNavigate()
+  const { addAccount } = useAccounts()
   const reducedMotion = useReducedMotion()
   const panelRef = React.useRef<HTMLDivElement>(null)
   const panelAnimationRef = React.useRef<Animation | null>(null)
-  const trailNodesRef = React.useRef<HTMLElement[]>([])
+  const wasOpenRef = React.useRef(false)
   const [step, setStep] = React.useState<Step>("match")
   const [date, setDate] = React.useState<(typeof appointmentDates)[number]["id"]>(
     appointmentDates[0].id
@@ -123,30 +74,30 @@ export function AdvisorMatchOnboarding({
   const [time, setTime] = React.useState<(typeof appointmentTimes)[number]>(
     appointmentTimes[1]
   )
-  const [minimizing, setMinimizing] = React.useState(false)
+  const [transitioning, setTransitioning] = React.useState(false)
+  const [accountsPrepared, setAccountsPrepared] = React.useState(false)
 
   React.useEffect(() => {
     return () => {
       panelAnimationRef.current?.cancel()
-      trailNodesRef.current.forEach((node) => node.remove())
     }
   }, [])
 
   React.useEffect(() => {
-    if (open) {
+    const opening = open && !wasOpenRef.current
+    if (opening) {
       panelAnimationRef.current?.cancel()
-      trailNodesRef.current.forEach((node) => node.remove())
-      trailNodesRef.current = []
-      setMinimizing(false)
+      setTransitioning(false)
       if (appointment) {
         setDate(appointment.date)
         setTime(appointment.time)
-        setStep("next")
+        setStep(accountsPrepared ? "next" : "accounts")
       }
     } else {
-      setStep("match")
+      if (!open) setStep("match")
     }
-  }, [appointment, open])
+    wasOpenRef.current = open
+  }, [accountsPrepared, appointment, open])
 
   const confirmedAppointment = appointmentLabel(date, time)
 
@@ -156,10 +107,11 @@ export function AdvisorMatchOnboarding({
     setStep("next")
   }
 
-  function finish() {
+  function finish(afterComplete?: () => void) {
     const complete = () => {
-      navigate("/advisors")
+      navigate("/")
       onComplete()
+      afterComplete?.()
     }
 
     if (reducedMotion) {
@@ -168,81 +120,34 @@ export function AdvisorMatchOnboarding({
     }
 
     const panel = panelRef.current
-    const destination = document.querySelector<HTMLElement>(
-      "[data-advisor-match-nav]"
-    )
-    if (!panel || !destination || destination.offsetParent === null) {
+    if (!panel) {
       complete()
       return
     }
 
-    const panelRect = panel.getBoundingClientRect()
-    const destinationRect = destination.getBoundingClientRect()
-    const panelCenter = {
-      x: panelRect.left + panelRect.width / 2,
-      y: panelRect.top + panelRect.height / 2,
-    }
-    const destinationCenter = {
-      x: destinationRect.left + destinationRect.width / 2,
-      y: destinationRect.top + destinationRect.height / 2,
-    }
-    const x = destinationCenter.x - panelCenter.x
-    const y = destinationCenter.y - panelCenter.y
-    const scale = Math.max(
-      0.035,
-      Math.min(
-        0.12,
-        destinationRect.width / panelRect.width,
-        destinationRect.height / panelRect.height
-      )
-    )
-    setMinimizing(true)
+    setTransitioning(true)
 
-    trailNodesRef.current = createVelocityTrails(panelCenter, { x, y })
     const panelAnimation = panel.animate(
       [
         { transform: "translate3d(0, 0, 0) scale(1)", opacity: 1 },
         {
-          offset: 0.34,
-          transform: `translate3d(${x * 0.16}px, ${y * 0.16}px, 0) scale(0.88)`,
-          opacity: 1,
-        },
-        {
-          offset: 0.72,
-          transform: `translate3d(${x * 0.72}px, ${y * 0.72}px, 0) scale(0.28, 0.18)`,
-          opacity: 0.78,
-        },
-        {
-          transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+          transform: "translate3d(0, -6px, 0) scale(0.985)",
           opacity: 0,
         },
       ],
       {
-        duration: 440,
-        easing: "cubic-bezier(0.77, 0, 0.175, 1)",
+        duration: 180,
+        easing: "cubic-bezier(0.23, 1, 0.32, 1)",
         fill: "forwards",
       }
     )
     panelAnimationRef.current = panelAnimation
 
-    destination.animate(
-      [
-        { transform: "scale(1)" },
-        { offset: 0.5, transform: "scale(0.96)" },
-        { transform: "scale(1)" },
-      ],
-      {
-        delay: 320,
-        duration: 220,
-        easing: "cubic-bezier(0.23, 1, 0.32, 1)",
-      }
-    )
-
     void panelAnimation.finished.then(complete, () => {})
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && !minimizing && onDismiss()}>
+    <Dialog open={open} onOpenChange={(next) => !next && !transitioning && onDismiss()}>
       <DialogContent
         showCloseButton={false}
         aria-describedby="advisor-match-intro-description"
@@ -257,26 +162,36 @@ export function AdvisorMatchOnboarding({
           ref={panelRef}
           className={cn(
             "flex size-full min-h-0 flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl",
-            minimizing && "pointer-events-none"
+            transitioning && "pointer-events-none"
           )}
         >
-          <header className="flex shrink-0 items-center gap-4 border-b border-border px-5 py-4 sm:px-7">
-            <StepRail step={step} />
-            <button
-              type="button"
-              onClick={onDismiss}
-              aria-label="Close advisor match"
-              className="ml-auto flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[color,background-color,transform] duration-150 ease-out hover:bg-secondary hover:text-foreground active:scale-90"
-            >
-              <RiCloseLine className="size-4" />
-            </button>
+          <header className="shrink-0 border-b border-border px-5 py-4 sm:px-8">
+            <div className="mx-auto flex max-w-4xl items-center gap-4">
+              <StepRail step={step} />
+              <button
+                type="button"
+                onClick={onDismiss}
+                aria-label="Close advisor match"
+                className="ml-auto flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-[color,background-color,transform] duration-150 ease-out hover:bg-secondary hover:text-foreground active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100"
+              >
+                <RiCloseLine className="size-4" />
+              </button>
+            </div>
           </header>
 
           <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain">
             {step === "match" ? (
               <MatchScreen
                 appointmentLocked={appointment !== null}
-                onContinue={() => setStep(appointment ? "next" : "schedule")}
+                onContinue={() =>
+                  setStep(
+                    appointment
+                      ? accountsPrepared
+                        ? "next"
+                        : "accounts"
+                      : "schedule"
+                  )
+                }
               />
             ) : step === "schedule" ? (
               <ScheduleScreen
@@ -287,18 +202,70 @@ export function AdvisorMatchOnboarding({
                 onBack={() => setStep("match")}
                 onContinue={confirmTime}
               />
+            ) : step === "accounts" ? (
+              <AccountsScreen
+                onBack={() => setStep("next")}
+                onAccountAdded={addAccount}
+                onSkip={() => finish(onAccountsSkipped)}
+                onConnected={() => {
+                  setAccountsPrepared(true)
+                  finish(onAnalysisReady)
+                }}
+              />
             ) : (
               <NextScreen
                 appointment={{ date, time, label: confirmedAppointment }}
                 onBack={() => setStep("match")}
-                onFinish={finish}
+                onContinue={() => setStep("accounts")}
               />
             )}
-            <DatalignAdvisorDisclosure className="mx-auto max-w-4xl border-t border-border px-5 py-7 sm:px-8" />
+            <div className="px-5 sm:px-8">
+              <DatalignAdvisorDisclosure className="mx-auto max-w-4xl border-t border-border py-7" />
+            </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function AccountsScreen({
+  onBack,
+  onAccountAdded,
+  onSkip,
+  onConnected,
+}: {
+  onBack: () => void
+  onAccountAdded: ReturnType<typeof useAccounts>["addAccount"]
+  onSkip: () => void
+  onConnected: () => void
+}) {
+  return (
+    <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
+      <div className="mx-auto max-w-4xl">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+            Build your financial analysis.
+          </h2>
+          <Button variant="ghost" onClick={onSkip}>
+            Skip for now
+          </Button>
+        </div>
+        <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+          Connect accounts for a more complete financial analysis report.
+        </p>
+
+        <div className="mt-7">
+          <ConnectAccountFlow
+            embedded
+            hideChooseHeader
+            onBack={onBack}
+            onAccountAdded={onAccountAdded}
+            onComplete={onConnected}
+          />
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -355,32 +322,28 @@ function MatchScreen({
 
         <div className="mt-8 rounded-xl bg-secondary/30 p-5 sm:p-6">
           <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_18.5rem] sm:items-start">
-            <div className="flex min-w-0 items-start gap-4">
-              <span className="flex h-12 w-32 shrink-0 items-center">
-                <img
-                  src={advisorMatch.logo}
-                  alt="Carson Wealth"
-                  className="h-auto w-full"
-                />
-              </span>
-              <div className="min-w-0">
-                <h3 className="text-lg font-semibold">{advisorMatch.firm}</h3>
-                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
-                  <a
-                    href={advisorMatch.websiteUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 transition-colors hover:text-foreground"
-                  >
-                    <RiGlobalLine className="size-4" /> {advisorMatch.website}
-                  </a>
-                  <a
-                    href={`tel:${advisorMatch.phone.replace(/[^+\d]/g, "")}`}
-                    className="flex items-center gap-2 transition-colors hover:text-foreground"
-                  >
-                    <RiPhoneLine className="size-4" /> {advisorMatch.phone}
-                  </a>
-                </div>
+            <div className="min-w-0">
+              <img
+                src={advisorMatch.logo}
+                alt="Carson Wealth"
+                className="h-auto w-36"
+              />
+              <h3 className="mt-4 text-lg font-semibold">{advisorMatch.firm}</h3>
+              <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                <a
+                  href={advisorMatch.websiteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 transition-colors hover:text-foreground"
+                >
+                  <RiGlobalLine className="size-4" /> {advisorMatch.website}
+                </a>
+                <a
+                  href={`tel:${advisorMatch.phone.replace(/[^+\d]/g, "")}`}
+                  className="flex items-center gap-2 transition-colors hover:text-foreground"
+                >
+                  <RiPhoneLine className="size-4" /> {advisorMatch.phone}
+                </a>
               </div>
             </div>
             <div className="w-full sm:justify-self-end">
@@ -399,7 +362,7 @@ function MatchScreen({
             </div>
           </div>
 
-          <div className="mt-8 grid gap-7 sm:grid-cols-2 sm:gap-12">
+          <div className="mt-8 grid gap-7 sm:grid-cols-[minmax(0,1fr)_18.5rem] sm:gap-12">
             <MatchList title="Your priorities" items={advisorMatch.matchReasons} />
             <MatchList title="Relevant experience" items={advisorMatch.expertise} />
           </div>
@@ -467,7 +430,7 @@ function ScheduleScreen({
   return (
     <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
       <div className="mx-auto max-w-4xl">
-        <h2 className="text-3xl font-semibold tracking-[-0.03em]">
+        <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
           Choose a time.
         </h2>
 
@@ -505,7 +468,7 @@ function ScheduleScreen({
                       aria-pressed={date === item.id}
                       onClick={() => onDateChange(item.id)}
                       className={cn(
-                        "flex min-h-20 flex-col items-center justify-center rounded-lg border text-sm transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97]",
+                        "flex min-h-20 flex-col items-center justify-center rounded-lg border text-sm transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100",
                         date === item.id
                           ? "border-primary bg-primary text-primary-foreground"
                           : "border-border hover:border-input hover:bg-secondary/35"
@@ -529,7 +492,7 @@ function ScheduleScreen({
                       aria-pressed={time === item}
                       onClick={() => onTimeChange(item)}
                       className={cn(
-                        "rounded-lg border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.98]",
+                        "rounded-lg border px-3 py-2.5 text-sm font-medium transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100",
                         time === item
                           ? "border-foreground bg-secondary text-foreground"
                           : "border-border hover:border-input"
@@ -561,11 +524,11 @@ function ScheduleScreen({
 function NextScreen({
   appointment,
   onBack,
-  onFinish,
+  onContinue,
 }: {
   appointment: AdvisorAppointment
   onBack: () => void
-  onFinish: () => void
+  onContinue: () => void
 }) {
   const items = [
     {
@@ -577,21 +540,33 @@ function NextScreen({
       body: "Note any goals, questions, or financial decisions you want to discuss.",
     },
     {
-      title: "Keep your analysis handy",
-      body: "Your Halo financial analysis will stay available here for the conversation.",
+      title: "Complete your financial picture",
+      body: "Add accounts in the next step to make your financial analysis more complete.",
     },
   ]
 
   return (
     <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
       <div className="mx-auto w-full max-w-4xl">
-        <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-          What’s next
-        </h2>
-        <p className="mt-4 text-lg font-medium">{appointment.label}</p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          30-minute video call with {advisorMatch.firm}
-        </p>
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+              What’s next
+            </h2>
+            <p className="mt-4 text-lg font-medium">{appointment.label}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              30-minute video call with {advisorMatch.firm}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => downloadAdvisorAppointment(appointment)}
+            className="shrink-0 gap-2 self-start"
+          >
+            <RiDownload2Line className="size-4" />
+            Download calendar event
+          </Button>
+        </div>
 
         <div className="mt-8 space-y-6 rounded-xl bg-secondary/30 p-5 sm:p-6">
           {items.map((item, index) => (
@@ -615,21 +590,10 @@ function NextScreen({
             <RiArrowLeftLine className="size-4" />
             Back to your match
           </Button>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => downloadAdvisorAppointment(appointment)}
-              className="gap-2"
-            >
-              <RiDownload2Line className="size-4" />
-              Download calendar event
-            </Button>
-            <Button size="lg" onClick={onFinish} className="gap-2">
-              Go to Advisor Match
-              <RiArrowRightLine className="size-4" />
-            </Button>
-          </div>
+          <Button size="lg" onClick={onContinue} className="gap-2">
+            Continue to accounts
+            <RiArrowRightLine className="size-4" />
+          </Button>
         </div>
       </div>
     </div>

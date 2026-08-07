@@ -6,8 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { Toaster } from "@/components/ui/sonner"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AccountsProvider } from "@/components/accounts-provider"
+import { AccountConnectionNudge } from "@/components/account-connection-nudge"
 import { AskHaloProvider } from "@/components/ask-halo"
 import { AdvisorMatchOnboarding } from "@/components/advisor-match-onboarding"
+import { DemoDataToggle } from "@/components/demo-data-toggle"
 import type { AdvisorAppointment } from "@/lib/advisor-match"
 import Home from "@/routes/home"
 import AskHalo from "@/routes/ask"
@@ -22,6 +24,8 @@ import Placeholder from "@/routes/placeholder"
 export default function App() {
   const [advisorIntroOpen, setAdvisorIntroOpen] = React.useState(true)
   const [appointment, setAppointment] = React.useState<AdvisorAppointment | null>(null)
+  const [analysisReady, setAnalysisReady] = React.useState(false)
+  const [connectNudgeOpen, setConnectNudgeOpen] = React.useState(false)
 
   function dismissAdvisorIntro() {
     setAdvisorIntroOpen(false)
@@ -35,15 +39,33 @@ export default function App() {
     setAdvisorIntroOpen(false)
   }
 
+  function setDemoData(filled: boolean) {
+    setAnalysisReady(filled)
+    if (filled) setConnectNudgeOpen(false)
+  }
+
+  function openAccountConnection() {
+    setConnectNudgeOpen(false)
+    setAdvisorIntroOpen(true)
+  }
+
   return (
     <TooltipProvider delayDuration={200}>
-      <AccountsProvider>
+      <AccountsProvider filled={analysisReady}>
         <AskHaloProvider>
           <SidebarProvider>
             <AppSidebar />
             <SidebarInset className="min-w-0">
               <Routes>
-              <Route path="/" element={<Home />} />
+              <Route
+                path="/"
+                element={
+                  <Home
+                    analysisReady={analysisReady}
+                    onConnectAccounts={openAccountConnection}
+                  />
+                }
+              />
               <Route path="/accounts" element={<Accounts />} />
               <Route path="/ask" element={<AskHalo />} />
               <Route
@@ -56,7 +78,10 @@ export default function App() {
                 }
               />
               <Route path="/tools/calculators" element={<Calculators />} />
-              <Route path="/tools/goals" element={<Goals />} />
+              <Route
+                path="/tools/goals"
+                element={<Goals filled={analysisReady} />}
+              />
               <Route
                 path="/advisors"
                 element={
@@ -86,9 +111,20 @@ export default function App() {
               onDismiss={dismissAdvisorIntro}
               onConfirm={confirmAdvisorAppointment}
               onComplete={completeAdvisorIntro}
+              onAnalysisReady={() => {
+                setAnalysisReady(true)
+                setConnectNudgeOpen(false)
+              }}
+              onAccountsSkipped={() => setConnectNudgeOpen(true)}
+            />
+            <AccountConnectionNudge
+              open={connectNudgeOpen}
+              onOpenChange={setConnectNudgeOpen}
+              onConnect={openAccountConnection}
             />
           </SidebarProvider>
           <Toaster />
+          <DemoDataToggle filled={analysisReady} onChange={setDemoData} />
         </AskHaloProvider>
       </AccountsProvider>
     </TooltipProvider>

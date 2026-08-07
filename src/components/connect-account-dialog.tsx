@@ -45,51 +45,98 @@ export function ConnectAccountDialog({
   onOpenChange: (open: boolean) => void
   onAccountAdded: (account: Account) => void
 }) {
-  const [mode, setMode] = React.useState<Mode>("choose")
-
-  // Reset to the chooser whenever the dialog reopens.
   function handleOpenChange(next: boolean) {
-    if (!next) setMode("choose")
     onOpenChange(next)
   }
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
-        {mode === "choose" && <ChooseStep onSelect={setMode} />}
-        {mode === "plaid" && (
-          <PlaidStep
-            onBack={() => setMode("choose")}
-            onDone={() => handleOpenChange(false)}
-          />
-        )}
-        {mode === "manual" && (
-          <ManualStep
-            onBack={() => setMode("choose")}
-            onDone={(account) => {
-              onAccountAdded(account)
-              handleOpenChange(false)
-            }}
-          />
-        )}
+        <ConnectAccountFlow
+          onAccountAdded={onAccountAdded}
+          onComplete={() => handleOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   )
 }
 
-function ChooseStep({ onSelect }: { onSelect: (mode: Mode) => void }) {
+export function ConnectAccountFlow({
+  onAccountAdded,
+  onComplete,
+  onBack,
+  hideChooseHeader = false,
+  embedded = false,
+}: {
+  onAccountAdded: (account: Account) => void
+  onComplete: () => void
+  onBack?: () => void
+  hideChooseHeader?: boolean
+  embedded?: boolean
+}) {
+  const [mode, setMode] = React.useState<Mode>("choose")
+
+  if (mode === "plaid") {
+    return (
+      <div className="grid gap-4">
+        <PlaidStep
+          onBack={() => setMode("choose")}
+          onDone={onComplete}
+          embedded={embedded}
+        />
+      </div>
+    )
+  }
+
+  if (mode === "manual") {
+    return (
+      <div className="grid gap-4">
+        <ManualStep
+          onBack={() => setMode("choose")}
+          embedded={embedded}
+          onDone={(account) => {
+            onAccountAdded(account)
+            onComplete()
+          }}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid gap-4">
+      <ChooseStep
+        onSelect={setMode}
+        onBack={onBack}
+        hideHeader={hideChooseHeader}
+      />
+    </div>
+  )
+}
+
+function ChooseStep({
+  onSelect,
+  onBack,
+  hideHeader,
+}: {
+  onSelect: (mode: Mode) => void
+  onBack?: () => void
+  hideHeader?: boolean
+}) {
   return (
     <>
-      <DialogHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-          <RiBankLine className="size-5" />
-        </span>
-        <DialogTitle>Connect accounts</DialogTitle>
-        <DialogDescription>
-          Add an account manually, or connect an institution through Plaid to
-          sync balances automatically.
-        </DialogDescription>
-      </DialogHeader>
+      {!hideHeader && (
+        <DialogHeader>
+          <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+            <RiBankLine className="size-5" />
+          </span>
+          <DialogTitle>Connect accounts</DialogTitle>
+          <DialogDescription>
+            Add an account manually, or connect an institution through Plaid to
+            sync balances automatically.
+          </DialogDescription>
+        </DialogHeader>
+      )}
       <div className="grid gap-2.5">
         <OptionRow
           icon={RiPencilLine}
@@ -104,6 +151,14 @@ function ChooseStep({ onSelect }: { onSelect: (mode: Mode) => void }) {
           onClick={() => onSelect("plaid")}
         />
       </div>
+      {onBack && (
+        <div>
+          <Button variant="ghost" className="gap-1.5" onClick={onBack}>
+            <RiArrowLeftLine className="size-4" />
+            Back
+          </Button>
+        </div>
+      )}
     </>
   )
 }
@@ -142,17 +197,21 @@ function OptionRow({
 function PlaidStep({
   onBack,
   onDone,
+  embedded = false,
 }: {
   onBack: () => void
   onDone: () => void
+  embedded?: boolean
 }) {
   return (
     <>
       <DialogHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-          <RiShieldCheckLine className="size-5" />
-        </span>
-        <DialogTitle>Connect with Plaid</DialogTitle>
+        {!embedded && (
+          <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+            <RiShieldCheckLine className="size-5" />
+          </span>
+        )}
+        <DialogTitle className={cn(embedded && "text-xl")}>Connect with Plaid</DialogTitle>
         <DialogDescription>
           Connect a financial institution through Plaid to sync eligible account
           balances automatically.
@@ -162,7 +221,7 @@ function PlaidStep({
         You’ll sign in securely with Plaid and choose which accounts to share;
         Halo receives read-only account data, never your login credentials.
       </div>
-      <DialogFooter>
+      <DialogFooter className={cn(embedded && "sm:justify-between")}>
         <Button variant="outline" className="gap-1.5" onClick={onBack}>
           <RiArrowLeftLine className="size-4" />
           Back
@@ -324,35 +383,16 @@ function AnimatedHeight({
   open: boolean
   children: React.ReactNode
 }) {
-  const contentRef = React.useRef<HTMLDivElement>(null)
-  const [height, setHeight] = React.useState(0)
-
-  React.useEffect(() => {
-    const content = contentRef.current
-    if (!content || !open) {
-      setHeight(0)
-      return
-    }
-
-    const updateHeight = () => setHeight(content.scrollHeight)
-    updateHeight()
-
-    const observer = new ResizeObserver(updateHeight)
-    observer.observe(content)
-    return () => observer.disconnect()
-  }, [open])
-
   return (
     <div
       aria-hidden={!open}
       className={cn(
-        "overflow-hidden transition-[height,opacity] duration-[260ms] [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none",
-        open ? "opacity-100" : "pointer-events-none opacity-0"
+        "grid transition-[grid-template-rows,opacity] duration-[260ms] [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none",
+        open ? "grid-rows-[1fr] opacity-100" : "pointer-events-none grid-rows-[0fr] opacity-0"
       )}
-      style={{ height: open ? height : 0 }}
     >
-      <div ref={contentRef} className="p-1">
-        {children}
+      <div className="min-h-0 overflow-hidden">
+        <div className="p-1">{children}</div>
       </div>
     </div>
   )
@@ -361,9 +401,11 @@ function AnimatedHeight({
 function ManualStep({
   onBack,
   onDone,
+  embedded = false,
 }: {
   onBack: () => void
   onDone: (account: Account) => void
+  embedded?: boolean
 }) {
   const [categoryIndex, setCategoryIndex] = React.useState<number | null>(null)
   const [type, setType] = React.useState("")
@@ -431,10 +473,12 @@ function ManualStep({
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <DialogHeader>
-        <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-          <RiPencilLine className="size-5" />
-        </span>
-        <DialogTitle>Add account manually</DialogTitle>
+        {!embedded && (
+          <span className="mb-1 flex size-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+            <RiPencilLine className="size-5" />
+          </span>
+        )}
+        <DialogTitle className={cn(embedded && "text-xl")}>Add account manually</DialogTitle>
         <DialogDescription className="sr-only">
           Add an account manually.
         </DialogDescription>
@@ -551,7 +595,7 @@ function ManualStep({
         </AnimatedHeight>
       </div>
 
-      <DialogFooter>
+      <DialogFooter className={cn(embedded && "sm:justify-between")}>
         <Button type="button" variant="outline" className="gap-1.5" onClick={onBack}>
           <RiArrowLeftLine className="size-4" />
           Back

@@ -154,7 +154,7 @@ export function MortgageResultView({ result }: { result: MortgageResult }) {
                   stroke="none"
                   isAnimationActive={!reducedMotion}
                   animationBegin={180}
-                  animationDuration={900}
+                  animationDuration={500}
                   animationEasing="ease-out"
                 >
                   {slices.map((_, i) => (

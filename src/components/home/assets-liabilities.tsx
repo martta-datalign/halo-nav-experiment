@@ -413,7 +413,7 @@ function CompositionCard({
           </div>
           <ResponsiveContainer width="100%" height="100%" minWidth={0} className="relative z-10">
             <PieChart>
-              <Pie data={data} dataKey="value" innerRadius={70} outerRadius={98} paddingAngle={2} stroke="var(--card)" strokeWidth={3}>
+              <Pie data={data} dataKey="value" innerRadius={70} outerRadius={98} paddingAngle={2} stroke="var(--card)" strokeWidth={3} isAnimationActive={false}>
                 {data.map((entry, index) => (
                   <Cell key={entry.name} fill={colors[index % colors.length]} />
                 ))}

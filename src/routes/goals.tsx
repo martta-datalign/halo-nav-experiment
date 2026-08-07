@@ -87,11 +87,19 @@ function makeId() {
   return `goal-custom-${nextId}`
 }
 
-export default function Goals() {
-  const [goals, setGoals] = React.useState<Goal[]>(seedGoals)
+export default function Goals({ filled = true }: { filled?: boolean }) {
+  const [goals, setGoals] = React.useState<Goal[]>(() =>
+    filled ? seedGoals : []
+  )
   // `null` = closed, "new" = adding, or the goal being edited.
   const [editing, setEditing] = React.useState<Goal | "new" | null>(null)
   const [deleting, setDeleting] = React.useState<Goal | null>(null)
+
+  React.useEffect(() => {
+    setGoals(filled ? seedGoals : [])
+    setEditing(null)
+    setDeleting(null)
+  }, [filled])
 
   const byCategory = GOAL_CATEGORY_ORDER.map((category) => ({
     category,
@@ -131,14 +139,16 @@ export default function Goals() {
               amount you've saved so far up to date.
             </p>
           </div>
-          <Button
-            className="shrink-0 gap-1.5 max-sm:size-9 max-sm:px-0"
-            aria-label="Add goal"
-            onClick={() => setEditing("new")}
-          >
-            <RiAddLine className="size-4" />
-            <span className="max-sm:hidden">Add goal</span>
-          </Button>
+          {byCategory.length > 0 && (
+            <Button
+              className="shrink-0 gap-1.5 max-sm:size-9 max-sm:px-0"
+              aria-label="Add goal"
+              onClick={() => setEditing("new")}
+            >
+              <RiAddLine className="size-4" />
+              <span className="max-sm:hidden">Add goal</span>
+            </Button>
+          )}
         </div>
 
         {byCategory.length === 0 ? (
@@ -276,8 +286,8 @@ function GoalCard({
 
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
         <div
-          className="h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
-          style={{ width: `${pct}%`, background: accent }}
+          className="h-full w-full origin-left rounded-full transition-transform duration-300 [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none"
+          style={{ transform: `scaleX(${pct / 100})`, background: accent }}
         />
       </div>
 
@@ -582,8 +592,8 @@ function GoalDialog({
             </div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-secondary">
               <div
-                className="h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none"
-                style={{ width: `${previewPct}%`, background: accent }}
+                className="h-full w-full origin-left rounded-full transition-transform duration-300 [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none"
+                style={{ transform: `scaleX(${previewPct / 100})`, background: accent }}
               />
             </div>
           </div>

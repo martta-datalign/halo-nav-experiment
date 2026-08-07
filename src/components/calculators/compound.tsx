@@ -180,7 +180,7 @@ export function CompoundResultView({ result }: { result: CompoundResult }) {
                   fill={s.color}
                   isAnimationActive={!reducedMotion}
                   animationBegin={180}
-                  animationDuration={720}
+                  animationDuration={500}
                   animationEasing="ease-out"
                   radius={i === SERIES.length - 1 ? [3, 3, 0, 0] : 0}
                   maxBarSize={40}

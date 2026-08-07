@@ -160,8 +160,9 @@ export function MoneyFlowCard() {
         <div className="min-w-[720px]">
           <ResponsiveContainer width="100%" height={CHART_HEIGHT} minWidth={0}>
             <Sankey
-              key={range}
               data={{ nodes: flow.nodes, links: flow.links }}
+              // recharts' Sankey type omits isAnimationActive though it's honored at runtime
+              {...({ isAnimationActive: false } as { isAnimationActive?: boolean })}
               node={<FlowNodeShape total={flow.total} />}
               link={<FlowLinkShape />}
               nodePadding={16}

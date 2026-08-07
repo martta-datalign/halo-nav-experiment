@@ -99,7 +99,7 @@ export function VaultDialog({
           </div>
           {docs.length === 0 ? (
             <p className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-[13px] text-muted-foreground">
-              No documents yet. RiUpload2Line one above to get started.
+              No documents yet. Upload one above to get started.
             </p>
           ) : (
             <div className="-mx-1 max-h-64 space-y-0.5 overflow-y-auto px-1">
@@ -123,7 +123,7 @@ export function VaultDialog({
                     type="button"
                     onClick={() => onDelete(d.id)}
                     aria-label={`Delete ${d.name}`}
-                    className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[color,background-color,opacity,transform] duration-150 ease-out hover:bg-negative/10 hover:text-negative active:scale-90 motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:opacity-100 group-hover:opacity-100"
+                    className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-[color,background-color,opacity,transform] duration-150 ease-out hover:bg-negative/10 hover:text-negative active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:opacity-100 group-hover:opacity-100"
                   >
                     <RiDeleteBinLine className="size-4" />
                   </button>

@@ -67,27 +67,30 @@ export default function Accounts() {
   const { accounts: connectedAccounts, addAccount, removeAccount } = useAccounts()
   const [disconnecting, setDisconnecting] = React.useState<Account | null>(null)
   const institutions = groupByInstitution(connectedAccounts)
+  const hasAccounts = connectedAccounts.length > 0
 
   return (
     <>
       <SiteHeader
         hideAddAccounts
         actions={
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                className="header-responsive-action gap-1.5 max-sm:size-9 max-sm:px-0"
-                aria-label="Connect accounts"
-                onClick={() => setConnectOpen(true)}
-              >
-                <RiAddLine className="size-4" />
-                <span className="header-action-label max-sm:sr-only">Connect accounts</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent portalled={false} side="bottom" sideOffset={8} className="header-action-tooltip">
-              Connect accounts
-            </TooltipContent>
-          </Tooltip>
+          hasAccounts ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  className="header-responsive-action gap-1.5 max-sm:size-9 max-sm:px-0"
+                  aria-label="Connect accounts"
+                  onClick={() => setConnectOpen(true)}
+                >
+                  <RiAddLine className="size-4" />
+                  <span className="header-action-label max-sm:sr-only">Connect accounts</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent portalled={false} side="bottom" sideOffset={8} className="header-action-tooltip">
+                Connect accounts
+              </TooltipContent>
+            </Tooltip>
+          ) : undefined
         }
       />
 
@@ -99,38 +102,61 @@ export default function Accounts() {
               Manage connected institutions and manually added accounts.
             </p>
           </div>
-          <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
+          {hasAccounts && (
+            <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
+          )}
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <SummaryCard label="Institutions" value={String(institutions.length)} />
-          <SummaryCard label="Accounts" value={String(connectedAccounts.length)} />
-          <SummaryCard label="Sync status" value="Up to date" positive />
-        </div>
+        {hasAccounts ? (
+          <>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <SummaryCard label="Institutions" value={String(institutions.length)} />
+              <SummaryCard label="Accounts" value={String(connectedAccounts.length)} />
+              <SummaryCard label="Sync status" value="Up to date" positive />
+            </div>
 
-        <section className="mt-6">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold">Accounts</h2>
-            <span className="text-xs text-muted-foreground">
-              Connected balances sync through Plaid; manual balances update here
-            </span>
-          </div>
+            <section className="mt-6">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <h2 className="text-base font-semibold">Accounts</h2>
+                <span className="text-xs text-muted-foreground">
+                  Connected balances sync through Plaid; manual balances update here
+                </span>
+              </div>
 
-          <div className="space-y-4">
-            {institutions.map((institution) => (
-              <InstitutionCard
-                key={institution.institution}
-                institution={institution.institution}
-                accounts={institution.accounts}
-                onDisconnectAccount={setDisconnecting}
-              />
-            ))}
-          </div>
-        </section>
+              <div className="space-y-4">
+                {institutions.map((institution) => (
+                  <InstitutionCard
+                    key={institution.institution}
+                    institution={institution.institution}
+                    accounts={institution.accounts}
+                    onDisconnectAccount={setDisconnecting}
+                  />
+                ))}
+              </div>
+            </section>
 
-        <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
-          Halo uses Plaid for secure, read-only access to connected balances. Manually added accounts stay under your control and do not sync automatically.
-        </p>
+            <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+              Halo uses Plaid for secure, read-only access to connected balances. Manually added accounts stay under your control and do not sync automatically.
+            </p>
+          </>
+        ) : (
+          <section className="mt-10 flex min-h-80 items-center justify-center rounded-xl border border-dashed border-border bg-card/40 p-8 text-center">
+            <div className="max-w-sm">
+              <span className="mx-auto flex size-11 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
+                <RiBankLine className="size-5" />
+              </span>
+              <h2 className="mt-4 text-base font-semibold">No accounts yet</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Connect an institution or add an account manually to build your
+                financial picture.
+              </p>
+              <Button className="mt-5 gap-1.5" onClick={() => setConnectOpen(true)}>
+                <RiAddLine className="size-4" />
+                Connect accounts
+              </Button>
+            </div>
+          </section>
+        )}
       </div>
 
       <ConnectAccountDialog

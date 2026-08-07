@@ -64,7 +64,7 @@ export function OpportunitiesCard() {
   return (
     <Card className="gap-0 overflow-hidden p-0">
       <div
-        className="flex h-[410px] flex-col px-5 py-5"
+        className="grid"
         onTouchStart={(event) => {
           touchStartX.current = event.touches[0]?.clientX ?? null
         }}
@@ -77,56 +77,71 @@ export function OpportunitiesCard() {
           goTo(current + (distance < 0 ? 1 : -1))
         }}
       >
-        <div className="text-xs font-medium text-muted-foreground">
-          {opportunity.eyebrow}
-        </div>
+        {opportunities.map((item, index) => {
+          const isActive = index === current
+          return (
+            <div
+              key={item.title}
+              aria-hidden={!isActive}
+              inert={!isActive}
+              className={cn(
+                "col-start-1 row-start-1 flex flex-col px-5 py-5 transition-opacity duration-[220ms] [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none",
+                isActive ? "z-10 opacity-100" : "pointer-events-none opacity-0"
+              )}
+            >
+              <div className="text-xs font-medium text-muted-foreground">
+                {item.eyebrow}
+              </div>
 
-        <h3 className="mt-4 text-xl font-semibold leading-tight tracking-[-0.015em] text-foreground">
-          {opportunity.title}
-        </h3>
+              <h3 className="mt-4 text-xl font-semibold leading-tight tracking-[-0.015em] text-foreground">
+                {item.title}
+              </h3>
 
-        <div className="mt-3 flex h-16 items-center">
-          <img
-            src={opportunity.image}
-            alt={opportunity.imageAlt}
-            className={cn("object-contain object-left", opportunity.imageClassName)}
-          />
-        </div>
+              <div className="mt-3 flex h-16 items-center">
+                <img
+                  src={item.image}
+                  alt={item.imageAlt}
+                  className={cn("object-contain object-left", item.imageClassName)}
+                />
+              </div>
 
-        <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
-          {opportunity.detail}
-        </p>
+              <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
+                {item.detail}
+              </p>
 
-        <div className="mt-auto rounded-xl bg-secondary/55 p-3.5">
-          <p className="text-xs font-medium text-muted-foreground">
-            {opportunity.valueLabel}
-          </p>
-          <div className="mt-1 flex items-baseline gap-1.5">
-            <span className="text-[30px] font-semibold leading-none tracking-[-0.025em] text-foreground">
-              {opportunity.value}
-            </span>
-            <span className="text-sm font-medium text-muted-foreground">per year</span>
-          </div>
-        </div>
+              <div className="mt-4 rounded-xl bg-secondary/55 p-3.5">
+                <p className="text-xs font-medium text-muted-foreground">
+                  {item.valueLabel}
+                </p>
+                <div className="mt-1 flex items-baseline gap-1.5">
+                  <span className="text-[30px] font-semibold leading-none tracking-[-0.025em] text-foreground">
+                    {item.value}
+                  </span>
+                  <span className="text-sm font-medium text-muted-foreground">per year</span>
+                </div>
+              </div>
 
-        <Button
-          className="mt-4 w-full"
-          onClick={() => toast.info(`${opportunity.action} selected`)}
-        >
-          {opportunity.action}
-        </Button>
-        <button
-          type="button"
-          className="mt-2 self-center px-2 py-1 text-xs font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-          onClick={() => {
-            const remaining = opportunities.filter((_, index) => index !== current)
-            setOpportunities(remaining)
-            setCurrent(current >= remaining.length ? 0 : current)
-            toast.info("Offer removed from your opportunities")
-          }}
-        >
-          Not interested in this offer
-        </button>
+              <Button
+                className="mt-4 w-full"
+                onClick={() => toast.info(`${item.action} selected`)}
+              >
+                {item.action}
+              </Button>
+              <button
+                type="button"
+                className="mt-2 self-center px-2 py-1 text-xs font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                onClick={() => {
+                  const remaining = opportunities.filter((_, i) => i !== index)
+                  setOpportunities(remaining)
+                  setCurrent(current >= remaining.length ? 0 : current)
+                  toast.info("Offer removed from your opportunities")
+                }}
+              >
+                Not interested in this offer
+              </button>
+            </div>
+          )
+        })}
       </div>
 
       <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -148,7 +163,7 @@ export function OpportunitiesCard() {
               aria-current={index === current ? "true" : undefined}
               onClick={() => goTo(index)}
               className={cn(
-                "h-1.5 rounded-full transition-[width,background-color] duration-300 ease-out motion-reduce:transition-none",
+                "h-1.5 rounded-full transition-[width,background-color] duration-200 [transition-timing-function:var(--motion-ease-out)] motion-reduce:transition-none",
                 index === current ? "w-5 bg-foreground" : "w-1.5 bg-border hover:bg-muted-foreground/50"
               )}
             />
