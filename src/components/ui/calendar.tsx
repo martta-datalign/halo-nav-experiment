@@ -85,7 +85,7 @@ export function Calendar({
         {WEEKDAYS.map((w, i) => (
           <div
             key={i}
-            className="flex h-8 items-center justify-center text-[11px] font-medium text-muted-foreground"
+            className="flex h-8 items-center justify-center text-xs font-medium text-muted-foreground"
           >
             {w}
           </div>

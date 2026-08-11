@@ -4,12 +4,28 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Halo AI — design tokens, "Mercury / Willow" voice.
-  Warm off-white surfaces, hairline borders, near-black primary (Mercury signature),
-  and a reserved violet "Halo" accent used only for AI/Ask-Halo affordances.
+  Halo — design tokens, "Mercury / Willow" voice.
+  Near-white surfaces, hairline borders, near-black primary (Mercury signature),
+  and a single reserved "Halo" accent used only for AI/Ask-Halo affordances.
+
+  ── White-label structure ──────────────────────────────────────────────
+  Tokens split into two layers:
+    • BRAND (swappable per tenant): the --halo accent family and --font-sans.
+      These are the ONLY tokens a firm overrides. At runtime, src/lib/theme.ts
+      injects a <style id="tenant-theme"> block that redefines them (for both
+      :root and .dark). The values below are the neutral graphite DEFAULT that
+      ships unbranded.
+    • CHASSIS (locked): neutrals, spacing, radius, motion, status semantics,
+      and the chart palette. These define the product's design language and are
+      NOT tenant-overridable — that is what keeps every firm's instance looking
+      intentional rather than letting them break the layout.
+  Neutrals are hue-neutral (chroma ~0) on purpose: a tenant accent of any hue
+  then sits cleanly on the chrome instead of subtly clashing with a cool tint.
 */
 :root {
-  --radius: 0.625rem;
+  /* ── CHASSIS (locked) ── */
+  /* 8px base → nav items, inputs, dropdowns. Cards use 16px, CTAs are pills. */
+  --radius: 0.5rem;
 
   /* Motion system: quick feedback, calm state changes, no playful bounce. */
   --motion-fast: 160ms;
@@ -19,38 +35,54 @@
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-ease-in: cubic-bezier(0.4, 0, 1, 1); /* never for UI enter/exit — delays the moment the user watches; reserve for exits that leave the screen */
 
+  /* Text hierarchy — three neutral tiers:
+       --foreground      #292929  headings / primary text
+       --muted-foreground #5D5D5D  secondary text (labels, descriptions)
+       --subtle          #9E9E9E  tertiary text (timestamps, placeholders, hints) */
   --background: oklch(1 0 0);            /* white content field */
-  --foreground: oklch(0.22 0.015 270);   /* cool near-black text */
+  --foreground: oklch(0.281 0 0);        /* #292929 */
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.015 270);
+  --card-foreground: oklch(0.281 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.015 270);
+  --popover-foreground: oklch(0.281 0 0);
 
-  /* Primary = near-black (Mercury-style dark buttons), faintly cool */
-  --primary: oklch(0.23 0.015 265);
-  --primary-foreground: oklch(0.98 0.003 265);
+  /* Primary = #292929 charcoal (dark pill CTAs) */
+  --primary: oklch(0.281 0 0);
+  --primary-foreground: oklch(0.98 0 0);
 
-  --secondary: oklch(0.95 0.007 265);
-  --secondary-foreground: oklch(0.23 0.015 265);
-  --muted: oklch(0.95 0.007 265);
-  --muted-foreground: oklch(0.5 0.015 265);
-  --accent: oklch(0.95 0.007 265);
-  --accent-foreground: oklch(0.23 0.015 265);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.281 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.478 0 0);  /* #5D5D5D */
+  --subtle: oklch(0.699 0 0);            /* #9E9E9E */
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.281 0 0);
 
   --destructive: oklch(0.56 0.17 27);
 
-  --border: oklch(0.92 0.007 265);       /* cool hairline */
-  --input: oklch(0.89 0.009 265);
-  --ring: oklch(0.23 0.015 265);         /* focus = neutral, never semantic */
+  --border: oklch(0.928 0 0);            /* #EDEDED hairline */
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.281 0 0);              /* focus = neutral, never semantic */
 
-  /* Halo AI accent — a refined, dusty periwinkle. Reserved for genuine AI/Halo
-     moments (brand mark, Ask Halo affordances, insights) and used sparingly. */
-  --halo: oklch(0.56 0.12 285);
+  /* ── BRAND (swappable per tenant — see src/lib/theme.ts) ──
+     The "Halo" accent. Reserved for genuine AI/Halo moments (brand mark, Ask
+     Halo affordances, insights) and used sparingly. Default is neutral graphite
+     so the unbranded product reads as refined-dark until a firm sets its color. */
+  --halo: oklch(0.35 0.01 270);
   --halo-foreground: oklch(1 0 0);
-  --halo-subtle: oklch(0.97 0.016 285);
-  --halo-border: oklch(0.91 0.03 285);
+  --halo-subtle: oklch(0.96 0.003 270);
+  --halo-border: oklch(0.88 0.006 270);
 
+  /* Brand typeface. Default is SF Pro via the Apple system stack — it renders
+     natively on Apple devices (no web-font files; same mechanism the reference
+     UI uses) and falls back gracefully elsewhere. A tenant overrides only this
+     family list; the generic fallback stack below stays fixed. See
+     FONT_REGISTRY in src/lib/theme.ts for how a new font is registered. */
+  --brand-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "SF Pro Display", "SF Pro";
+
+  /* ── CHASSIS (locked) ── */
   /* Status semantics — green is reserved for success, confirmation, and gains. */
   --positive: oklch(0.56 0.13 155);
   --positive-subtle: oklch(0.97 0.025 155);
@@ -60,48 +92,53 @@
   --warning-subtle: oklch(0.97 0.025 78);
   --info: oklch(0.57 0.12 250);
 
-  /* Data viz */
-  --chart-1: oklch(0.55 0.12 285);
+  /* Data viz — a fixed, legible categorical palette, independent of brand.
+     Intentionally does NOT track the tenant accent (charts must stay readable
+     across every firm's color). --chart-1 is a neutral-friendly blue. */
+  --chart-1: oklch(0.59 0.13 250);
   --chart-2: oklch(0.62 0.1 205);
   --chart-3: oklch(0.67 0.12 78);
-  --chart-4: oklch(0.59 0.13 250);
+  --chart-4: oklch(0.55 0.1 155);
   --chart-5: oklch(0.6 0.12 330);
 
   /* Sidebar */
-  --sidebar: oklch(0.98 0.008 255);
-  --sidebar-foreground: oklch(0.42 0.025 260);
-  --sidebar-primary: oklch(0.23 0.015 265);
-  --sidebar-primary-foreground: oklch(0.98 0.003 265);
-  --sidebar-accent: oklch(0.92 0.025 255);
-  --sidebar-accent-foreground: oklch(0.23 0.015 265);
-  --sidebar-hover: oklch(0.96 0.015 255);
-  --sidebar-border: oklch(0.93 0.014 255);
-  --sidebar-ring: oklch(0.23 0.015 265);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.478 0 0);   /* nav text #5D5D5D */
+  --sidebar-primary: oklch(0.281 0 0);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.946 0 0);       /* active item fill #EDEDED */
+  --sidebar-accent-foreground: oklch(0.281 0 0);
+  --sidebar-hover: oklch(0.97 0 0);
+  --sidebar-border: oklch(0.928 0 0);
+  --sidebar-ring: oklch(0.281 0 0);
 }
 
 .dark {
-  --background: oklch(0.18 0.012 285);
-  --foreground: oklch(0.96 0.006 75);
-  --card: oklch(0.22 0.014 285);
-  --card-foreground: oklch(0.96 0.006 75);
-  --popover: oklch(0.22 0.014 285);
-  --popover-foreground: oklch(0.96 0.006 75);
-  --primary: oklch(0.96 0.006 75);
-  --primary-foreground: oklch(0.22 0.014 285);
-  --secondary: oklch(0.28 0.016 285);
-  --secondary-foreground: oklch(0.96 0.006 75);
-  --muted: oklch(0.28 0.016 285);
-  --muted-foreground: oklch(0.72 0.012 75);
-  --accent: oklch(0.28 0.016 285);
-  --accent-foreground: oklch(0.96 0.006 75);
+  /* ── CHASSIS (locked) — hue-neutral ── */
+  --background: oklch(0.18 0 0);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.22 0 0);
+  --card-foreground: oklch(0.96 0 0);
+  --popover: oklch(0.22 0 0);
+  --popover-foreground: oklch(0.96 0 0);
+  --primary: oklch(0.96 0 0);
+  --primary-foreground: oklch(0.22 0 0);
+  --secondary: oklch(0.28 0 0);
+  --secondary-foreground: oklch(0.96 0 0);
+  --muted: oklch(0.28 0 0);
+  --muted-foreground: oklch(0.72 0 0);
+  --accent: oklch(0.28 0 0);
+  --accent-foreground: oklch(0.96 0 0);
   --destructive: oklch(0.68 0.16 27);
-  --border: oklch(0.31 0.016 285);
-  --input: oklch(0.34 0.018 285);
-  --ring: oklch(0.92 0.01 285);
-  --halo: oklch(0.7 0.13 285);
-  --halo-foreground: oklch(0.18 0.012 285);
-  --halo-subtle: oklch(0.25 0.025 285);
-  --halo-border: oklch(0.38 0.045 285);
+  --border: oklch(0.31 0 0);
+  --input: oklch(0.34 0 0);
+  --ring: oklch(0.92 0 0);
+  /* ── BRAND (swappable) — neutral graphite default (light-on-dark) ── */
+  --halo: oklch(0.72 0.01 270);
+  --halo-foreground: oklch(0.18 0 0);
+  --halo-subtle: oklch(0.27 0.006 270);
+  --halo-border: oklch(0.4 0.008 270);
+  /* ── CHASSIS (locked) ── */
   --positive: oklch(0.7 0.13 155);
   --positive-subtle: oklch(0.25 0.025 155);
   --positive-border: oklch(0.4 0.05 155);
@@ -109,15 +146,15 @@
   --warning: oklch(0.75 0.12 78);
   --warning-subtle: oklch(0.27 0.025 78);
   --info: oklch(0.72 0.11 250);
-  --sidebar: oklch(0.2 0.012 285);
-  --sidebar-foreground: oklch(0.8 0.01 75);
-  --sidebar-primary: oklch(0.96 0.006 75);
-  --sidebar-primary-foreground: oklch(0.22 0.014 285);
-  --sidebar-accent: oklch(0.29 0.016 285);
-  --sidebar-accent-foreground: oklch(0.96 0.006 75);
-  --sidebar-hover: oklch(0.25 0.014 285);
-  --sidebar-border: oklch(0.31 0.016 285);
-  --sidebar-ring: oklch(0.92 0.01 285);
+  --sidebar: oklch(0.2 0 0);
+  --sidebar-foreground: oklch(0.8 0 0);
+  --sidebar-primary: oklch(0.96 0 0);
+  --sidebar-primary-foreground: oklch(0.22 0 0);
+  --sidebar-accent: oklch(0.29 0 0);
+  --sidebar-accent-foreground: oklch(0.96 0 0);
+  --sidebar-hover: oklch(0.25 0 0);
+  --sidebar-border: oklch(0.31 0 0);
+  --sidebar-ring: oklch(0.92 0 0);
 }
 
 @theme inline {
@@ -125,6 +162,23 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Elevation — soft, diffuse, neutral (no color tint), low-opacity. Two
+     layered casts per level give the reference's "barely there but present"
+     feel instead of a single hard drop shadow. Applied via shadow-* utilities:
+       shadow-xs  hairline lift (inputs)
+       shadow-sm  resting cards
+       shadow-md  small popovers / menus
+       shadow-lg  dropdowns / dialogs
+       shadow-xl  large dialogs */
+  --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 6px -1px rgb(0 0 0 / 0.04);
+  --shadow: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 6px -1px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 2px 4px -1px rgb(0 0 0 / 0.04), 0 6px 16px -2px rgb(0 0 0 / 0.06);
+  --shadow-lg: 0 4px 10px -2px rgb(0 0 0 / 0.06), 0 12px 32px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 8px 20px -4px rgb(0 0 0 / 0.08), 0 24px 56px -8px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 12px 28px -6px rgb(0 0 0 / 0.12), 0 32px 72px -12px rgb(0 0 0 / 0.14);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -138,6 +192,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-subtle: var(--subtle);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
@@ -173,8 +228,10 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Brand family (--brand-font-family, tenant-swappable) followed by the fixed
+     fallback stack. */
+  --font-sans: var(--brand-font-family, "Instrument Sans Variable"), ui-sans-serif,
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 @layer base {
@@ -187,11 +244,60 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Base type = 14px; the type scale is 12 / 13 / 14 / 24 only. */
+    font-size: 0.875rem;
+    /* Tighter tracking to match the reference's crisp, dense feel. */
+    letter-spacing: -0.15px;
   }
   /* Financial figures read as aligned columns everywhere */
   .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
+}
+
+/* ── Gradient illustrations ────────────────────────────────────────────
+   The product's source of color. Chrome (text, borders, surfaces) stays
+   neutral; color lives in these decorative card surfaces — mirroring the
+   reference, where the palette comes from gradient art inside cards, not from
+   the UI chrome. Layered radial "mesh" gradients read richer than a single
+   linear ramp. Pair with light text (they're all mid/dark luminance). */
+.gradient-aurora {
+  background-color: oklch(0.45 0.14 274);
+  background-image:
+    radial-gradient(at 16% 20%, oklch(0.62 0.19 300 / 0.9) 0, transparent 55%),
+    radial-gradient(at 84% 8%, oklch(0.64 0.15 236 / 0.85) 0, transparent 52%),
+    radial-gradient(at 68% 92%, oklch(0.6 0.17 350 / 0.7) 0, transparent 55%);
+}
+.gradient-dusk {
+  background-color: oklch(0.5 0.13 28);
+  background-image:
+    radial-gradient(at 12% 18%, oklch(0.68 0.17 40 / 0.9) 0, transparent 55%),
+    radial-gradient(at 88% 12%, oklch(0.62 0.16 12 / 0.85) 0, transparent 50%),
+    radial-gradient(at 70% 95%, oklch(0.6 0.14 330 / 0.7) 0, transparent 55%);
+}
+.gradient-mint {
+  background-color: oklch(0.5 0.11 195);
+  background-image:
+    radial-gradient(at 15% 20%, oklch(0.66 0.14 175 / 0.9) 0, transparent 55%),
+    radial-gradient(at 85% 10%, oklch(0.64 0.13 220 / 0.85) 0, transparent 52%),
+    radial-gradient(at 65% 92%, oklch(0.62 0.12 150 / 0.7) 0, transparent 55%);
+}
+/* Accent-tied — recolors with the tenant brand. Use for genuine Halo/AI
+   moments so branded instances stay cohesive. */
+.gradient-brand {
+  background-color: var(--halo);
+  background-image:
+    radial-gradient(at 18% 18%, color-mix(in oklab, var(--halo) 70%, white) 0, transparent 60%),
+    radial-gradient(at 82% 92%, color-mix(in oklab, var(--halo) 80%, black) 0, transparent 60%);
+}
+/* Soft, light-surface wash — subtle color on a near-white card (for headers
+   that sit above dark body text). */
+.gradient-wash {
+  background-color: oklch(0.97 0.02 274);
+  background-image:
+    radial-gradient(at 12% 18%, oklch(0.9 0.06 300 / 0.7) 0, transparent 55%),
+    radial-gradient(at 88% 20%, oklch(0.91 0.05 220 / 0.7) 0, transparent 55%),
+    radial-gradient(at 70% 95%, oklch(0.92 0.05 350 / 0.6) 0, transparent 55%);
 }
 
 /* Shared application-page rhythm. Surface-specific max-widths remain local. */
@@ -301,6 +407,77 @@
   border-radius: 999px;
   background: currentColor;
   animation: halo-stream-caret 0.8s ease-in-out infinite;
+}
+
+/* ── Halo avatar ───────────────────────────────────────────────────────
+   The assistant's identity: a living bluish gradient orb. A conic gradient
+   slowly rotates behind a soft highlight; the orb breathes gently. Size it
+   with a utility class (e.g. `size-5`, `size-12`). Only transform/opacity
+   animate, so it stays cheap. `.is-active` speeds it up for the thinking state.
+   Reduced motion freezes it to a static gradient. */
+.halo-orb {
+  position: relative;
+  overflow: hidden;
+  border-radius: 9999px;
+  isolation: isolate;
+  background: oklch(0.55 0.13 250);
+  animation: halo-orb-breathe 5s var(--motion-ease-standard) infinite;
+  will-change: transform;
+}
+.halo-orb::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: conic-gradient(
+    from 0deg,
+    oklch(0.63 0.16 250),
+    oklch(0.74 0.13 210),
+    oklch(0.6 0.15 282),
+    oklch(0.72 0.14 200),
+    oklch(0.63 0.16 250)
+  );
+  filter: blur(4px);
+  animation: halo-orb-spin 6.5s linear infinite;
+  will-change: transform;
+}
+.halo-orb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 32% 26%, oklch(1 0 0 / 0.55), transparent 52%),
+    radial-gradient(circle at 74% 82%, oklch(0.38 0.16 278 / 0.55), transparent 58%);
+}
+.halo-orb.is-active {
+  animation-duration: 2.6s;
+}
+.halo-orb.is-active::before {
+  animation-duration: 2.6s;
+}
+
+@keyframes halo-orb-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes halo-orb-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo-orb,
+  .halo-orb::before {
+    animation: none;
+    transform: none;
+  }
 }
 
 .halo-composer-shell {
