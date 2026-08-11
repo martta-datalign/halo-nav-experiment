@@ -100,7 +100,7 @@ export function CompoundForm({
 
       <div className="grid grid-cols-2 gap-4">
         <Field
-          label="Rate of return (Annual %)"
+          label="Rate of return (annual %)"
           required
           hint="Expected average annual growth before inflation."
           htmlFor="c-rate"
@@ -134,7 +134,7 @@ export function CompoundResultView({ result }: { result: CompoundResult }) {
     <div className="flex flex-col gap-4">
       <ResultPanel>
         <p className="text-[13px] text-muted-foreground">Final value</p>
-        <p className="mt-1 text-[28px] font-semibold leading-none tabular-nums text-foreground">
+        <p className="mt-1 text-2xl font-semibold leading-none tabular-nums text-foreground">
           {formatUSD(result.finalValue)}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5">
@@ -146,7 +146,7 @@ export function CompoundResultView({ result }: { result: CompoundResult }) {
       <ResultPanel>
         <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
           {SERIES.map((s) => (
-            <span key={s.key} className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+            <span key={s.key} className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <span className="size-2.5 rounded-full" style={{ background: s.color }} />
               {s.label}
             </span>
@@ -200,7 +200,7 @@ function CompoundTip({ active, payload, label }: any) {
   const point = payload[0].payload as CompoundYearPoint
   return (
     <div className="min-w-[180px] rounded-lg border border-border bg-popover p-3 shadow-md">
-      <div className="text-[11px] font-medium text-muted-foreground">Year {label}</div>
+      <div className="text-xs font-medium text-muted-foreground">Year {label}</div>
       <div className="mt-2 space-y-1.5">
         {SERIES.map((s) => (
           <div key={s.key} className="flex items-center justify-between gap-4">

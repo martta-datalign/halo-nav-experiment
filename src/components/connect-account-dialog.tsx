@@ -211,7 +211,7 @@ function PlaidStep({
             <RiShieldCheckLine className="size-5" />
           </span>
         )}
-        <DialogTitle className={cn(embedded && "text-xl")}>Connect with Plaid</DialogTitle>
+        <DialogTitle className={cn(embedded && "text-2xl")}>Connect with Plaid</DialogTitle>
         <DialogDescription>
           Connect a financial institution through Plaid to sync eligible account
           balances automatically.
@@ -478,7 +478,7 @@ function ManualStep({
             <RiPencilLine className="size-5" />
           </span>
         )}
-        <DialogTitle className={cn(embedded && "text-xl")}>Add account manually</DialogTitle>
+        <DialogTitle className={cn(embedded && "text-2xl")}>Add account manually</DialogTitle>
         <DialogDescription className="sr-only">
           Add an account manually.
         </DialogDescription>

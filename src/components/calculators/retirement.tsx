@@ -131,11 +131,11 @@ export function RetirementResultView({ result }: { result: RetirementResult }) {
           How your savings accumulate over {result.years} years (today's $)
         </p>
         <div className="mt-2 mb-3 flex items-center gap-4">
-          <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="size-2.5 rounded-full" style={{ background: INVESTMENT_COLOR }} />
             Investment
           </span>
-          <span className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <span className="size-2.5 rounded-full" style={{ background: BALANCE_COLOR }} />
             Balance
           </span>
@@ -218,7 +218,7 @@ function RetirementTip({ active, payload }: any) {
   const point = payload[0].payload as RetirementYearPoint
   return (
     <div className="min-w-[180px] rounded-lg border border-border bg-popover p-3 shadow-md">
-      <div className="text-[11px] font-medium text-muted-foreground">Age {point.age}</div>
+      <div className="text-xs font-medium text-muted-foreground">Age {point.age}</div>
       <div className="mt-2 space-y-1.5">
         <div className="flex items-center justify-between gap-4">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">

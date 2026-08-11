@@ -65,7 +65,7 @@ export function CardTitleRow({
 }) {
   return (
     <div className="mb-1 flex items-center justify-between gap-3">
-      <h2 className="text-[15px] font-semibold tracking-[-0.005em]">{title}</h2>
+      <h2 className="text-sm font-semibold tracking-[-0.005em]">{title}</h2>
       {caption && (
         <span className="whitespace-nowrap text-xs text-muted-foreground">
           {caption}

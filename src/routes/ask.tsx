@@ -10,7 +10,6 @@ import {
   RiMore2Line,
   RiPencilLine,
   RiSafe2Line,
-  RiSparkling2Line,
   RiThumbDownLine,
   RiThumbUpLine,
 } from "@remixicon/react"
@@ -44,7 +43,7 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 import { suggestedPrompts } from "@/lib/data"
-import { SiteHeader } from "@/components/site-header"
+import { HaloAvatar } from "@/components/halo-avatar"
 import { SEED_VAULT_DOCS, VaultDialog, type VaultDoc } from "@/components/ask/vault"
 import { StockWidget } from "@/components/ask/stock-widget"
 import { STOCKS, detectStockQuery, type StockSymbol } from "@/lib/stocks"
@@ -369,7 +368,7 @@ export default function AskHalo() {
           </div>
         )}
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
-          <div className="px-2 py-1.5 text-[11px] font-medium uppercase tracking-[0.05em] text-muted-foreground">
+          <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-[0.05em] text-muted-foreground">
             Recent
           </div>
           {chats
@@ -409,7 +408,7 @@ export default function AskHalo() {
                       }
                     }}
                     aria-label="Chat title"
-                    className="h-7 w-full min-w-0 rounded-md border border-ring bg-background px-2 text-base outline-none ring-2 ring-ring/15 md:text-[13px]"
+                    className="h-7 w-full min-w-0 rounded-md border border-ring bg-background px-2 text-sm outline-none ring-2 ring-ring/15 md:text-[13px]"
                   />
                 </form>
               ) : (
@@ -429,7 +428,7 @@ export default function AskHalo() {
                     <span className="w-full truncate text-[13px] font-medium text-foreground">
                       {c.title}
                     </span>
-                    <span className="text-[11px] text-muted-foreground">{c.when}</span>
+                    <span className="text-xs text-muted-foreground">{c.when}</span>
                   </button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -473,8 +472,8 @@ export default function AskHalo() {
             <span className="flex size-7 shrink-0 items-center justify-center rounded-md bg-halo-subtle text-halo">
               <RiSafe2Line className="size-4" />
             </span>
-            <span className="flex-1 text-[13px] font-medium text-foreground">My Vault</span>
-            <span className="text-[11px] text-muted-foreground">{docs.length}</span>
+            <span className="flex-1 text-[13px] font-medium text-foreground">Vault</span>
+            <span className="text-xs text-muted-foreground">{docs.length}</span>
           </button>
         </div>
       </>
@@ -483,38 +482,6 @@ export default function AskHalo() {
 
   return (
     <>
-      <SiteHeader
-        title={active.title}
-        showSearch={false}
-        // On mobile New chat + history live in the header; hide the avatar and
-        // bell so the row doesn't crowd. Both stay reachable from other pages.
-        hideAccountOnMobile
-        hideNotificationsOnMobile
-        actions={
-          <>
-            <Button
-              size="icon"
-              variant="ghost"
-              // 40px touch target on mobile (36px is tight for fingers); the
-              // glyph stays 16px. Desktop is hidden anyway.
-              className="size-10 text-muted-foreground md:hidden"
-              aria-label="New chat"
-              onClick={newChat}
-            >
-              <RiAddLine className="size-5" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="size-10 text-muted-foreground md:hidden"
-              aria-label="Chat history"
-              onClick={() => setHistoryOpen(true)}
-            >
-              <RiChatHistoryLine className="size-5" />
-            </Button>
-          </>
-        }
-      />
       <div className="flex h-[calc(100svh-3.5rem)]">
         {/* Chat history — desktop rail. On mobile this collapses into the Sheet below. */}
         <aside className="hidden w-64 shrink-0 flex-col border-r border-border md:flex">
@@ -535,13 +502,35 @@ export default function AskHalo() {
 
         {/* Conversation */}
         <div className="flex min-w-0 flex-1 flex-col">
+          {/* Mobile: New chat + history live here (the desktop rail is hidden). */}
+          <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2 md:hidden">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-9 text-muted-foreground"
+              aria-label="New chat"
+              onClick={newChat}
+            >
+              <RiAddLine className="size-5" />
+            </Button>
+            <span className="min-w-0 flex-1 truncate text-center text-sm font-medium">
+              {active.title}
+            </span>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="size-9 text-muted-foreground"
+              aria-label="Chat history"
+              onClick={() => setHistoryOpen(true)}
+            >
+              <RiChatHistoryLine className="size-5" />
+            </Button>
+          </div>
           <div ref={scrollRef} className="flex-1 overflow-y-auto">
             <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
               {empty ? (
                 <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
-                  <span className="flex size-12 items-center justify-center rounded-2xl bg-halo-subtle text-halo">
-                    <RiSparkling2Line className="size-6" />
-                  </span>
+                  <HaloAvatar className="size-12 shadow-sm" />
                   <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
                     Ask anything about your money — your goals, cash flow, or what to do
                     next. Halo sees the full picture from your connected accounts.
@@ -570,7 +559,7 @@ export default function AskHalo() {
 
           <div className="bg-background/80 backdrop-blur-md">
             <div className="mx-auto w-full max-w-3xl px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
-              <div className="mb-2 flex w-fit rounded-lg bg-secondary p-0.5 text-[12px]">
+              <div className="mb-2 flex w-fit rounded-lg bg-secondary p-0.5 text-xs">
                 {(["simple", "deep"] as const).map((m) => (
                   <Tooltip key={m} delayDuration={500}>
                     <TooltipTrigger asChild>
@@ -589,8 +578,8 @@ export default function AskHalo() {
                     </TooltipTrigger>
                     <TooltipContent>
                       {m === "simple"
-                        ? "Answers without referring to the financial information you provide"
-                        : "Answers that refer to the financial information you provide"}
+                        ? "Answers from general knowledge only"
+                        : "Answers using your connected accounts and profile"}
                     </TooltipContent>
                   </Tooltip>
                 ))}
@@ -622,14 +611,15 @@ export default function AskHalo() {
                         }
                       }}
                       rows={1}
-                      placeholder="Ask me anything about your finances"
-                      className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-base leading-relaxed outline-none placeholder:text-muted-foreground md:text-sm"
+                      placeholder="Ask me anything about your money"
+                      className="max-h-40 flex-1 resize-none bg-transparent py-1.5 text-sm leading-relaxed outline-none placeholder:text-muted-foreground md:text-sm"
                     />
                     <Button
                       type="submit"
-                      size="icon"
-                      className="size-8 shrink-0 rounded-lg"
+                      size="icon-sm"
+                      className="shrink-0"
                       disabled={!draft.trim()}
+                      aria-label="Send message"
                     >
                       <RiArrowUpLine className="size-4" />
                     </Button>
@@ -637,7 +627,7 @@ export default function AskHalo() {
                 </div>
               </form>
 
-              <p className="mt-2 text-center text-[11px] leading-relaxed text-muted-foreground">
+              <p className="mt-2 text-center text-xs leading-relaxed text-muted-foreground">
                 AI can make mistakes. Please consult with your financial advisor before
                 taking any actions.
               </p>
@@ -792,12 +782,12 @@ function HaloMessage({
       {status === "complete" && vote === "down" && (
         <div className="mt-2 flex flex-wrap items-center gap-1.5 duration-200 animate-in fade-in-0 slide-in-from-top-1 motion-reduce:slide-in-from-top-0">
           {reasonSent ? (
-            <span className="text-[12px] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               Thanks — this helps Halo improve.
             </span>
           ) : (
             <>
-              <span className="mr-0.5 text-[12px] text-muted-foreground">
+              <span className="mr-0.5 text-xs text-muted-foreground">
                 What went wrong?
               </span>
               {DISLIKE_TAGS.map((t) => (
@@ -805,7 +795,7 @@ function HaloMessage({
                   key={t}
                   type="button"
                   onClick={() => setReasonSent(true)}
-                  className="rounded-full border border-border px-2.5 py-1 text-[12px] text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
+                  className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-secondary/60 hover:text-foreground"
                 >
                   {t}
                 </button>

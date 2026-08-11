@@ -11,7 +11,6 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { user } from "@/lib/data"
-import { SiteHeader } from "@/components/site-header"
 
 import { NetWorthCard } from "@/components/home/net-worth-card"
 import { AccountsCard } from "@/components/home/accounts-card"
@@ -87,21 +86,20 @@ export default function Home({
 
   return (
     <>
-      <SiteHeader
-        actions={
-          analysisReady ? <CustomizeMenu visible={visible} toggle={toggle} /> : undefined
-        }
-        hideAddAccounts={!analysisReady}
-      />
       <div className="app-page max-w-[1240px] xl:max-w-[1440px] 2xl:max-w-[1600px]">
         {/* Greeting */}
-        <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-[0.06em] text-muted-foreground">
-            {todayLabel()}
-          </p>
-          <h1 className="mt-1.5 text-[26px] font-semibold tracking-[-0.02em]">
-            Welcome back, {user.name}
-          </h1>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs font-medium uppercase tracking-[0.06em] text-muted-foreground">
+              {todayLabel()}
+            </p>
+            <h1 className="mt-1.5 text-2xl font-semibold tracking-[-0.02em]">
+              Welcome back, {user.name}
+            </h1>
+          </div>
+          {analysisReady && (
+            <CustomizeMenu visible={visible} toggle={toggle} />
+          )}
         </div>
 
       {/* Subtabs */}
@@ -157,7 +155,7 @@ export default function Home({
           <div className="mt-6">
             <section className="flex min-h-80 items-center justify-center rounded-xl border border-dashed border-border bg-card/40 p-8 text-center">
               <div className="max-w-sm">
-                <h2 className="text-lg font-semibold">Your dashboard is ready for data</h2>
+                <h2 className="text-2xl font-semibold">Your dashboard is ready for data</h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Connect at least one account to populate balances, cash flow, and
                   planning insights.
@@ -179,7 +177,7 @@ export default function Home({
         </div>
       ) : (
         <div className="mt-6 flex min-h-[40vh] items-center justify-center rounded-xl border border-dashed border-border bg-card/40">
-          <p className="text-sm text-muted-foreground">{subtab} — coming in a later pass</p>
+          <p className="text-sm text-muted-foreground">{subtab} isn't available yet.</p>
         </div>
       )}
       </div>
@@ -221,7 +219,7 @@ function CustomizeMenu({
           <label className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-2 py-2 text-sm opacity-60">
             <Checkbox checked disabled aria-label="Net worth" />
             <span>Net worth</span>
-            <span className="ml-auto text-[11px] text-muted-foreground">Required</span>
+            <span className="ml-auto text-xs text-muted-foreground">Required</span>
           </label>
 
           {CUSTOMIZABLE_CARDS.map((key) => (

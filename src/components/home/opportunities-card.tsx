@@ -93,7 +93,7 @@ export function OpportunitiesCard() {
                 {item.eyebrow}
               </div>
 
-              <h3 className="mt-4 text-xl font-semibold leading-tight tracking-[-0.015em] text-foreground">
+              <h3 className="mt-4 text-2xl font-semibold leading-tight tracking-[-0.015em] text-foreground">
                 {item.title}
               </h3>
 
@@ -114,7 +114,7 @@ export function OpportunitiesCard() {
                   {item.valueLabel}
                 </p>
                 <div className="mt-1 flex items-baseline gap-1.5">
-                  <span className="text-[30px] font-semibold leading-none tracking-[-0.025em] text-foreground">
+                  <span className="text-2xl font-semibold leading-none tracking-[-0.025em] text-foreground">
                     {item.value}
                   </span>
                   <span className="text-sm font-medium text-muted-foreground">per year</span>
@@ -122,8 +122,9 @@ export function OpportunitiesCard() {
               </div>
 
               <Button
+                variant="secondary"
                 className="mt-4 w-full"
-                onClick={() => toast.info(`${item.action} selected`)}
+                onClick={() => toast.info(`Opening ${item.title}`)}
               >
                 {item.action}
               </Button>

@@ -76,12 +76,12 @@ export function StockWidget({ symbol }: { symbol: StockSymbol }) {
       <div className="flex flex-wrap items-start justify-between gap-4 px-4 pt-4 sm:px-5">
         <div>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-base font-semibold tracking-[-0.01em]">
+            <h3 className="text-sm font-semibold tracking-[-0.01em]">
               {stock.symbol}
             </h3>
             <span className="text-xs text-muted-foreground">{stock.name}</span>
           </div>
-          <p className="mt-2 text-[28px] font-semibold leading-none tracking-[-0.02em] tabular-nums">
+          <p className="mt-2 text-2xl font-semibold leading-none tracking-[-0.02em] tabular-nums">
             ${price.toFixed(2)}
           </p>
           <p
@@ -104,7 +104,7 @@ export function StockWidget({ symbol }: { symbol: StockSymbol }) {
             </span>
           </p>
         </div>
-        <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+        <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground">
           {series?.exchange || stock.exchange} · {series?.currency || stock.currency}
         </span>
       </div>
@@ -159,7 +159,7 @@ export function StockWidget({ symbol }: { symbol: StockSymbol }) {
               if (!active || !payload?.length) return null
               return (
                 <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-md">
-                  <p className="text-[11px] text-muted-foreground">{label}</p>
+                  <p className="text-xs text-muted-foreground">{label}</p>
                   <p className="mt-0.5 text-sm font-semibold tabular-nums">
                     ${Number(payload[0].value).toFixed(2)}
                   </p>
@@ -199,13 +199,13 @@ export function StockWidget({ symbol }: { symbol: StockSymbol }) {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span>
             {source === "live"
               ? "Twelve Data"
               : source === "loading"
                 ? "Updating…"
-                : "Demo fallback"}
+                : "Sample data"}
           </span>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -247,8 +247,7 @@ function DataSourceNote({
   }
   return (
     <>
-      Illustrative fallback data. The public demo API only supports AAPL; add a free
-      Twelve Data key to load {symbol}.
+      Showing sample prices for {symbol}. Live quotes are temporarily unavailable.
     </>
   )
 }

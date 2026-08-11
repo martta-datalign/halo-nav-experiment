@@ -1,8 +1,9 @@
-import { RiSparkling2Line, RiCloseLine } from "@remixicon/react"
+import { RiCloseLine } from "@remixicon/react"
 
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { AskHaloAction } from "@/components/ask-halo-action"
+import { HaloAvatar } from "@/components/halo-avatar"
 import { insights, type Insight } from "@/lib/data"
 
 const TONE_DOT: Record<Insight["tone"], string> = {
@@ -15,10 +16,8 @@ export function InsightsCard({ onDismiss }: { onDismiss?: () => void }) {
   return (
     <Card className="gap-0 overflow-hidden p-0">
       <div className="flex items-center gap-2 border-b border-border px-5 py-3.5">
-        <span className="flex size-6 items-center justify-center rounded-md bg-halo-subtle text-halo">
-          <RiSparkling2Line className="size-3.5" />
-        </span>
-        <h2 className="text-[15px] font-semibold tracking-[-0.005em]">
+        <HaloAvatar className="size-6" />
+        <h2 className="text-sm font-semibold tracking-[-0.005em]">
           Halo insights
         </h2>
         <div className="ml-auto flex items-center gap-1.5">

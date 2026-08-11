@@ -14,9 +14,8 @@ import { toast } from "sonner"
 
 import { ConnectAccountDialog } from "@/components/connect-account-dialog"
 import { useAccounts } from "@/components/accounts-provider"
-import { SiteHeader } from "@/components/site-header"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { SourceBadge } from "@/components/source-badge"
 import { Card } from "@/components/ui/card"
 import {
   Dialog,
@@ -33,7 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { type Account, type AccountKind } from "@/lib/data"
 import { formatUSD } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -71,40 +69,30 @@ export default function Accounts() {
 
   return (
     <>
-      <SiteHeader
-        hideAddAccounts
-        actions={
-          hasAccounts ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  className="header-responsive-action gap-1.5 max-sm:size-9 max-sm:px-0"
-                  aria-label="Connect accounts"
-                  onClick={() => setConnectOpen(true)}
-                >
-                  <RiAddLine className="size-4" />
-                  <span className="header-action-label max-sm:sr-only">Connect accounts</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent portalled={false} side="bottom" sideOffset={8} className="header-action-tooltip">
-                Connect accounts
-              </TooltipContent>
-            </Tooltip>
-          ) : undefined
-        }
-      />
-
       <div className="app-page max-w-[1100px]">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-[26px] font-semibold tracking-[-0.02em]">My Accounts</h1>
+            <h1 className="text-2xl font-semibold tracking-[-0.02em]">Accounts</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Manage connected institutions and manually added accounts.
             </p>
           </div>
-          {hasAccounts && (
-            <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
-          )}
+          <div className="flex items-center gap-3">
+            {hasAccounts && (
+              <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
+            )}
+            {hasAccounts && (
+              <Button
+                size="sm"
+                className="gap-1.5"
+                aria-label="Connect accounts"
+                onClick={() => setConnectOpen(true)}
+              >
+                <RiAddLine className="size-4" />
+                Connect accounts
+              </Button>
+            )}
+          </div>
         </div>
 
         {hasAccounts ? (
@@ -117,7 +105,7 @@ export default function Accounts() {
 
             <section className="mt-6">
               <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-base font-semibold">Accounts</h2>
+                <h2 className="text-sm font-semibold">Accounts</h2>
                 <span className="text-xs text-muted-foreground">
                   Connected balances sync through Plaid; manual balances update here
                 </span>
@@ -145,7 +133,7 @@ export default function Accounts() {
               <span className="mx-auto flex size-11 items-center justify-center rounded-xl bg-secondary text-muted-foreground">
                 <RiBankLine className="size-5" />
               </span>
-              <h2 className="mt-4 text-base font-semibold">No accounts yet</h2>
+              <h2 className="mt-4 text-sm font-semibold">No accounts yet</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Connect an institution or add an account manually to build your
                 financial picture.
@@ -233,18 +221,8 @@ function InstitutionCard({
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-[15px] font-semibold">{institution}</h3>
-            <Badge
-              className={cn(
-                manualGroup
-                  ? "border-border bg-secondary text-secondary-foreground"
-                  : "border-positive-border bg-positive-subtle text-positive"
-              )}
-              variant="outline"
-            >
-              <span className={cn("size-1.5 rounded-full", manualGroup ? "bg-muted-foreground" : "bg-positive")} />
-              {manualGroup ? "Manual" : "Connected"}
-            </Badge>
+            <h3 className="text-sm font-semibold">{institution}</h3>
+            <SourceBadge source={manualGroup ? "manual" : "connected"} />
           </div>
           <p className="mt-0.5 text-xs text-muted-foreground">
             {accounts.length} account{accounts.length === 1 ? "" : "s"} · {manualGroup ? "Added" : "Last synced"} {lastUpdated?.toLowerCase()}
@@ -263,7 +241,7 @@ function InstitutionCard({
           return (
             <li
               key={account.id}
-              className="grid grid-cols-[36px_minmax(0,1fr)_auto_32px] items-center gap-3 border-b border-border py-3.5 last:border-0"
+              className="-mx-3 grid grid-cols-[36px_minmax(0,1fr)_auto_32px] items-center gap-3 rounded-lg border-b border-border px-3 py-3.5 transition-colors last:border-0 hover:bg-secondary/40"
             >
               <span className="flex size-9 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
                 <Icon className="size-4" />
@@ -336,13 +314,13 @@ function InstitutionMenu({ institution }: { institution: string }) {
         >
           <RiRefreshLine /> Refresh balances
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => toast.info(`Opening ${institution} connection settings`)}>
+        <DropdownMenuItem onSelect={() => toast.info(`Opening connection settings for ${institution}`)}>
           <RiExternalLinkLine /> Manage connection
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
-          onSelect={() => toast.info(`Disconnect ${institution} from connection settings.`)}
+          onSelect={() => toast.info(`To disconnect ${institution}, remove its accounts below`)}
           className="whitespace-nowrap"
         >
           <RiDeleteBinLine /> Disconnect institution

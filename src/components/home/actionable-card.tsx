@@ -32,7 +32,7 @@ export function ActionableCard({ onDismiss }: { onDismiss?: () => void }) {
       )}
 
       <div className="flex flex-wrap items-center gap-2 pr-7">
-        <h2 className="text-[15px] font-semibold tracking-[-0.005em]">
+        <h2 className="text-sm font-semibold tracking-[-0.005em]">
           Make it actionable
         </h2>
         <Badge variant="secondary">
@@ -45,7 +45,7 @@ export function ActionableCard({ onDismiss }: { onDismiss?: () => void }) {
         fiduciary — obligated to protect your interests — and you can revoke access
         anytime.
       </p>
-      <Button className="mt-4 w-full gap-1.5" onClick={share}>
+      <Button variant="secondary" className="mt-4 w-full gap-1.5" onClick={share}>
         <RiShieldCheckLine className="size-4" />
         Share with my advisor
       </Button>

@@ -73,7 +73,7 @@ function FlowNodeShape(props: any) {
       >
         <tspan className="fill-muted-foreground">{flowPct(value, total)}</tspan>
         <tspan className="fill-foreground" dx={6} fontWeight={500}>
-          {node.emoji} {node.name}
+          {node.name}
         </tspan>
       </text>
     </Layer>
@@ -124,7 +124,7 @@ function FlowTooltip({ active, payload, total }: any) {
   if (p?.source && p?.target && typeof p.source === "object") {
     return (
       <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-md">
-        <div className="text-[11px] text-muted-foreground">
+        <div className="text-xs text-muted-foreground">
           {p.source.name} → {p.target.name}
         </div>
         <div className="mt-0.5 text-[13px] font-semibold tabular-nums text-foreground">
@@ -136,7 +136,7 @@ function FlowTooltip({ active, payload, total }: any) {
 
   return (
     <div className="rounded-lg border border-border bg-popover px-3 py-2 shadow-md">
-      <div className="text-[11px] text-muted-foreground">{p.name}</div>
+      <div className="text-xs text-muted-foreground">{p.name}</div>
       <div className="mt-0.5 text-[13px] font-semibold tabular-nums text-foreground">
         {formatUSD(p.value)} · {flowPct(p.value, total)}
       </div>

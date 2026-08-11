@@ -5,7 +5,6 @@ import {
   RiPhoneLine,
 } from "@remixicon/react"
 
-import { SiteHeader } from "@/components/site-header"
 import { DatalignAdvisorDisclosure } from "@/components/datalign-advisor-disclosure"
 import { Button } from "@/components/ui/button"
 import { advisorMatch } from "@/lib/advisor-match"
@@ -31,11 +30,10 @@ export default function Advisors({
 
   return (
     <>
-      <SiteHeader />
       <main className="app-page max-w-6xl">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-[26px] font-semibold tracking-[-0.02em]">
+            <h1 className="text-2xl font-semibold tracking-[-0.02em]">
               Your matched firm
             </h1>
           </div>
@@ -48,10 +46,10 @@ export default function Advisors({
         {appointment && (
           <div className="mt-6 flex items-center gap-4 rounded-xl border border-positive-border bg-positive-subtle p-4">
             <div className="w-14 shrink-0 overflow-hidden rounded-lg border border-positive-border bg-background text-center shadow-xs">
-              <div className="bg-positive px-1 py-1 text-[10px] font-semibold tracking-[0.08em] text-white">
+              <div className="bg-positive px-1 py-1 text-xs font-semibold tracking-[0.08em] text-white">
                 {appointmentMonth}
               </div>
-              <div className="py-1.5 text-xl font-semibold leading-none tabular-nums text-foreground">
+              <div className="py-1.5 text-2xl font-semibold leading-none tabular-nums text-foreground">
                 {appointmentDay}
               </div>
             </div>
@@ -75,7 +73,7 @@ export default function Advisors({
                 />
               </span>
               <div className="min-w-0">
-                <h2 className="text-xl font-semibold tracking-[-0.01em]">
+                <h2 className="text-2xl font-semibold tracking-[-0.01em]">
                   {advisorMatch.firm}
                 </h2>
                 <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -102,12 +100,12 @@ export default function Advisors({
               <div className="grid grid-cols-2 gap-2">
                 <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.advFormUrl} target="_blank" rel="noreferrer">
-                    View ADV Form <RiArrowRightUpLine className="size-4" />
+                    View ADV form <RiArrowRightUpLine className="size-4" />
                   </a>
                 </Button>
                 <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.secProfileUrl} target="_blank" rel="noreferrer">
-                    View SEC Profile <RiArrowRightUpLine className="size-4" />
+                    View SEC profile <RiArrowRightUpLine className="size-4" />
                   </a>
                 </Button>
               </div>

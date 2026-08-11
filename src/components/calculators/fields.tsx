@@ -77,7 +77,7 @@ export function Field({
 // The input surface, replicated from ui/input so we can inline $ / % / period
 // affixes while keeping the same border, height, and focus ring.
 const affixSurface =
-  "flex h-9 w-full items-center rounded-md border border-input bg-transparent text-base shadow-xs transition-[color,box-shadow] outline-none focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 md:text-sm dark:bg-input/30"
+  "flex h-9 w-full items-center rounded-md border border-input bg-transparent text-sm shadow-xs transition-[color,box-shadow] outline-none focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50 md:text-sm dark:bg-input/30"
 
 function toText(value: number, format: "money" | "decimal") {
   // NaN / non-finite means "unset" — render blank so the placeholder shows.
@@ -184,7 +184,7 @@ export function SelectInput({
         id={id}
         value={value}
         onChange={(e) => onValueChange(e.target.value)}
-        className="h-full w-full appearance-none bg-transparent px-3 pr-8 text-base outline-none md:text-sm"
+        className="h-full w-full appearance-none bg-transparent px-3 pr-8 text-sm outline-none md:text-sm"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -231,7 +231,7 @@ export function Stat({
       <p
         className={cn(
           "mt-1 font-semibold tabular-nums tracking-[-0.01em]",
-          large ? "text-[28px] leading-none" : "text-lg",
+          large ? "text-2xl leading-none" : "text-2xl",
           accent ? "text-primary" : "text-foreground"
         )}
       >

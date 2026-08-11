@@ -134,7 +134,7 @@ export function MortgageResultView({ result }: { result: MortgageResult }) {
     <div className="flex flex-col gap-4">
       <ResultPanel className="text-center">
         <p className="text-[13px] font-medium text-muted-foreground">Total monthly payment</p>
-        <p className="mt-1.5 text-[32px] font-semibold leading-none tabular-nums text-foreground">
+        <p className="mt-1.5 text-2xl font-semibold leading-none tabular-nums text-foreground">
           {formatUSD(result.totalMonthly)}
         </p>
       </ResultPanel>
@@ -164,7 +164,7 @@ export function MortgageResultView({ result }: { result: MortgageResult }) {
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-[11px] text-muted-foreground">Loan amount</span>
+              <span className="text-xs text-muted-foreground">Loan amount</span>
               <span className="text-sm font-semibold tabular-nums">
                 {formatUSD(result.loanAmount)}
               </span>

@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import { SiteHeader } from "@/components/site-header"
 import { EmptyResult } from "@/components/calculators/fields"
 import { CALCULATORS, type CalcEntry, type CalcId } from "@/components/calculators/registry"
 
@@ -26,10 +25,9 @@ export default function Calculators() {
 
   return (
     <>
-      <SiteHeader />
       <div className="app-page max-w-[1240px] xl:max-w-[1440px]">
         <div className="min-w-0">
-          <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Calculators</h1>
+          <h1 className="text-2xl font-semibold tracking-[-0.02em]">Calculators</h1>
           <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
             Model a purchase or plan for the future. Open a calculator, run the numbers,
             and your result stays on the card.
@@ -103,7 +101,7 @@ function CalculatorCard({
           <Icon className="size-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-[15px] font-semibold leading-snug tracking-[-0.01em]">
+          <h2 className="text-sm font-semibold leading-snug tracking-[-0.01em]">
             {calc.title}
           </h2>
           <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
@@ -157,7 +155,7 @@ function CalculatorDialog({
           <Icon className="size-5" />
         </span>
         <div className="min-w-0 pr-8">
-          <DialogTitle className="text-lg tracking-[-0.01em]">{calc.title}</DialogTitle>
+          <DialogTitle className="text-2xl tracking-[-0.01em]">{calc.title}</DialogTitle>
           <p className="mt-1 text-sm text-muted-foreground">{calc.description}</p>
         </div>
       </div>

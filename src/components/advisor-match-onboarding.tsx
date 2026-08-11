@@ -151,7 +151,7 @@ export function AdvisorMatchOnboarding({
       <DialogContent
         showCloseButton={false}
         aria-describedby="advisor-match-intro-description"
-        className="h-[min(820px,calc(100dvh-2rem))] max-h-[calc(100dvh-2rem)] gap-0 overflow-visible border-0 bg-transparent p-0 shadow-none sm:max-w-5xl"
+        className="h-[min(820px,calc(100dvh-2rem))] max-h-[calc(100dvh-2rem)] gap-0 overflow-visible border-0 bg-transparent p-0 shadow-none sm:max-w-4xl"
       >
         <DialogTitle className="sr-only">Your RIA match</DialogTitle>
         <DialogDescription id="advisor-match-intro-description" className="sr-only">
@@ -166,7 +166,7 @@ export function AdvisorMatchOnboarding({
           )}
         >
           <header className="shrink-0 border-b border-border px-5 py-4 sm:px-8">
-            <div className="mx-auto flex max-w-4xl items-center gap-4">
+            <div className="flex items-center gap-4">
               <StepRail step={step} />
               <button
                 type="button"
@@ -220,7 +220,7 @@ export function AdvisorMatchOnboarding({
               />
             )}
             <div className="px-5 sm:px-8">
-              <DatalignAdvisorDisclosure className="mx-auto max-w-4xl border-t border-border py-7" />
+              <DatalignAdvisorDisclosure className="border-t border-border py-7" />
             </div>
           </div>
         </div>
@@ -242,10 +242,10 @@ function AccountsScreen({
 }) {
   return (
     <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
-      <div className="mx-auto max-w-4xl">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-            Build your financial analysis.
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] sm:text-2xl">
+            Build your financial analysis
           </h2>
           <Button variant="ghost" onClick={onSkip}>
             Skip for now
@@ -308,9 +308,9 @@ function MatchScreen({
 }) {
   return (
     <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
-      <div className="mx-auto max-w-4xl">
-        <h2 className="max-w-2xl text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-          Great news! We found you a match.
+      <div>
+        <h2 className="max-w-2xl text-2xl font-semibold tracking-[-0.03em] sm:text-2xl">
+          We found your advisor match.
         </h2>
         <p className="mt-3 flex items-center gap-2 text-sm">
           <span className="flex size-5 shrink-0 items-center justify-center rounded-full border border-positive text-positive">
@@ -328,7 +328,7 @@ function MatchScreen({
                 alt="Carson Wealth"
                 className="h-auto w-36"
               />
-              <h3 className="mt-4 text-lg font-semibold">{advisorMatch.firm}</h3>
+              <h3 className="mt-4 text-2xl font-semibold">{advisorMatch.firm}</h3>
               <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
                 <a
                   href={advisorMatch.websiteUrl}
@@ -350,12 +350,12 @@ function MatchScreen({
               <div className="grid grid-cols-2 gap-2">
                 <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.advFormUrl} target="_blank" rel="noreferrer">
-                    View ADV Form <RiArrowRightUpLine className="size-4" />
+                    View ADV form <RiArrowRightUpLine className="size-4" />
                   </a>
                 </Button>
                 <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.secProfileUrl} target="_blank" rel="noreferrer">
-                    View SEC Profile <RiArrowRightUpLine className="size-4" />
+                    View SEC profile <RiArrowRightUpLine className="size-4" />
                   </a>
                 </Button>
               </div>
@@ -429,9 +429,9 @@ function ScheduleScreen({
 }) {
   return (
     <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
-      <div className="mx-auto max-w-4xl">
-        <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
-          Choose a time.
+      <div>
+        <h2 className="text-2xl font-semibold tracking-[-0.03em] sm:text-2xl">
+          Choose a time
         </h2>
 
         <div className="mt-8 rounded-xl bg-secondary/30 p-5 sm:p-6 lg:grid lg:grid-cols-[0.65fr_1.35fr] lg:gap-10">
@@ -442,7 +442,7 @@ function ScheduleScreen({
               className="h-auto w-36"
             />
             <p className="mt-4 text-sm text-muted-foreground">Introduction with</p>
-            <h3 className="mt-1 text-xl font-semibold">{advisorMatch.firm}</h3>
+            <h3 className="mt-1 text-2xl font-semibold">{advisorMatch.firm}</h3>
             <div className="mt-5 space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-2.5">
                 <RiTimeLine className="size-4" /> 30 minutes
@@ -475,8 +475,8 @@ function ScheduleScreen({
                       )}
                     >
                       <span className="text-xs opacity-70">{item.weekday}</span>
-                      <span className="mt-1 text-lg font-semibold">{item.day}</span>
-                      <span className="text-[11px] opacity-70">{item.month}</span>
+                      <span className="mt-1 text-2xl font-semibold">{item.day}</span>
+                      <span className="text-xs opacity-70">{item.month}</span>
                     </button>
                   ))}
                 </div>
@@ -547,13 +547,13 @@ function NextScreen({
 
   return (
     <div className="advisor-onboarding-step px-5 py-7 sm:px-8 sm:py-9">
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="w-full">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+            <h2 className="text-2xl font-semibold tracking-[-0.03em] sm:text-2xl">
               What’s next
             </h2>
-            <p className="mt-4 text-lg font-medium">{appointment.label}</p>
+            <p className="mt-4 text-2xl font-medium">{appointment.label}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               30-minute video call with {advisorMatch.firm}
             </p>

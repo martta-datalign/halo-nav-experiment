@@ -2,7 +2,6 @@ import { RiSparkling2Line } from "@remixicon/react"
 
 import { Button } from "@/components/ui/button"
 import { useAskHalo } from "@/components/ask-halo"
-import { SiteHeader } from "@/components/site-header"
 
 export default function Placeholder({
   title,
@@ -14,12 +13,11 @@ export default function Placeholder({
   const { ask } = useAskHalo()
   return (
     <>
-      <SiteHeader />
       <div className="mx-auto flex min-h-[calc(100svh-3.5rem)] max-w-md flex-col items-center justify-center px-6 text-center">
       <span className="flex size-11 items-center justify-center rounded-xl bg-halo-subtle text-halo">
         <RiSparkling2Line className="size-5" />
       </span>
-      <h1 className="mt-4 text-lg font-semibold tracking-[-0.01em]">{title}</h1>
+      <h1 className="mt-4 text-2xl font-semibold tracking-[-0.01em]">{title}</h1>
       <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
         {description}
       </p>

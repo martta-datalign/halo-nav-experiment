@@ -8,7 +8,6 @@ import {
   RiFileTextLine,
   RiLineChartLine,
   RiMore2Line,
-  RiShieldCheckLine,
 } from "@remixicon/react"
 import {
   Cell,
@@ -18,9 +17,9 @@ import {
   Tooltip as RechartsTooltip,
 } from "recharts"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { SourceBadge } from "@/components/source-badge"
 import {
   Dialog,
   DialogContent,
@@ -309,7 +308,7 @@ export function AssetsLiabilities() {
 
       <Card className="gap-0 overflow-hidden p-0">
         <div className="border-b border-border px-5 py-4 sm:px-6">
-          <h2 className="text-base font-semibold">Balance details</h2>
+          <h2 className="text-sm font-semibold">Balance details</h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
             Connected balances replace matching form estimates. Unconnected categories continue using estimated form values.
           </p>
@@ -373,7 +372,7 @@ function Summary({ label, value, emphasis = false }: { label: string; value: num
       <p
         className={cn(
           "font-semibold leading-tight tracking-[-0.02em] tabular-nums",
-          emphasis ? "text-[28px]" : "text-[26px]"
+          emphasis ? "text-2xl" : "text-2xl"
         )}
       >
         {formatUSD(value)}
@@ -398,7 +397,7 @@ function CompositionCard({
   return (
     <Card className="gap-4 p-5 sm:p-6">
       <div>
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
+        <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         <p className="mt-1 text-xs text-muted-foreground">Percentages are calculated from current balances</p>
       </div>
       <div className="grid items-center gap-4 sm:grid-cols-[220px_1fr]">
@@ -407,7 +406,7 @@ function CompositionCard({
             <span className="text-xs text-muted-foreground">
               {side === "asset" ? "Total assets" : "Total liabilities"}
             </span>
-            <span className="mt-1 text-lg font-semibold tabular-nums">
+            <span className="mt-1 text-2xl font-semibold tabular-nums">
               {formatUSD(total)}
             </span>
           </div>
@@ -428,7 +427,7 @@ function CompositionCard({
                     <div className="min-w-[230px] max-w-[300px] rounded-lg border border-border bg-popover p-3 shadow-md">
                       <p className="text-xs font-medium text-muted-foreground">{slice.name}</p>
                       <div className="mt-1 flex items-baseline justify-between gap-4">
-                        <p className="text-base font-semibold tabular-nums text-foreground">
+                        <p className="text-sm font-semibold tabular-nums text-foreground">
                           {formatUSD(slice.value)}
                         </p>
                         <p className="text-xs tabular-nums text-muted-foreground">
@@ -499,7 +498,7 @@ function BalanceSection({
   return (
     <section className={cn("px-5 py-4 sm:px-6", !last && "border-b border-border")}>
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h3 className="text-[15px] font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold">{title}</h3>
         <Button variant="ghost" size="sm" onClick={onAdd}>
           <RiAddLine /> Add {side}
         </Button>
@@ -514,16 +513,10 @@ function BalanceSection({
                 : side === "asset"
                   ? RiLineChartLine
                   : RiExternalLinkLine
-          const sourceLabel =
-            item.source === "connected"
-              ? "Connected"
-              : item.source === "form"
-                ? "Estimated from form"
-                : "Manual"
           return (
             <li
               key={item.id}
-              className="grid grid-cols-[36px_minmax(0,1fr)_auto_32px] items-center gap-3 border-b border-border py-3 last:border-0"
+              className="-mx-3 grid grid-cols-[36px_minmax(0,1fr)_auto_32px] items-center gap-3 rounded-lg border-b border-border px-3 py-3 transition-colors last:border-0 hover:bg-secondary/40"
             >
               <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
                 <Icon className="size-4" />
@@ -531,10 +524,7 @@ function BalanceSection({
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-medium">{item.name}</span>
-                  <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
-                    {item.source === "connected" ? <RiShieldCheckLine /> : null}
-                    {sourceLabel}
-                  </Badge>
+                  <SourceBadge source={item.source} />
                 </div>
                 <div className="mt-0.5 truncate text-xs text-muted-foreground">
                   {item.type ? `${item.type} · ${item.category}` : item.category}
@@ -628,7 +618,7 @@ function AddBalanceDialog({
           <DialogTitle>Add {side === "asset" ? "asset" : "liability"}</DialogTitle>
           <DialogDescription>
             Enter an account manually. To keep its balance updated automatically,
-            connect it through Plaid using Add accounts instead.
+            connect it through Plaid with Connect accounts instead.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={submit} className="space-y-4">
@@ -662,7 +652,9 @@ function AddBalanceDialog({
           </FormField>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={!valid}>Save changes</Button>
+            <Button type="submit" disabled={!valid}>
+              Add {side === "asset" ? "asset" : "liability"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

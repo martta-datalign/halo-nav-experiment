@@ -74,7 +74,7 @@ export function NetWorthCard() {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div>
           <p className="text-sm font-medium text-muted-foreground">Net worth</p>
-          <p className="mt-1.5 text-[28px] font-semibold leading-none tracking-[-0.02em] tabular-nums">
+          <p className="mt-1.5 text-2xl font-semibold leading-none tracking-[-0.02em] tabular-nums">
             {formatUSD(NET_WORTH)}
           </p>
           <p
@@ -207,7 +207,7 @@ function ChartTooltipCustom({ showAnalytics }: { showAnalytics: boolean }) {
 
         return (
           <div className="min-w-[184px] max-w-[260px] rounded-lg border border-border bg-popover p-3 shadow-md">
-            <div className="text-[11px] font-medium text-muted-foreground">{label}</div>
+            <div className="text-xs font-medium text-muted-foreground">{label}</div>
             <div className="mt-1.5 flex items-center justify-between gap-4">
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <span className="size-2 rounded-[3px] bg-[var(--color-value)]" />

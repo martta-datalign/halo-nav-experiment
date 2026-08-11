@@ -1,4 +1,3 @@
-import { SiteHeader } from "@/components/site-header"
 
 const DISCLOSURES = [
   {
@@ -26,9 +25,8 @@ const DISCLOSURES = [
 export default function Disclosures() {
   return (
     <>
-      <SiteHeader />
       <main className="app-page max-w-3xl">
-        <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Disclosures</h1>
+        <h1 className="text-2xl font-semibold tracking-[-0.02em]">Disclosures</h1>
 
         <div className="mt-7 border-t border-border">
           {DISCLOSURES.map((item) => (

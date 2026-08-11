@@ -195,11 +195,11 @@ export function AffordabilityResultView({ result }: { result: AffordabilityResul
         </div>
         <div className="mt-4 flex items-center justify-between border-t border-border pt-4">
           <span className="text-sm font-semibold">Total monthly payment</span>
-          <span className="text-[22px] font-semibold tabular-nums">
+          <span className="text-2xl font-semibold tabular-nums">
             {formatUSD(result.totalMonthly)}
           </span>
         </div>
-        <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
           PMI applies while down payment &lt; 20%. Illustrative only — not credit or
           lending advice.
         </p>

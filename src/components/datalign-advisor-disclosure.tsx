@@ -21,9 +21,9 @@ export function DatalignAdvisorDisclosure({ className }: { className?: string })
         <p>
           Datalign Advisory, Inc. (“Datalign Advisory”) is a solicitor for One Wealth
           Inc. One Wealth Inc pays Datalign Advisory a referral fee for prospective
-          client introductions. Learn more about what this means{" "}
+          client introductions. Read the full{" "}
           <Link to="/disclosures" className="underline underline-offset-2 hover:text-foreground">
-            here
+            disclosures
           </Link>
           . We encourage you to review One Wealth Inc’s disclosure brochure before
           making any investment decisions.

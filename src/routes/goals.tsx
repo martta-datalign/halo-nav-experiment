@@ -15,7 +15,6 @@ import {
 } from "@remixicon/react"
 import { toast } from "sonner"
 
-import { SiteHeader } from "@/components/site-header"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Card } from "@/components/ui/card"
@@ -128,12 +127,11 @@ export default function Goals({ filled = true }: { filled?: boolean }) {
 
   return (
     <>
-      <SiteHeader />
 
       <div className="app-page max-w-[1240px] xl:max-w-[1440px]">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h1 className="text-[26px] font-semibold tracking-[-0.02em]">Goals</h1>
+            <h1 className="text-2xl font-semibold tracking-[-0.02em]">Goals</h1>
             <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Set what you're saving toward, track how far you've come, and keep the
               amount you've saved so far up to date.
@@ -212,7 +210,7 @@ function CategorySection({
           <Icon className="size-4.5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{meta.label}</h2>
+          <h2 className="text-sm font-semibold tracking-[-0.01em]">{meta.label}</h2>
         </div>
       </div>
 
@@ -265,7 +263,7 @@ function GoalCard({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="truncate text-[15px] font-semibold leading-snug tracking-[-0.01em]">
+          <h3 className="truncate text-sm font-semibold leading-snug tracking-[-0.01em]">
             {goal.name}
           </h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
@@ -276,7 +274,7 @@ function GoalCard({
       </div>
 
       <div className="mt-4 flex items-baseline justify-between gap-2">
-        <span className="text-lg font-semibold tabular-nums tracking-[-0.01em]">
+        <span className="text-2xl font-semibold tabular-nums tracking-[-0.01em]">
           {formatUSD(goal.current)}
         </span>
         <span className="text-xs text-muted-foreground tabular-nums">
@@ -296,7 +294,7 @@ function GoalCard({
           {pct}% funded
         </span>
         <span className="text-muted-foreground tabular-nums">
-          {complete ? "Fully funded 🎉" : `${formatUSD(remaining)} to go`}
+          {complete ? "Fully funded" : `${formatUSD(remaining)} to go`}
         </span>
       </div>
     </Card>
