@@ -1,53 +1,52 @@
 import * as React from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import {
-  RiArrowDownSLine,
+  RiBankLine,
   RiFileTextLine,
+  RiFlag2Line,
   RiHome5Line,
+  RiLineChartLine,
   RiQuestionLine,
+  RiSidebarFoldLine,
+  RiSidebarUnfoldLine,
   RiSparkling2Line,
   RiTeamLine,
-  RiToolsLine,
 } from "@remixicon/react"
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarTrigger,
-  useSidebar,
-} from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
-type NavNode = {
-  title: string
-  to: string
-  icon: React.ElementType
-  children?: { title: string; to: string }[]
-}
+type Item = { title: string; to: string; icon: React.ElementType }
+type Section = { label?: string; items: Item[] }
 
-const NAV: NavNode[] = [
-  { title: "Dashboard", to: "/", icon: RiHome5Line },
-  { title: "Ask Halo", to: "/ask", icon: RiSparkling2Line },
+/** Primary navigation — sectioned, reference-style. Lives in the side rail. */
+const SECTIONS: Section[] = [
   {
-    title: "Financial Tools",
-    to: "/tools",
-    icon: RiToolsLine,
-    children: [
-      { title: "Calculators", to: "/tools/calculators" },
-      { title: "Goals", to: "/tools/goals" },
+    label: "Workspace",
+    items: [
+      { title: "Dashboard", to: "/", icon: RiHome5Line },
+      { title: "Ask Halo", to: "/ask", icon: RiSparkling2Line },
+      { title: "Advisor Match", to: "/advisors", icon: RiTeamLine },
+      { title: "Accounts", to: "/accounts", icon: RiBankLine },
     ],
   },
-  { title: "Advisor Match", to: "/advisors", icon: RiTeamLine },
+  {
+    label: "Financial Tools",
+    items: [
+      { title: "Calculators", to: "/tools/calculators", icon: RiLineChartLine },
+      { title: "Goals", to: "/tools/goals", icon: RiFlag2Line },
+    ],
+  },
+]
+
+const FOOTER: Item[] = [
+  { title: "Help", to: "/help", icon: RiQuestionLine },
+  { title: "Disclosures", to: "/disclosures", icon: RiFileTextLine },
+]
+
+const INSTITUTIONS = [
+  { src: "/chase.ico", alt: "Chase" },
+  { src: "/fidelity.ico", alt: "Fidelity" },
 ]
 
 function isActive(pathname: string, to: string) {
@@ -55,172 +54,161 @@ function isActive(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(to + "/")
 }
 
-/** On mobile the sidebar is an overlay sheet — close it after navigating. */
-function useCloseMobile() {
-  const { isMobile, setOpenMobile } = useSidebar()
-  return React.useCallback(() => {
-    if (isMobile) setOpenMobile(false)
-  }, [isMobile, setOpenMobile])
-}
-
-export function AppSidebar() {
-  const { pathname } = useLocation()
-  const closeMobile = useCloseMobile()
-
+function NavLink({
+  item,
+  pathname,
+  collapsed,
+}: {
+  item: Item
+  pathname: string
+  collapsed: boolean
+}) {
+  const active = isActive(pathname, item.to)
+  const link = (
+    <Link
+      to={item.to}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "flex h-9 items-center rounded-lg text-[13px] transition-colors",
+        collapsed ? "w-9 justify-center" : "gap-2.5 px-2.5",
+        active
+          ? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+          : "text-sidebar-foreground hover:bg-sidebar-hover hover:text-foreground"
+      )}
+    >
+      <item.icon className="size-3.5 shrink-0" />
+      {!collapsed && <span className="truncate">{item.title}</span>}
+    </Link>
+  )
+  if (!collapsed) return link
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="h-14 flex-row items-center gap-1 border-b border-sidebar-border px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-        <button
-          type="button"
-          aria-label="Halo AI workspace"
-          className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-sidebar-hover group-data-[collapsible=icon]:hidden"
-        >
-          <span className="flex min-w-0 flex-1 flex-col leading-tight">
-            <span className="truncate text-[14px] font-semibold tracking-[-0.01em]">
-              Halo AI
-            </span>
-            <span className="truncate text-[11px] text-muted-foreground">
-              Powered by Datalign
-            </span>
-          </span>
-        </button>
-        <SidebarTrigger className="size-8 shrink-0 text-muted-foreground" />
-      </SidebarHeader>
-
-      <SidebarContent className="py-2">
-        <SidebarGroup>
-          <SidebarGroupLabel>Workspace</SidebarGroupLabel>
-          <SidebarMenu>
-            {NAV.map((item) =>
-              item.children ? (
-                <NavGroup
-                  key={item.to}
-                  item={item}
-                  pathname={pathname}
-                  onNavigate={closeMobile}
-                />
-              ) : (
-                <SidebarMenuItem key={item.to}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(pathname, item.to)}
-                    tooltip={item.title}
-                  >
-                    <Link to={item.to} onClick={closeMobile}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )
-            )}
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
-
-      <SidebarFooter className="gap-2">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={isActive(pathname, "/faq")}
-              tooltip="FAQ"
-            >
-              <Link to="/faq" onClick={closeMobile}>
-                <RiQuestionLine />
-                <span>FAQ</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={isActive(pathname, "/disclosures")}
-              tooltip="Disclosures"
-            >
-              <Link to="/disclosures" onClick={closeMobile}>
-                <RiFileTextLine />
-                <span>Disclosures</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+    <Tooltip>
+      <TooltipTrigger asChild>{link}</TooltipTrigger>
+      <TooltipContent side="right">{item.title}</TooltipContent>
+    </Tooltip>
   )
 }
 
-/**
- * A collapsible nav group with a chevron affordance (Grok-style): the row
- * toggles its sub-menu open/closed and the chevron flips down→up. It opens
- * automatically when you're inside the section. When the rail is collapsed to
- * icons there's no room for a sub-menu, so a click navigates to the section
- * landing instead of toggling a hidden panel.
- */
-function NavGroup({
-  item,
-  pathname,
-  onNavigate,
+export function AppSidebar({
+  collapsed = false,
+  onToggle,
 }: {
-  item: NavNode
-  pathname: string
-  onNavigate: () => void
+  collapsed?: boolean
+  onToggle?: () => void
 }) {
-  const { state, isMobile } = useSidebar()
-  const navigate = useNavigate()
-  const sectionActive = isActive(pathname, item.to)
-  const [open, setOpen] = React.useState(true)
-  const iconCollapsed = state === "collapsed" && !isMobile
-
-  // Keep the group open whenever the current route lives inside it.
-  React.useEffect(() => {
-    if (sectionActive) setOpen(true)
-  }, [sectionActive])
+  const { pathname } = useLocation()
 
   return (
-    <SidebarMenuItem>
-      <SidebarMenuButton
-        tooltip={item.title}
-        isActive={pathname === item.to}
-        aria-expanded={iconCollapsed ? undefined : open}
-        onClick={() => {
-          if (iconCollapsed) {
-            navigate(item.to)
-            onNavigate()
-          } else {
-            setOpen((v) => !v)
-          }
-        }}
-      >
-        <item.icon />
-        <span>{item.title}</span>
-        <RiArrowDownSLine
-          className={cn(
-            "ml-auto size-4 text-sidebar-foreground/50 transition-transform duration-200 [transition-timing-function:var(--motion-ease-standard)] motion-reduce:transition-none group-data-[collapsible=icon]:hidden",
-            open && "rotate-180"
-          )}
-        />
-      </SidebarMenuButton>
-      <div
-        className={cn(
-          "grid transition-[grid-template-rows] duration-200 [transition-timing-function:var(--motion-ease-standard)] motion-reduce:transition-none",
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        )}
-      >
-        <div className="min-h-0 overflow-hidden">
-        <SidebarMenuSub>
-          {item.children!.map((child) => (
-            <SidebarMenuSubItem key={child.to}>
-              <SidebarMenuSubButton asChild isActive={pathname === child.to}>
-                <Link to={child.to} onClick={onNavigate}>
-                  <span>{child.title}</span>
-                </Link>
-              </SidebarMenuSubButton>
-            </SidebarMenuSubItem>
-          ))}
-        </SidebarMenuSub>
-        </div>
+    <aside
+      className={cn(
+        "hidden shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-out md:flex",
+        collapsed ? "w-14" : "w-60"
+      )}
+    >
+      <div className={cn("min-h-0 flex-1 overflow-y-auto py-4", collapsed ? "px-2" : "px-3")}>
+        {SECTIONS.map((section, i) => (
+          <div key={i} className="mb-5">
+            {section.label &&
+              (collapsed ? (
+                i > 0 && <div className="mx-2 mb-2 border-t border-sidebar-border" />
+              ) : (
+                <div className="px-2 pb-1.5 text-xs font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                  {section.label}
+                </div>
+              ))}
+            <nav className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
+              {section.items.map((item) => (
+                <NavLink key={item.to} item={item} pathname={pathname} collapsed={collapsed} />
+              ))}
+            </nav>
+          </div>
+        ))}
       </div>
-    </SidebarMenuItem>
+
+      {/* Footer: connect prompt + help links */}
+      <div className={cn("border-t border-sidebar-border", collapsed ? "px-2 py-3" : "p-3")}>
+        {collapsed ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link
+                to="/accounts"
+                aria-label="Connect accounts"
+                className="mx-auto flex size-9 items-center justify-center rounded-lg text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground"
+              >
+                <RiBankLine className="size-4" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="right">Connect accounts</TooltipContent>
+          </Tooltip>
+        ) : (
+          <Link
+            to="/accounts"
+            className="block rounded-xl border border-sidebar-border bg-card p-3 transition-colors hover:bg-sidebar-hover"
+          >
+            <p className="text-[13px] font-medium text-foreground">Connect accounts</p>
+            <p className="mt-0.5 text-xs leading-snug text-muted-foreground">
+              Connect banks and brokerages to see your full picture.
+            </p>
+            <div className="mt-2.5 flex items-center gap-1.5">
+              {INSTITUTIONS.map((inst) => (
+                <img
+                  key={inst.alt}
+                  src={inst.src}
+                  alt={inst.alt}
+                  className="size-5 rounded-full ring-1 ring-sidebar-border"
+                />
+              ))}
+              <span className="flex size-5 items-center justify-center rounded-full bg-secondary text-xs text-muted-foreground">
+                +
+              </span>
+            </div>
+          </Link>
+        )}
+
+        <nav className={cn("mt-2 flex flex-col gap-0.5", collapsed && "items-center")}>
+          {FOOTER.map((item) => (
+            <NavLink key={item.to} item={item} pathname={pathname} collapsed={collapsed} />
+          ))}
+          <CollapseToggle collapsed={collapsed} onToggle={onToggle} />
+        </nav>
+      </div>
+    </aside>
+  )
+}
+
+function CollapseToggle({
+  collapsed,
+  onToggle,
+}: {
+  collapsed: boolean
+  onToggle?: () => void
+}) {
+  const button = (
+    <button
+      type="button"
+      onClick={onToggle}
+      aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      aria-pressed={collapsed}
+      className={cn(
+        "flex h-9 items-center rounded-lg text-[13px] text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground",
+        collapsed ? "w-9 justify-center" : "gap-2.5 px-2.5"
+      )}
+    >
+      {collapsed ? (
+        <RiSidebarUnfoldLine className="size-3.5 shrink-0" />
+      ) : (
+        <>
+          <RiSidebarFoldLine className="size-3.5 shrink-0" />
+          <span>Collapse</span>
+        </>
+      )}
+    </button>
+  )
+  if (!collapsed) return button
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent side="right">Expand sidebar</TooltipContent>
+    </Tooltip>
   )
 }
