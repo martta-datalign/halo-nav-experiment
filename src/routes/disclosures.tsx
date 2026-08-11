@@ -25,20 +25,22 @@ const DISCLOSURES = [
 export default function Disclosures() {
   return (
     <>
-      <main className="app-page max-w-3xl">
+      <main className="app-page max-w-[1080px]">
         <h1 className="text-2xl font-semibold tracking-[-0.02em]">Disclosures</h1>
 
-        <div className="mt-7 border-t border-border">
+        <div className="mt-6 flex max-w-3xl flex-col">
           {DISCLOSURES.map((item) => (
             <a
               key={item.href}
               href={item.href}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-between gap-4 border-b border-border py-4 text-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="group -mx-3 flex items-center justify-between gap-4 rounded-lg px-3 py-3.5 text-sm transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="font-medium">{item.title}</span>
-              <span className="text-xs text-muted-foreground">{item.label}</span>
+              <span className="text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+                {item.label}
+              </span>
             </a>
           ))}
         </div>

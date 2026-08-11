@@ -410,34 +410,39 @@
 }
 
 /* ── Halo avatar ───────────────────────────────────────────────────────
-   The assistant's identity: a living bluish gradient orb. A conic gradient
-   slowly rotates behind a soft highlight; the orb breathes gently. Size it
-   with a utility class (e.g. `size-5`, `size-12`). Only transform/opacity
-   animate, so it stays cheap. `.is-active` speeds it up for the thinking state.
+   The assistant's identity: a living light-blue orb. A few overlapping radial
+   blobs blend into a soft nebula (no conic seam), sway gently within a small arc
+   under a soft, glowing highlight — so it reads as *thinking* rather than a
+   spinner. The orb breathes over it. Size it with a utility class (e.g. `size-5`,
+   `size-12`). Only transform/opacity animate, so it stays cheap. `.is-active`
+   quickens the pondering for the active thinking state.
    Reduced motion freezes it to a static gradient. */
 .halo-orb {
   position: relative;
   overflow: hidden;
   border-radius: 9999px;
   isolation: isolate;
-  background: oklch(0.55 0.13 250);
-  animation: halo-orb-breathe 5s var(--motion-ease-standard) infinite;
+  background: oklch(0.9 0.05 235);
+  animation: halo-orb-breathe 6.5s var(--motion-ease-standard) infinite;
   will-change: transform;
 }
 .halo-orb::before {
   content: "";
   position: absolute;
   inset: -45%;
-  background: conic-gradient(
-    from 0deg,
-    oklch(0.63 0.16 250),
-    oklch(0.74 0.13 210),
-    oklch(0.6 0.15 282),
-    oklch(0.72 0.14 200),
-    oklch(0.63 0.16 250)
-  );
-  filter: blur(4px);
-  animation: halo-orb-spin 6.5s linear infinite;
+  /* A solid base color (the LAST layer) fills the whole disc, so the blobs —
+     which fade to alpha 0 between one another — never leave a gap that reveals
+     the element's flat background as the layer sways. Blobs fade to their OWN
+     color at alpha 0 (not `transparent`, which is transparent *black* and would
+     darken the fade into a visible ring). */
+  background:
+    radial-gradient(circle at 28% 28%, oklch(0.95 0.045 220), oklch(0.95 0.045 220 / 0) 55%),
+    radial-gradient(circle at 74% 32%, oklch(0.87 0.085 264), oklch(0.87 0.085 264 / 0) 55%),
+    radial-gradient(circle at 34% 74%, oklch(0.93 0.055 210), oklch(0.93 0.055 210 / 0) 55%),
+    radial-gradient(circle at 78% 76%, oklch(0.9 0.07 245), oklch(0.9 0.07 245 / 0) 55%),
+    oklch(0.9 0.05 235);
+  filter: blur(6px);
+  animation: halo-orb-think 7s ease-in-out infinite;
   will-change: transform;
 }
 .halo-orb::after {
@@ -446,19 +451,45 @@
   inset: 0;
   border-radius: inherit;
   background:
-    radial-gradient(circle at 32% 26%, oklch(1 0 0 / 0.55), transparent 52%),
-    radial-gradient(circle at 74% 82%, oklch(0.38 0.16 278 / 0.55), transparent 58%);
+    radial-gradient(circle at 33% 27%, oklch(1 0 0 / 0.6), oklch(1 0 0 / 0) 62%),
+    radial-gradient(circle at 72% 82%, oklch(0.66 0.1 258 / 0.22), oklch(0.66 0.1 258 / 0) 66%);
+  animation: halo-orb-glow 5s var(--motion-ease-standard) infinite;
+  will-change: opacity;
 }
 .halo-orb.is-active {
-  animation-duration: 2.6s;
+  animation-duration: 3.6s;
 }
 .halo-orb.is-active::before {
-  animation-duration: 2.6s;
+  animation-duration: 3.6s;
+}
+.halo-orb.is-active::after {
+  animation-duration: 3s;
 }
 
-@keyframes halo-orb-spin {
-  to {
-    transform: rotate(1turn);
+/* Sway, don't spin: the gradient rotates only a small arc and then reverses,
+   with a gentle throb. Bounded + reversing is what reads as pondering rather
+   than a loader. */
+@keyframes halo-orb-think {
+  0% {
+    transform: rotate(-22deg) scale(1);
+  }
+  50% {
+    transform: rotate(26deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(-22deg) scale(1);
+  }
+}
+
+/* A gentle glow pulse on the sheen — a calm "breath of thought." Opacity only,
+   so the highlight never moves and can't uncover the surface beneath. */
+@keyframes halo-orb-glow {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
   }
 }
 
@@ -468,13 +499,14 @@
     transform: scale(1);
   }
   50% {
-    transform: scale(1.035);
+    transform: scale(1.04);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .halo-orb,
-  .halo-orb::before {
+  .halo-orb::before,
+  .halo-orb::after {
     animation: none;
     transform: none;
   }
@@ -545,6 +577,28 @@
 
 .advisor-onboarding-step {
   animation: advisor-onboarding-step var(--motion-base) var(--motion-ease-out) both;
+}
+
+/* Sidebar nav labels fade + slide in as the rail expands, instead of popping in
+   at frame 0 while the width animates. Enter-only; on collapse they leave with
+   the shrinking width. */
+@keyframes nav-label-in {
+  from {
+    opacity: 0;
+    transform: translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.nav-label {
+  animation: nav-label-in var(--motion-base) var(--motion-ease-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-label {
+    animation: none;
+  }
 }
 
 .calculator-result-disclosure {

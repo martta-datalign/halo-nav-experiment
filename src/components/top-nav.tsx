@@ -1,9 +1,6 @@
-import { useState } from "react"
 import { Link } from "react-router-dom"
-import { RiNotification3Line, RiAddLine, RiSparkling2Line } from "@remixicon/react"
+import { RiNotification3Line, RiSparkling2Line } from "@remixicon/react"
 
-import { ConnectAccountDialog } from "@/components/connect-account-dialog"
-import { useAccounts } from "@/components/accounts-provider"
 import { useAskHalo } from "@/components/ask-halo"
 import { Button } from "@/components/ui/button"
 import { HaloAvatar } from "@/components/halo-avatar"
@@ -24,8 +21,6 @@ import { user } from "@/lib/data"
  */
 export function TopNav() {
   const { ask } = useAskHalo()
-  const { addAccount } = useAccounts()
-  const [connectOpen, setConnectOpen] = useState(false)
 
   return (
     <header className="site-header sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background/90 px-3 backdrop-blur-md sm:px-4">
@@ -58,17 +53,6 @@ export function TopNav() {
 
       {/* Right cluster */}
       <div className="flex shrink-0 items-center gap-1.5">
-        <Button
-          variant="secondary"
-          className="gap-1.5 max-sm:size-9 max-sm:px-0"
-          size="sm"
-          aria-label="Connect accounts"
-          onClick={() => setConnectOpen(true)}
-        >
-          <RiAddLine className="size-4" />
-          <span className="max-sm:sr-only">Connect accounts</span>
-        </Button>
-
         <Button
           size="icon"
           variant="ghost"
@@ -112,12 +96,6 @@ export function TopNav() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      <ConnectAccountDialog
-        open={connectOpen}
-        onOpenChange={setConnectOpen}
-        onAccountAdded={addAccount}
-      />
     </header>
   )
 }

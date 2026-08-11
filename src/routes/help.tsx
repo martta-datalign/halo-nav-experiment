@@ -123,6 +123,14 @@ export default function Help() {
   const faqResults = FAQS.filter((f) => matches(query, f.question, f.answer))
   const noResults = searching && topicResults.length === 0 && faqResults.length === 0
 
+  // Single-open accordion: opening one FAQ closes the others. Re-anchor to the
+  // first visible result whenever the query changes so search always shows one.
+  const [openFaq, setOpenFaq] = React.useState<string | null>(FAQS[0].question)
+  React.useEffect(() => {
+    setOpenFaq(searching ? (faqResults[0]?.question ?? null) : FAQS[0].question)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
+
   return (
     <main className="app-page max-w-[1080px]">
       <h1 className="text-2xl font-semibold tracking-[-0.02em]">Help</h1>
@@ -154,12 +162,17 @@ export default function Help() {
             <section className="mt-8" aria-label="Frequently asked questions">
               <h2 className="text-sm font-semibold">Frequently asked questions</h2>
               <div className="mt-3 rounded-2xl border border-border bg-card px-5 shadow-sm">
-                {faqResults.map((item, index) => (
+                {faqResults.map((item) => (
                   <FAQItem
                     key={item.question}
                     question={item.question}
                     answer={item.answer}
-                    defaultOpen={searching || index === 0}
+                    open={openFaq === item.question}
+                    onToggle={() =>
+                      setOpenFaq((current) =>
+                        current === item.question ? null : item.question
+                      )
+                    }
                   />
                 ))}
               </div>
@@ -176,18 +189,10 @@ export default function Help() {
                 {topicResults.map(({ topic, articles }) => (
                   <div
                     key={topic.id}
-                    className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-sm"
+                    className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="flex size-8 items-center justify-center rounded-lg bg-secondary text-foreground">
-                        <topic.icon className="size-4.5" />
-                      </span>
-                      <h3 className="text-sm font-semibold">{topic.title}</h3>
-                    </div>
-                    <p className="mt-2 text-[13px] leading-snug text-muted-foreground">
-                      {topic.blurb}
-                    </p>
-                    <ul className="mt-3 flex flex-col">
+                    <TopicThumb topic={topic} />
+                    <ul className="mt-4 flex flex-col">
                       {articles.map((a) => (
                         <li key={a.title}>
                           <a
@@ -210,19 +215,40 @@ export default function Help() {
   )
 }
 
+/**
+ * Cover art for a topic card — a neutral gray "frame" holding a document-style
+ * preview: the topic icon, the topic title (a real <h3>, so it labels the card
+ * for assistive tech), and a couple of skeleton body lines. The icon and
+ * skeletons are decorative (aria-hidden); the heading carries the meaning.
+ */
+function TopicThumb({ topic }: { topic: Topic }) {
+  return (
+    <div className="relative h-32 overflow-hidden rounded-xl bg-linear-to-b from-secondary to-muted/50">
+      {/* Inset "document" that bleeds off the bottom edge for a preview feel. */}
+      <div className="absolute inset-x-4 -bottom-3 top-4 rounded-t-lg border border-b-0 border-border/70 bg-card p-4 shadow-sm">
+        <topic.icon aria-hidden="true" className="size-5 text-muted-foreground" />
+        <h3 className="mt-2.5 truncate text-sm font-semibold text-foreground">
+          {topic.title}
+        </h3>
+        <div aria-hidden="true" className="mt-2.5 h-1.5 w-full rounded-full bg-foreground/[0.06]" />
+        <div aria-hidden="true" className="mt-2 h-1.5 w-4/5 rounded-full bg-foreground/[0.06]" />
+      </div>
+    </div>
+  )
+}
+
 function FAQItem({
   question,
   answer,
-  defaultOpen,
+  open,
+  onToggle,
 }: {
   question: string
   answer: string
-  defaultOpen: boolean
+  open: boolean
+  onToggle: () => void
 }) {
-  const [open, setOpen] = React.useState(defaultOpen)
   const contentId = React.useId()
-
-  React.useEffect(() => setOpen(defaultOpen), [defaultOpen])
 
   return (
     <div className="border-b border-border last:border-b-0">
@@ -230,11 +256,8 @@ function FAQItem({
         type="button"
         aria-expanded={open}
         aria-controls={contentId}
-        onClick={() => setOpen((current) => !current)}
-        className={cn(
-          "flex w-full items-center justify-between gap-6 text-left text-sm font-medium transition-[padding] duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
-          open ? "py-4" : "py-5"
-        )}
+        onClick={onToggle}
+        className="flex w-full items-center justify-between gap-6 py-4 text-left text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span>{question}</span>
         <span className="relative size-4 shrink-0 text-muted-foreground" aria-hidden="true">

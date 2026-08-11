@@ -77,7 +77,7 @@ function NavLink({
       )}
     >
       <item.icon className="size-3.5 shrink-0" />
-      {!collapsed && <span className="truncate">{item.title}</span>}
+      {!collapsed && <span className="nav-label truncate">{item.title}</span>}
     </Link>
   )
   if (!collapsed) return link
@@ -101,21 +101,38 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        "hidden shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 ease-out md:flex",
+        "hidden shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-[var(--motion-base)] [transition-timing-function:var(--motion-ease-out)] md:flex",
         collapsed ? "w-14" : "w-60"
       )}
     >
       <div className={cn("min-h-0 flex-1 overflow-y-auto py-4", collapsed ? "px-2" : "px-3")}>
         {SECTIONS.map((section, i) => (
           <div key={i} className="mb-5">
-            {section.label &&
-              (collapsed ? (
-                i > 0 && <div className="mx-2 mb-2 border-t border-sidebar-border" />
-              ) : (
-                <div className="px-2 pb-1.5 text-xs font-medium uppercase tracking-[0.04em] text-muted-foreground">
-                  {section.label}
+            {collapsed ? (
+              // Collapsed: the first section carries the toggle at the top; later
+              // sections get a divider (labels are hidden in this state).
+              i === 0 ? (
+                <div className="mb-2 flex justify-center">
+                  <CollapseToggle collapsed onToggle={onToggle} />
                 </div>
-              ))}
+              ) : (
+                <div className="mx-2 mb-2 border-t border-sidebar-border" />
+              )
+            ) : (
+              section.label && (
+                <div
+                  className={cn(
+                    "flex items-center pb-1.5",
+                    i === 0 ? "justify-between pl-2 pr-1" : "px-2"
+                  )}
+                >
+                  <span className="text-xs font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                    {section.label}
+                  </span>
+                  {i === 0 && <CollapseToggle collapsed={false} onToggle={onToggle} />}
+                </div>
+              )
+            )}
             <nav className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
               {section.items.map((item) => (
                 <NavLink key={item.to} item={item} pathname={pathname} collapsed={collapsed} />
@@ -169,13 +186,17 @@ export function AppSidebar({
           {FOOTER.map((item) => (
             <NavLink key={item.to} item={item} pathname={pathname} collapsed={collapsed} />
           ))}
-          <CollapseToggle collapsed={collapsed} onToggle={onToggle} />
         </nav>
       </div>
     </aside>
   )
 }
 
+/**
+ * Icon-only collapse control. Sits inline on the first section's label row when
+ * expanded (compact, so it doesn't grow the row); centers at the top of the
+ * rail when collapsed.
+ */
 function CollapseToggle({
   collapsed,
   onToggle,
@@ -183,32 +204,28 @@ function CollapseToggle({
   collapsed: boolean
   onToggle?: () => void
 }) {
-  const button = (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-      aria-pressed={collapsed}
-      className={cn(
-        "flex h-9 items-center rounded-lg text-[13px] text-sidebar-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground",
-        collapsed ? "w-9 justify-center" : "gap-2.5 px-2.5"
-      )}
-    >
-      {collapsed ? (
-        <RiSidebarUnfoldLine className="size-3.5 shrink-0" />
-      ) : (
-        <>
-          <RiSidebarFoldLine className="size-3.5 shrink-0" />
-          <span>Collapse</span>
-        </>
-      )}
-    </button>
-  )
-  if (!collapsed) return button
+  const label = collapsed ? "Expand sidebar" : "Collapse sidebar"
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent side="right">Expand sidebar</TooltipContent>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={label}
+          aria-pressed={collapsed}
+          className={cn(
+            "flex items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-hover hover:text-foreground",
+            collapsed ? "size-9" : "size-6"
+          )}
+        >
+          {collapsed ? (
+            <RiSidebarUnfoldLine className="size-4 shrink-0" />
+          ) : (
+            <RiSidebarFoldLine className="size-3.5 shrink-0" />
+          )}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side={collapsed ? "right" : "bottom"}>{label}</TooltipContent>
     </Tooltip>
   )
 }
