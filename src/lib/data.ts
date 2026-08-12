@@ -262,28 +262,12 @@ export const goals: Goal[] = [
     targetDate: "2027-03-01",
   },
   {
-    id: "loans",
-    name: "Pay off student loans",
-    category: "financial-security",
-    current: 14000,
-    target: 22000,
-    targetDate: "2027-12-01",
-  },
-  {
     id: "home",
     name: "Home down payment",
     category: "life-milestone",
     current: 49200,
     target: 120000,
     targetDate: "2028-06-01",
-  },
-  {
-    id: "wedding",
-    name: "Wedding",
-    category: "life-milestone",
-    current: 12500,
-    target: 40000,
-    targetDate: "2027-09-20",
   },
   {
     id: "car",

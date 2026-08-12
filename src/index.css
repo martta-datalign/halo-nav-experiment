@@ -4,117 +4,97 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Halo — design tokens, "Mercury / Willow" voice.
-  Near-white surfaces, hairline borders, near-black primary (Mercury signature),
-  and a single reserved "Halo" accent used only for AI/Ask-Halo affordances.
-
-  ── White-label structure ──────────────────────────────────────────────
-  Tokens split into two layers:
-    • BRAND (swappable per tenant): the --halo accent family and --font-sans.
-      These are the ONLY tokens a firm overrides. At runtime, src/lib/theme.ts
-      injects a <style id="tenant-theme"> block that redefines them (for both
-      :root and .dark). The values below are the neutral graphite DEFAULT that
-      ships unbranded.
-    • CHASSIS (locked): neutrals, spacing, radius, motion, status semantics,
-      and the chart palette. These define the product's design language and are
-      NOT tenant-overridable — that is what keeps every firm's instance looking
-      intentional rather than letting them break the layout.
-  Neutrals are hue-neutral (chroma ~0) on purpose: a tenant accent of any hue
-  then sits cleanly on the chrome instead of subtly clashing with a cool tint.
+  Halo design tokens. Neutral palette (text tiers, borders, surfaces, inverse)
+  follows the Oreo UI light tokens; status semantics follow Oreo's Status colors.
+  The BRAND layer (--halo and --brand-font-family) is the only tenant-swappable
+  set — injected at runtime by src/lib/theme.ts. Everything else is locked.
 */
 :root {
-  /* ── CHASSIS (locked) ── */
-  /* 8px base → nav items, inputs, dropdowns. Cards use 16px, CTAs are pills. */
   --radius: 0.5rem;
 
-  /* Motion system: quick feedback, calm state changes, no playful bounce. */
   --motion-fast: 160ms;
   --motion-base: 220ms;
   --motion-slow: 300ms;
   --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1); /* never for UI enter/exit — delays the moment the user watches; reserve for exits that leave the screen */
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
 
-  /* Text hierarchy — three neutral tiers:
-       --foreground      #292929  headings / primary text
-       --muted-foreground #5D5D5D  secondary text (labels, descriptions)
-       --subtle          #9E9E9E  tertiary text (timestamps, placeholders, hints) */
-  --background: oklch(1 0 0);            /* white content field */
-  --foreground: oklch(0.281 0 0);        /* #292929 */
+  /* Text tiers: #000 primary / #646464 secondary / #838383 tertiary */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0 0 0);
 
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.281 0 0);
+  --card-foreground: oklch(0 0 0);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.281 0 0);
+  --popover-foreground: oklch(0 0 0);
 
-  /* Primary = #292929 charcoal (dark pill CTAs) */
-  --primary: oklch(0.281 0 0);
-  --primary-foreground: oklch(0.98 0 0);
+  /* Dark pill / inverse surface — #202020 */
+  --primary: oklch(0.244 0 0);
+  --primary-foreground: oklch(1 0 0);
 
   --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.281 0 0);
+  --secondary-foreground: oklch(0 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.478 0 0);  /* #5D5D5D */
-  --subtle: oklch(0.699 0 0);            /* #9E9E9E */
+  --muted-foreground: oklch(0.503 0 0);
+  --subtle: oklch(0.611 0 0);
   --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.281 0 0);
+  --accent-foreground: oklch(0 0 0);
 
-  --destructive: oklch(0.56 0.17 27);
+  --destructive: oklch(0.6 0.19 24);
 
-  --border: oklch(0.928 0 0);            /* #EDEDED hairline */
-  --input: oklch(0.9 0 0);
-  --ring: oklch(0.281 0 0);              /* focus = neutral, never semantic */
+  /* Translucent hairline (12% black) — reads on white and tinted surfaces alike */
+  --border: oklch(0 0 0 / 0.12);
+  --input: oklch(0 0 0 / 0.12);
+  --ring: oklch(0.244 0 0);
 
-  /* ── BRAND (swappable per tenant — see src/lib/theme.ts) ──
-     The "Halo" accent. Reserved for genuine AI/Halo moments (brand mark, Ask
-     Halo affordances, insights) and used sparingly. Default is neutral graphite
-     so the unbranded product reads as refined-dark until a firm sets its color. */
+  /* BRAND (tenant-swappable — see src/lib/theme.ts). Neutral graphite default. */
   --halo: oklch(0.35 0.01 270);
   --halo-foreground: oklch(1 0 0);
   --halo-subtle: oklch(0.96 0.003 270);
   --halo-border: oklch(0.88 0.006 270);
 
-  /* Brand typeface. Default is SF Pro via the Apple system stack — it renders
-     natively on Apple devices (no web-font files; same mechanism the reference
-     UI uses) and falls back gracefully elsewhere. A tenant overrides only this
-     family list; the generic fallback stack below stays fixed. See
-     FONT_REGISTRY in src/lib/theme.ts for how a new font is registered. */
   --brand-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "SF Pro Display", "SF Pro";
 
-  /* ── CHASSIS (locked) ── */
-  /* Status semantics — green is reserved for success, confirmation, and gains. */
-  --positive: oklch(0.56 0.13 155);
-  --positive-subtle: oklch(0.97 0.025 155);
-  --positive-border: oklch(0.88 0.055 155);
-  --negative: oklch(0.56 0.17 27);
-  --warning: oklch(0.66 0.13 78);
-  --warning-subtle: oklch(0.97 0.025 78);
-  --info: oklch(0.57 0.12 250);
+  /* Status semantics — Oreo UI: progress/info indigo, success teal, warning
+     orange, error red. Solids stay dark enough to read as text on white. */
+  --positive: oklch(0.58 0.12 182);
+  --positive-subtle: oklch(0.97 0.025 182);
+  --positive-border: oklch(0.88 0.05 182);
+  --negative: oklch(0.6 0.19 24);
+  --warning: oklch(0.67 0.18 47);
+  --warning-subtle: oklch(0.97 0.03 47);
+  --info: oklch(0.54 0.19 267);
 
-  /* Data viz — a fixed, legible categorical palette, independent of brand.
-     Intentionally does NOT track the tenant accent (charts must stay readable
-     across every firm's color). --chart-1 is a neutral-friendly blue. */
+  /* Data-viz categorical palette — fixed, brand-independent. */
   --chart-1: oklch(0.59 0.13 250);
   --chart-2: oklch(0.62 0.1 205);
   --chart-3: oklch(0.67 0.12 78);
   --chart-4: oklch(0.55 0.1 155);
   --chart-5: oklch(0.6 0.12 330);
 
+  /* Goal categories reuse the shared categorical palette — Oreo's only categorical
+     set is chart colors, so category N's solid is --chart-N (see CATEGORY_STYLE).
+     These are just the pill bg/text tints derived from each chart hue. */
+  --cat-1-bg: oklch(0.96 0.035 250);  --cat-1-fg: oklch(0.45 0.14 250);
+  --cat-2-bg: oklch(0.96 0.03 205);   --cat-2-fg: oklch(0.42 0.09 205);
+  --cat-3-bg: oklch(0.96 0.05 82);    --cat-3-fg: oklch(0.47 0.085 68);
+  --cat-4-bg: oklch(0.96 0.035 155);  --cat-4-fg: oklch(0.43 0.1 155);
+  --cat-5-bg: oklch(0.96 0.035 330);  --cat-5-fg: oklch(0.47 0.15 330);
+
   /* Sidebar */
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.478 0 0);   /* nav text #5D5D5D */
-  --sidebar-primary: oklch(0.281 0 0);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.946 0 0);       /* active item fill #EDEDED */
-  --sidebar-accent-foreground: oklch(0.281 0 0);
+  --sidebar: oklch(0.982 0 0);              /* #f9f9f9  Bg/Elevated */
+  --sidebar-foreground: oklch(0.503 0 0);   /* nav text #646464 */
+  --sidebar-primary: oklch(0.244 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.946 0 0);       /* active item fill */
+  --sidebar-accent-foreground: oklch(0 0 0);
   --sidebar-hover: oklch(0.97 0 0);
-  --sidebar-border: oklch(0.928 0 0);
-  --sidebar-ring: oklch(0.281 0 0);
+  --sidebar-border: oklch(0 0 0 / 0.12);    /* Border/Default */
+  --sidebar-ring: oklch(0.244 0 0);
 }
 
 .dark {
-  /* ── CHASSIS (locked) — hue-neutral ── */
   --background: oklch(0.18 0 0);
   --foreground: oklch(0.96 0 0);
   --card: oklch(0.22 0 0);
@@ -129,23 +109,27 @@
   --muted-foreground: oklch(0.72 0 0);
   --accent: oklch(0.28 0 0);
   --accent-foreground: oklch(0.96 0 0);
-  --destructive: oklch(0.68 0.16 27);
+  --destructive: oklch(0.68 0.17 24);
   --border: oklch(0.31 0 0);
   --input: oklch(0.34 0 0);
   --ring: oklch(0.92 0 0);
-  /* ── BRAND (swappable) — neutral graphite default (light-on-dark) ── */
+  /* BRAND (tenant-swappable) */
   --halo: oklch(0.72 0.01 270);
   --halo-foreground: oklch(0.18 0 0);
   --halo-subtle: oklch(0.27 0.006 270);
   --halo-border: oklch(0.4 0.008 270);
-  /* ── CHASSIS (locked) ── */
-  --positive: oklch(0.7 0.13 155);
-  --positive-subtle: oklch(0.25 0.025 155);
-  --positive-border: oklch(0.4 0.05 155);
-  --negative: oklch(0.68 0.16 27);
-  --warning: oklch(0.75 0.12 78);
-  --warning-subtle: oklch(0.27 0.025 78);
-  --info: oklch(0.72 0.11 250);
+  --positive: oklch(0.72 0.11 182);
+  --positive-subtle: oklch(0.25 0.03 182);
+  --positive-border: oklch(0.4 0.05 182);
+  --negative: oklch(0.68 0.17 24);
+  --warning: oklch(0.76 0.16 50);
+  --warning-subtle: oklch(0.27 0.04 50);
+  --info: oklch(0.72 0.16 267);
+  --cat-1-bg: oklch(0.28 0.06 250);   --cat-1-fg: oklch(0.8 0.11 250);
+  --cat-2-bg: oklch(0.28 0.05 205);   --cat-2-fg: oklch(0.82 0.09 205);
+  --cat-3-bg: oklch(0.29 0.045 78);   --cat-3-fg: oklch(0.84 0.1 80);
+  --cat-4-bg: oklch(0.28 0.045 155);  --cat-4-fg: oklch(0.82 0.1 155);
+  --cat-5-bg: oklch(0.28 0.055 330);  --cat-5-fg: oklch(0.83 0.1 330);
   --sidebar: oklch(0.2 0 0);
   --sidebar-foreground: oklch(0.8 0 0);
   --sidebar-primary: oklch(0.96 0 0);
@@ -163,14 +147,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Elevation — soft, diffuse, neutral (no color tint), low-opacity. Two
-     layered casts per level give the reference's "barely there but present"
-     feel instead of a single hard drop shadow. Applied via shadow-* utilities:
-       shadow-xs  hairline lift (inputs)
-       shadow-sm  resting cards
-       shadow-md  small popovers / menus
-       shadow-lg  dropdowns / dialogs
-       shadow-xl  large dialogs */
+  /* Elevation — soft, neutral, two-layer casts (shadow-xs … shadow-2xl). */
   --shadow-2xs: 0 1px 2px 0 rgb(0 0 0 / 0.03);
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 2px 6px -1px rgb(0 0 0 / 0.04);
@@ -228,8 +205,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Brand family (--brand-font-family, tenant-swappable) followed by the fixed
-     fallback stack. */
   --font-sans: var(--brand-font-family, "Instrument Sans Variable"), ui-sans-serif,
     system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -255,12 +230,8 @@
   }
 }
 
-/* ── Gradient illustrations ────────────────────────────────────────────
-   The product's source of color. Chrome (text, borders, surfaces) stays
-   neutral; color lives in these decorative card surfaces — mirroring the
-   reference, where the palette comes from gradient art inside cards, not from
-   the UI chrome. Layered radial "mesh" gradients read richer than a single
-   linear ramp. Pair with light text (they're all mid/dark luminance). */
+/* Gradient illustrations — the product's source of color; chrome stays neutral.
+   Layered radial "mesh" gradients; pair with light text. */
 .gradient-aurora {
   background-color: oklch(0.45 0.14 274);
   background-image:
@@ -300,9 +271,10 @@
     radial-gradient(at 70% 95%, oklch(0.92 0.05 350 / 0.6) 0, transparent 55%);
 }
 
-/* Shared application-page rhythm. Surface-specific max-widths remain local. */
+/* Shared page container — fills laptops, caps on wide desktops so page edges align. */
 .app-page {
   width: 100%;
+  max-width: 90rem; /* 1440px — fills laptops, caps wide desktops */
   margin-inline: auto;
   padding: 1.5rem 1rem;
 }
@@ -319,8 +291,7 @@
   }
 }
 
-/* Header actions respond to the space left after the sidebar, not the viewport.
-   This keeps compact desktop shells from crowding the Ask Halo field. */
+/* Header actions size to the space left after the sidebar, not the viewport. */
 .site-header {
   container: site-header / inline-size;
 }
@@ -409,14 +380,8 @@
   animation: halo-stream-caret 0.8s ease-in-out infinite;
 }
 
-/* ── Halo avatar ───────────────────────────────────────────────────────
-   The assistant's identity: a living light-blue orb. A few overlapping radial
-   blobs blend into a soft nebula (no conic seam), sway gently within a small arc
-   under a soft, glowing highlight — so it reads as *thinking* rather than a
-   spinner. The orb breathes over it. Size it with a utility class (e.g. `size-5`,
-   `size-12`). Only transform/opacity animate, so it stays cheap. `.is-active`
-   quickens the pondering for the active thinking state.
-   Reduced motion freezes it to a static gradient. */
+/* Halo avatar — a living light-blue orb that sways as if thinking. Size via a
+   utility class (e.g. size-5). `.is-active` quickens it; reduced motion freezes it. */
 .halo-orb {
   position: relative;
   overflow: hidden;
@@ -430,11 +395,8 @@
   content: "";
   position: absolute;
   inset: -45%;
-  /* A solid base color (the LAST layer) fills the whole disc, so the blobs —
-     which fade to alpha 0 between one another — never leave a gap that reveals
-     the element's flat background as the layer sways. Blobs fade to their OWN
-     color at alpha 0 (not `transparent`, which is transparent *black* and would
-     darken the fade into a visible ring). */
+  /* Solid base color as the last layer fills gaps between blobs as they sway.
+     Blobs fade to their own color at alpha 0 (not `transparent`) to avoid a ring. */
   background:
     radial-gradient(circle at 28% 28%, oklch(0.95 0.045 220), oklch(0.95 0.045 220 / 0) 55%),
     radial-gradient(circle at 74% 32%, oklch(0.87 0.085 264), oklch(0.87 0.085 264 / 0) 55%),
@@ -466,9 +428,7 @@
   animation-duration: 3s;
 }
 
-/* Sway, don't spin: the gradient rotates only a small arc and then reverses,
-   with a gentle throb. Bounded + reversing is what reads as pondering rather
-   than a loader. */
+/* Sway, don't spin: rotate a small arc and reverse — reads as pondering, not a loader. */
 @keyframes halo-orb-think {
   0% {
     transform: rotate(-22deg) scale(1);
@@ -481,8 +441,7 @@
   }
 }
 
-/* A gentle glow pulse on the sheen — a calm "breath of thought." Opacity only,
-   so the highlight never moves and can't uncover the surface beneath. */
+/* Gentle glow pulse on the sheen — opacity only, so the highlight never moves. */
 @keyframes halo-orb-glow {
   0%,
   100% {
@@ -579,9 +538,7 @@
   animation: advisor-onboarding-step var(--motion-base) var(--motion-ease-out) both;
 }
 
-/* Sidebar nav labels fade + slide in as the rail expands, instead of popping in
-   at frame 0 while the width animates. Enter-only; on collapse they leave with
-   the shrinking width. */
+/* Sidebar nav labels fade + slide in as the rail expands (enter-only). */
 @keyframes nav-label-in {
   from {
     opacity: 0;
