@@ -91,7 +91,7 @@ export default function Home({
         {/* Greeting */}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-[0.06em] text-muted-foreground">
+            <p className="text-xs font-medium text-muted-foreground">
               {todayLabel()}
             </p>
             <h1 className="mt-1.5 text-2xl font-semibold tracking-[-0.02em]">

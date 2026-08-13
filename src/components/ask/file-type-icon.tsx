@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils"
 
-// A recognizable file badge: a solid colored page with the extension in white
-// (red PDF, green sheet, blue doc, violet image), matching the familiar
-// file-icon look. The hues are fixed and brand-independent by design — like
-// the chart palette — so a PDF reads as a PDF in any tenant theme.
+// A recognizable file badge: a white page (dog-eared corner) with a small
+// colored type chip in the lower-left — red PDF, green sheet, blue doc, violet
+// image. The chip hues are fixed and brand-independent by design — like the
+// chart palette — so a PDF reads as a PDF in any tenant theme.
 type FileFamily = "pdf" | "sheet" | "doc" | "image" | "generic"
 
 const EXT_FAMILY: Record<string, FileFamily> = {
@@ -42,24 +42,33 @@ export function FileTypeIcon({
     <svg
       viewBox="0 0 32 32"
       className={cn("shrink-0", className)}
-      style={{ color: FAMILY_COLOR[family] }}
       role="img"
       aria-label={`${label} file`}
     >
-      {/* page with a dog-eared top-right corner */}
+      {/* white page */}
       <path
-        d="M8 3h11l6 6v17a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3z"
-        fill="currentColor"
+        d="M8 4 H18 L24 10 V26 A2 2 0 0 1 22 28 H8 A2 2 0 0 1 6 26 V6 A2 2 0 0 1 8 4 Z"
+        fill="#fff"
+        stroke="oklch(0.84 0 0)"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
       />
-      {/* the folded corner, lightened */}
-      <path d="M19 3l6 6h-4a2 2 0 0 1-2-2V3z" fill="#fff" fillOpacity="0.38" />
-      {/* extension label */}
+      {/* folded top-right corner */}
+      <path
+        d="M18 4 L24 10 H19.5 A1.5 1.5 0 0 1 18 8.5 Z"
+        fill="oklch(0.92 0 0)"
+        stroke="oklch(0.84 0 0)"
+        strokeWidth="1.1"
+        strokeLinejoin="round"
+      />
+      {/* colored type chip */}
+      <rect x="3" y="17.5" width="15.5" height="8.5" rx="2.2" fill={FAMILY_COLOR[family]} />
       <text
-        x="15"
-        y="23"
+        x="10.75"
+        y="23.7"
         textAnchor="middle"
         fill="#fff"
-        fontSize={label.length > 3 ? 6 : 7.5}
+        fontSize="6"
         fontWeight="700"
         letterSpacing="0.02em"
       >

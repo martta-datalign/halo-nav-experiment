@@ -368,7 +368,7 @@ function MatchScreen({
         </div>
 
         <blockquote className="mt-6 rounded-xl bg-secondary/30 p-5 sm:p-6">
-          <p className="text-xs font-medium uppercase tracking-[0.05em] text-muted-foreground">
+          <p className="text-xs font-medium text-muted-foreground">
             From {advisorMatch.firm}
           </p>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-foreground/85">

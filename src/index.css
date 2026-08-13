@@ -82,6 +82,9 @@
   --cat-4-bg: oklch(0.96 0.035 155);  --cat-4-fg: oklch(0.43 0.1 155);
   --cat-5-bg: oklch(0.96 0.035 330);  --cat-5-fg: oklch(0.47 0.15 330);
 
+  /* Neutral progress fill — goal gauges read as progress, not category. */
+  --gauge: oklch(0.32 0 0);
+
   /* Sidebar */
   --sidebar: oklch(0.982 0 0);              /* #f9f9f9  Bg/Elevated */
   --sidebar-foreground: oklch(0.503 0 0);   /* nav text #646464 */
@@ -130,6 +133,7 @@
   --cat-3-bg: oklch(0.29 0.045 78);   --cat-3-fg: oklch(0.84 0.1 80);
   --cat-4-bg: oklch(0.28 0.045 155);  --cat-4-fg: oklch(0.82 0.1 155);
   --cat-5-bg: oklch(0.28 0.055 330);  --cat-5-fg: oklch(0.83 0.1 330);
+  --gauge: oklch(0.8 0 0);
   --sidebar: oklch(0.2 0 0);
   --sidebar-foreground: oklch(0.8 0 0);
   --sidebar-primary: oklch(0.96 0 0);

@@ -13,7 +13,7 @@ export function DatalignAdvisorDisclosure({ className }: { className?: string })
     >
       <h2
         id={titleId}
-        className="font-mono text-xs font-medium uppercase tracking-[0.04em] text-foreground"
+        className="font-mono text-xs font-medium text-foreground"
       >
         Disclosures &amp; Disclaimers
       </h2>

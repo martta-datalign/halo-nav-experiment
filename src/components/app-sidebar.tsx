@@ -126,7 +126,7 @@ export function AppSidebar({
                     i === 0 ? "justify-between pl-2 pr-1" : "px-2"
                   )}
                 >
-                  <span className="text-xs font-medium uppercase tracking-[0.04em] text-muted-foreground">
+                  <span className="text-xs font-medium text-muted-foreground">
                     {section.label}
                   </span>
                   {i === 0 && <CollapseToggle collapsed={false} onToggle={onToggle} />}

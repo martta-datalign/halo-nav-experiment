@@ -111,7 +111,7 @@ export default function Advisors({
           </div>
 
           <div className="mt-10 rounded-lg bg-secondary/40 p-5 sm:p-6">
-            <p className="text-xs font-medium uppercase tracking-[0.05em] text-muted-foreground">
+            <p className="text-xs font-medium text-muted-foreground">
               From {advisorMatch.firm}
             </p>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-foreground/85">

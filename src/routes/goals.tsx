@@ -71,13 +71,6 @@ const CATEGORY_STYLE: Record<GoalCategory, { icon: ElementType; chart: number }>
   other: { icon: RiPriceTag3Line, chart: 5 },
 }
 
-/** Compact dollar label for dense legends, e.g. $61.7k / $32k / $950. */
-function compactUSDk(v: number): string {
-  if (v < 1000) return formatUSD(v)
-  const k = v / 1000
-  return `$${k >= 100 ? Math.round(k) : Math.round(k * 10) / 10}k`
-}
-
 const AVG_DAYS_PER_MONTH = 30.44
 
 /** Months from today until an ISO target date (negative if already past,
@@ -107,6 +100,21 @@ function requiredMonthly(remaining: number, months: number | null): number | nul
   if (remaining <= 0 || months == null || months <= 0) return null
   const raw = remaining / Math.max(1, months)
   return Math.max(10, Math.round(raw / 10) * 10)
+}
+
+/** Pace status for a goal — drives the one accent colour on a card. Kept honest:
+ *  we only know saved/target/date, so we flag what's derivable. "behind" means
+ *  under half-funded with under a year to go — the pace needed has turned steep. */
+type GoalStatus = "funded" | "overdue" | "behind" | "ontrack"
+
+const BEHIND_MONTHS = 12
+const BEHIND_PCT = 50
+
+function goalStatus(pct: number, months: number | null): GoalStatus {
+  if (pct >= 100) return "funded"
+  if (months != null && months < 0) return "overdue"
+  if (months != null && months <= BEHIND_MONTHS && pct < BEHIND_PCT) return "behind"
+  return "ontrack"
 }
 
 type SortKey = "date" | "progress" | "amount"
@@ -194,27 +202,12 @@ export default function Goals({ filled = true }: { filled?: boolean }) {
     <>
 
       <div className="app-page">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold tracking-[-0.02em]">Goals</h1>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-              Set what you're saving toward, track how far you've come, and keep the
-              amount you've saved so far up to date.
-            </p>
-          </div>
-          {goals.length > 0 && (
-            <div className="flex shrink-0 items-center gap-2">
-              <SortMenu value={sort} onChange={setSort} />
-              <Button
-                className="gap-1.5 max-sm:size-9 max-sm:px-0"
-                aria-label="Add goal"
-                onClick={() => setEditing("new")}
-              >
-                <RiAddLine className="size-4" />
-                <span className="max-sm:hidden">Add goal</span>
-              </Button>
-            </div>
-          )}
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-[-0.02em]">Goals</h1>
+          <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+            Set what you're saving toward, track how far you've come, and keep the
+            amount you've saved so far up to date.
+          </p>
         </div>
 
         {goals.length === 0 ? (
@@ -222,7 +215,24 @@ export default function Goals({ filled = true }: { filled?: boolean }) {
         ) : (
           <>
             <GoalsOverview goals={goals} className="mt-6" />
-            <AutoAnimated className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Toolbar sits directly above the card grid, not the whole page. */}
+            <div className="mt-8 flex items-center justify-between gap-4">
+              <h2 className="text-sm font-semibold">
+                {goals.length} {goals.length === 1 ? "goal" : "goals"}
+              </h2>
+              <div className="flex shrink-0 items-center gap-2">
+                <SortMenu value={sort} onChange={setSort} />
+                <Button
+                  className="gap-1.5 max-sm:size-9 max-sm:px-0"
+                  aria-label="Add goal"
+                  onClick={() => setEditing("new")}
+                >
+                  <RiAddLine className="size-4" />
+                  <span className="max-sm:hidden">Add goal</span>
+                </Button>
+              </div>
+            </div>
+            <AutoAnimated className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {sortedGoals.map((goal) => (
                 <GoalCard
                   key={goal.id}
@@ -292,9 +302,9 @@ function SortMenu({
   )
 }
 
-/** Roll-up across every goal. Instead of restating one percentage, the bar is
- *  a *composition* — how the total saved splits across categories — so the
- *  overview shows where the money is, not just how full it is. */
+/** Roll-up across every goal — a borderless header strip (not a competing card)
+ *  aligned to the card grid below: how much is saved, how much is left, and the
+ *  monthly pace needed to hit every dated goal. */
 function GoalsOverview({
   goals,
   className,
@@ -306,6 +316,7 @@ function GoalsOverview({
   const totalTarget = goals.reduce((sum, g) => sum + (g.target || 0), 0)
   const remaining = Math.max(0, totalTarget - totalCurrent)
   const pct = totalTarget > 0 ? Math.round((totalCurrent / totalTarget) * 100) : 0
+  const activeCount = goals.filter((g) => (g.current || 0) < (g.target || 0)).length
 
   // Total you'd need to set aside each month to hit every dated goal on time —
   // the sum of each card's pace, and the most actionable number here.
@@ -317,82 +328,42 @@ function GoalsOverview({
     return sum + (need ?? 0)
   }, 0)
 
-  // Saved-so-far grouped by category, in display order — drives the bar + legend.
-  const segments = GOAL_CATEGORY_ORDER.map((category) => ({
-    category,
-    chart: CATEGORY_STYLE[category].chart,
-    label: goalCategoryMeta[category].label,
-    saved: goals
-      .filter((g) => g.category === category)
-      .reduce((sum, g) => sum + (g.current || 0), 0),
-  }))
-    .filter((s) => s.saved > 0)
-    .map((s) => ({ ...s, width: totalTarget > 0 ? (s.saved / totalTarget) * 100 : 0 }))
+  const metrics = [
+    {
+      label: "Total saved",
+      value: formatUSD(totalCurrent),
+      sub: `${pct}% of ${formatUSD(totalTarget)}`,
+    },
+    {
+      label: "Still to go",
+      value: formatUSD(remaining),
+      sub: `Across ${activeCount} ${activeCount === 1 ? "goal" : "goals"}`,
+    },
+    {
+      label: "To stay on track",
+      value: monthlyNeeded > 0 ? formatUSD(monthlyNeeded) : "—",
+      suffix: monthlyNeeded > 0 ? "/mo" : undefined,
+      sub: monthlyNeeded > 0 ? "On your dated goals" : "No target dates yet",
+    },
+  ]
 
   return (
-    <Card className={cn("gap-0 p-5 sm:p-6", className)}>
-      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-        <div className="min-w-0">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Total saved
+    <div className={cn("grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3", className)}>
+      {metrics.map((m) => (
+        <div key={m.label}>
+          <p className="text-xs font-medium text-muted-foreground">{m.label}</p>
+          <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-[-0.02em]">
+            {m.value}
+            {m.suffix && (
+              <span className="text-base font-medium text-muted-foreground">
+                {m.suffix}
+              </span>
+            )}
           </p>
-          <p className="mt-1 text-3xl font-semibold tabular-nums tracking-[-0.02em]">
-            {formatUSD(totalCurrent)}
-          </p>
-          <p className="mt-0.5 text-xs text-muted-foreground tabular-nums">
-            {pct}% of {formatUSD(totalTarget)}
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground tabular-nums">{m.sub}</p>
         </div>
-        <div className="text-right">
-          {monthlyNeeded > 0 ? (
-            <>
-              <p className="text-2xl font-semibold tabular-nums tracking-[-0.02em]">
-                {formatUSD(monthlyNeeded)}
-                <span className="text-base font-medium text-muted-foreground">/mo</span>
-              </p>
-              <p className="text-xs text-muted-foreground">to stay on track</p>
-            </>
-          ) : (
-            <>
-              <p className="text-2xl font-semibold tabular-nums tracking-[-0.02em]">
-                {formatUSD(remaining)}
-              </p>
-              <p className="text-xs text-muted-foreground">to go</p>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Composition bar: coloured segments = saved per category, grey = remaining. */}
-      <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-secondary">
-        {segments.map((s) => (
-          <div
-            key={s.category}
-            style={{ width: `${s.width}%`, backgroundColor: `var(--chart-${s.chart})` }}
-            title={`${s.label}: ${formatUSD(s.saved)}`}
-          />
-        ))}
-      </div>
-
-      {/* Legend — where the saved money actually sits. */}
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs">
-        {segments.map((s) => (
-          <span
-            key={s.category}
-            className="inline-flex items-center gap-1.5 text-muted-foreground"
-          >
-            <span
-              className="size-2 shrink-0 rounded-full"
-              style={{ backgroundColor: `var(--chart-${s.chart})` }}
-            />
-            {s.label}
-            <span className="font-medium tabular-nums text-foreground">
-              {compactUSDk(s.saved)}
-            </span>
-          </span>
-        ))}
-      </div>
-    </Card>
+      ))}
+    </div>
   )
 }
 
@@ -412,7 +383,7 @@ function TickGauge({
   const TICKS = 40
   const filled = Math.round((Math.max(0, Math.min(100, pct)) / 100) * TICKS)
   return (
-    <div className={cn("flex h-5 items-stretch gap-[3px]", className)} aria-hidden>
+    <div className={cn("flex h-3.5 items-stretch gap-[3px]", className)} aria-hidden>
       {Array.from({ length: TICKS }, (_, i) => (
         <span
           key={i}
@@ -443,6 +414,7 @@ function GoalCard({
   const complete = pct >= 100
   const months = monthsUntil(goal.targetDate)
   const perMonth = complete ? null : requiredMonthly(remaining, months)
+  const status = goalStatus(pct, months)
 
   return (
     <Card
@@ -481,7 +453,7 @@ function GoalCard({
       </h3>
 
       <div className="mt-3 flex items-baseline justify-between gap-2">
-        <span className="text-2xl font-semibold tabular-nums tracking-[-0.01em]">
+        <span className="text-xl font-semibold tabular-nums tracking-[-0.01em]">
           {formatUSD(goal.current)}
         </span>
         <span className="text-xs text-muted-foreground tabular-nums">
@@ -489,13 +461,21 @@ function GoalCard({
         </span>
       </div>
 
-      <TickGauge pct={pct} color={`var(--chart-${chart})`} className="mt-3" />
+      <TickGauge pct={pct} color="var(--gauge)" className="mt-3" />
 
       <div className="mt-2.5 flex items-center justify-between gap-2 text-xs">
-        <span className="font-medium tabular-nums text-foreground">{pct}% funded</span>
+        <span className="inline-flex min-w-0 items-center gap-2">
+          <span className="font-medium tabular-nums text-foreground">{pct}% funded</span>
+          {(status === "behind" || status === "overdue") && (
+            <span className="inline-flex shrink-0 items-center gap-1 font-medium text-warning">
+              <span className="size-1.5 shrink-0 rounded-full bg-warning" />
+              {status === "overdue" ? "Past due" : "Behind"}
+            </span>
+          )}
+        </span>
         <span
           className={cn(
-            "tabular-nums",
+            "shrink-0 tabular-nums",
             complete ? "font-medium text-positive" : "text-muted-foreground"
           )}
         >
@@ -814,11 +794,7 @@ function GoalDialog({
                 {previewPct}%
               </span>
             </div>
-            <TickGauge
-              pct={previewPct}
-              color={`var(--chart-${CATEGORY_STYLE[draft.category].chart})`}
-              className="mt-2"
-            />
+            <TickGauge pct={previewPct} color="var(--gauge)" className="mt-2" />
           </div>
         </div>
 

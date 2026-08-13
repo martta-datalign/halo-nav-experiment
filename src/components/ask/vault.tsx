@@ -98,7 +98,7 @@ export function VaultDialog({
         </button>
 
         <div>
-          <div className="mb-1 text-xs font-medium uppercase tracking-[0.05em] text-muted-foreground">
+          <div className="mb-1 text-xs font-medium text-muted-foreground">
             {docs.length} document{docs.length === 1 ? "" : "s"}
           </div>
           {docs.length === 0 ? (
