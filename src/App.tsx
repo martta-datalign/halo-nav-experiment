@@ -22,9 +22,9 @@ import Advisors from "@/routes/advisors"
 import Placeholder from "@/routes/placeholder"
 
 export default function App() {
-  const [advisorIntroOpen, setAdvisorIntroOpen] = React.useState(true)
+  const [advisorIntroOpen, setAdvisorIntroOpen] = React.useState(false)
   const [appointment, setAppointment] = React.useState<AdvisorAppointment | null>(null)
-  const [analysisReady, setAnalysisReady] = React.useState(false)
+  const [analysisReady, setAnalysisReady] = React.useState(true)
   const [connectNudgeOpen, setConnectNudgeOpen] = React.useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = React.useState(
     () => typeof localStorage !== "undefined" && localStorage.getItem("halo:nav-collapsed") === "1"

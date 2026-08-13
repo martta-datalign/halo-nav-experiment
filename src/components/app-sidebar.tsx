@@ -2,10 +2,10 @@ import * as React from "react"
 import { Link, useLocation } from "react-router-dom"
 import {
   RiBankLine,
+  RiCalculatorLine,
   RiFileTextLine,
-  RiFlag2Line,
+  RiFocus3Line,
   RiHome5Line,
-  RiLineChartLine,
   RiQuestionLine,
   RiSidebarFoldLine,
   RiSidebarUnfoldLine,
@@ -33,8 +33,8 @@ const SECTIONS: Section[] = [
   {
     label: "Financial Tools",
     items: [
-      { title: "Calculators", to: "/tools/calculators", icon: RiLineChartLine },
-      { title: "Goals", to: "/tools/goals", icon: RiFlag2Line },
+      { title: "Calculators", to: "/tools/calculators", icon: RiCalculatorLine },
+      { title: "Goals", to: "/tools/goals", icon: RiFocus3Line },
     ],
   },
 ]

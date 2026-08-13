@@ -3,14 +3,14 @@ import { cn } from "@/lib/utils"
 
 /**
  * The single, canonical way to show an account/holding's data source. Use this
- * everywhere a "Connected / Manual / Estimated" status appears so the badge
+ * everywhere a "Plaid / Manual / Estimated" status appears so the badge
  * reads identically across the app (dot + label, consistent color per source).
  */
 export type AccountSource = "connected" | "manual" | "form"
 
 const CONFIG: Record<AccountSource, { label: string; dot: string; className: string }> = {
   connected: {
-    label: "Connected",
+    label: "Plaid",
     dot: "bg-positive",
     className: "border-positive-border bg-positive-subtle text-positive",
   },

@@ -2,7 +2,6 @@ import * as React from "react"
 import { useNavigate } from "react-router-dom"
 import {
   RiArrowLeftLine,
-  RiArrowRightLine,
   RiArrowRightUpLine,
   RiCalendarCheckLine,
   RiCheckLine,
@@ -348,12 +347,12 @@ function MatchScreen({
             </div>
             <div className="w-full sm:justify-self-end">
               <div className="grid grid-cols-2 gap-2">
-                <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
+                <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.advFormUrl} target="_blank" rel="noreferrer">
                     View ADV form <RiArrowRightUpLine className="size-4" />
                   </a>
                 </Button>
-                <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
+                <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.secProfileUrl} target="_blank" rel="noreferrer">
                     View SEC profile <RiArrowRightUpLine className="size-4" />
                   </a>
@@ -382,7 +381,6 @@ function MatchScreen({
             {appointmentLocked
               ? "Review appointment"
               : "Schedule an introduction"}
-            <RiArrowRightLine className="size-4" />
           </Button>
         </div>
       </div>
@@ -513,7 +511,6 @@ function ScheduleScreen({
           </Button>
           <Button size="lg" onClick={onContinue} className="gap-2">
             Confirm {time}
-            <RiArrowRightLine className="size-4" />
           </Button>
         </div>
       </div>
@@ -592,7 +589,6 @@ function NextScreen({
           </Button>
           <Button size="lg" onClick={onContinue} className="gap-2">
             Continue to accounts
-            <RiArrowRightLine className="size-4" />
           </Button>
         </div>
       </div>

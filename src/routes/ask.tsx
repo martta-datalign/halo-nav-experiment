@@ -2,9 +2,11 @@ import * as React from "react"
 import { useSearchParams } from "react-router-dom"
 import {
   RiAddLine,
+  RiArrowDownLine,
   RiArrowUpLine,
   RiChatHistoryLine,
   RiCheckLine,
+  RiCornerDownLeftLine,
   RiDeleteBinLine,
   RiFileCopyLine,
   RiMore2Line,
@@ -42,6 +44,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { AutoAnimated } from "@/components/ui/auto-animated"
 import { suggestedPrompts } from "@/lib/data"
 import { HaloAvatar } from "@/components/halo-avatar"
 import { SEED_VAULT_DOCS, VaultDialog, type VaultDoc } from "@/components/ask/vault"
@@ -70,6 +73,14 @@ const REPLIES: Record<Mode, string> = {
     "Let's go deeper. First, what's driving this; second, the trade-offs to weigh; and third, the concrete next step to take. (Prototype — in Deep mode Halo shows its reasoning and walks through drivers, trade-offs, and next steps. The live model's detailed analysis plugs in here.)",
 }
 
+// Suggested next questions offered beneath the most recent answer. Canned for
+// this shell; a live model returns its own set with each reply.
+const FOLLOW_UPS = [
+  "How does this compare to last quarter?",
+  "What should I focus on first?",
+  "Show me the details behind this",
+]
+
 // Mock history so the panel has something to show.
 const SEED_CHATS: Chat[] = [
   {
@@ -81,7 +92,19 @@ const SEED_CHATS: Chat[] = [
       {
         id: 2,
         role: "halo",
-        text: "Your net worth is up 10.4% (+$61,421) over the last 3 months — most of it from investment gains, with ~$600/mo added to savings. Housing and healthcare held flat, so the growth is real rather than timing.",
+        text: `Your net worth is up 10.4% (+$61,421) over the last 3 months, reaching $651,204. Here's the full picture of what moved it — and what to watch from here.
+
+Investments did most of the work. Your brokerage and retirement accounts gained $48,300, roughly 79% of the quarter's growth. A little over half of that is market appreciation; the rest is your ongoing contributions compounding. Your allocation held steady at 72% stocks / 28% bonds, so this wasn't a case of taking on more risk — the existing mix simply had a strong quarter.
+
+Cash savings added $1,800. You moved about $600/month into your high-yield savings account, right on plan. Your emergency fund now sits at $18,000 — about 4.2 months of essential expenses, inside the recommended 3–6 month range but toward the lower end.
+
+Debt paydown quietly helped too. You reduced total liabilities by $6,900: $4,100 off the mortgage principal, $1,900 off student loans, and $900 off credit cards. Every dollar of principal paid is a dollar of net worth, and it compounds by lowering future interest.
+
+Housing and healthcare held flat. Your home's estimated value didn't change this quarter, and there were no large one-off medical or lifestyle expenses. That matters: it means the growth came from your own saving and investing, not from a paper gain on an asset you're not selling.
+
+A few things to keep an eye on. First, 95% of your equity exposure is domestic — adding 15–20% international could reduce volatility without lowering expected return. Second, your credit card balance ($8,500) carries the highest interest of anything you hold; clearing it is the single best risk-adjusted move available to you. Third, you have $15,320 of unused 401(k) headroom this year — bumping your contribution from 8% to 10% would accelerate next quarter's momentum while trimming your tax bill.
+
+Net takeaway: this was a healthy, broad-based quarter. The gains are real rather than a timing artifact, and the biggest lever from here is redirecting cash from low-interest savings toward the credit card and your 401(k).`,
       },
     ],
   },
@@ -180,6 +203,15 @@ export default function AskHalo() {
   const responseTimers = React.useRef<Set<number>>(new Set())
   const scrollRef = React.useRef<HTMLDivElement>(null)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+  const composerRef = React.useRef<HTMLDivElement>(null)
+  // The composer floats over the message list (frosted fade), so the list
+  // reserves matching space at its bottom — remeasured as the input grows.
+  const [composerHeight, setComposerHeight] = React.useState(148)
+  // Whether new content should keep the view pinned to the bottom. Flipped off
+  // the moment the reader scrolls up, so a streaming reply never yanks them
+  // back down; the jump-to-latest button lets them opt back in.
+  const followRef = React.useRef(true)
+  const [showJump, setShowJump] = React.useState(false)
 
   const active = chats.find((c) => c.id === activeId) ?? chats[0]
   const messages = active.messages
@@ -214,6 +246,9 @@ export default function AskHalo() {
   const send = React.useCallback((text: string) => {
     const value = text.trim()
     if (!value) return
+    // A new turn always follows the newest message, even if the reader had
+    // scrolled up during the previous exchange.
+    followRef.current = true
     const chatId = activeIdRef.current
     const userMessageId = msgId.current++
     const haloMessageId = msgId.current++
@@ -335,12 +370,39 @@ export default function AskHalo() {
     }
   }, [seeded, send, setParams])
 
+  // Landing on a different chat starts pinned to its latest message.
   React.useEffect(() => {
+    followRef.current = true
+    setShowJump(false)
+  }, [activeId])
+
+  React.useEffect(() => {
+    if (!followRef.current) return
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
       behavior: haloIsThinking ? "auto" : "smooth",
     })
   }, [haloIsThinking, messages])
+
+  // Track how far the reader is from the bottom. Past a small threshold they've
+  // deliberately scrolled up: stop following and reveal the jump button.
+  const handleScroll = React.useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+    const atBottom = distanceFromBottom < 64
+    followRef.current = atBottom
+    setShowJump(!atBottom)
+  }, [])
+
+  const jumpToBottom = React.useCallback(() => {
+    followRef.current = true
+    setShowJump(false)
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    })
+  }, [])
 
   // Auto-grow the input as the user types (capped, then it scrolls internally).
   React.useEffect(() => {
@@ -349,6 +411,16 @@ export default function AskHalo() {
     el.style.height = "auto"
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`
   }, [draft])
+
+  // Keep the list's reserved bottom space in sync with the floating composer.
+  React.useEffect(() => {
+    const el = composerRef.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const observer = new ResizeObserver(() => setComposerHeight(el.offsetHeight))
+    observer.observe(el)
+    setComposerHeight(el.offsetHeight)
+    return () => observer.disconnect()
+  }, [])
 
   const empty = messages.length === 0
 
@@ -371,9 +443,10 @@ export default function AskHalo() {
           <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-[0.05em] text-muted-foreground">
             Recent
           </div>
-          {chats
-            .filter((c) => c.messages.length > 0 || c.id === activeId)
-            .map((c) =>
+          <AutoAnimated>
+            {chats
+              .filter((c) => c.messages.length > 0 || c.id === activeId)
+              .map((c) =>
               renamingId === c.id ? (
                 <form
                   key={c.id}
@@ -458,6 +531,7 @@ export default function AskHalo() {
                 </div>
               )
             )}
+          </AutoAnimated>
         </div>
         {/* Vault lives one level down from chat — a utility, not a peer view. */}
         <div className="border-t border-border p-2">
@@ -501,7 +575,7 @@ export default function AskHalo() {
         </Sheet>
 
         {/* Conversation */}
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="relative flex min-w-0 flex-1 flex-col">
           {/* Mobile: New chat + history live here (the desktop rail is hidden). */}
           <div className="flex h-12 shrink-0 items-center gap-1 border-b border-border px-2 md:hidden">
             <Button
@@ -526,8 +600,15 @@ export default function AskHalo() {
               <RiChatHistoryLine className="size-5" />
             </Button>
           </div>
-          <div ref={scrollRef} className="flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6">
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="flex-1 overflow-y-auto"
+          >
+            <div
+              className="mx-auto w-full max-w-3xl px-4 pt-6 sm:px-6"
+              style={{ paddingBottom: composerHeight }}
+            >
               {empty ? (
                 <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
                   <HaloAvatar className="size-12 shadow-sm" />
@@ -549,17 +630,65 @@ export default function AskHalo() {
                 </div>
               ) : (
                 <div className="flex flex-col gap-6">
-                  {messages.map((m) => (
-                    <MessageRow key={m.id} message={m} />
+                  {messages.map((m, i) => (
+                    <MessageRow
+                      key={m.id}
+                      message={m}
+                      isLast={i === messages.length - 1}
+                      onFollowUp={send}
+                    />
                   ))}
                 </div>
               )}
             </div>
           </div>
 
-          <div className="bg-background/80 backdrop-blur-md">
-            <div className="mx-auto w-full max-w-3xl px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
-              <div className="mb-2 flex w-fit rounded-lg bg-secondary p-0.5 text-xs">
+          {/* Composer floats over the list so messages scroll up behind it. The
+              toggle row sits in a frosted fade that starts opaque at the top of the
+              input box and dissolves upward into the conversation. */}
+          <div
+            ref={composerRef}
+            className="pointer-events-none absolute inset-x-0 bottom-0"
+          >
+            {/* Jump to latest — appears only when the reader has scrolled up, so
+                a streaming reply can advance without dragging their view. */}
+            {showJump && (
+              <button
+                type="button"
+                onClick={jumpToBottom}
+                aria-label="Scroll to latest"
+                className="pointer-events-auto absolute -top-12 left-1/2 z-10 flex size-9 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-md transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in-0 zoom-in-95 hover:text-foreground active:scale-95 motion-reduce:animate-none"
+              >
+                <RiArrowDownLine className="size-5" />
+              </button>
+            )}
+            <div className="pointer-events-auto mx-auto w-full max-w-3xl px-4 sm:px-6">
+              {/* Progressive blur: stacked backdrop-blur layers, each a heavier
+                  radius revealed lower down, so the blur ramps up toward the input
+                  instead of switching on at a single hard edge. The wash on top goes
+                  opaque at the input's top edge and clears upward. */}
+              <div className="relative pt-8 pb-2">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+                  {[
+                    { blur: 0.5, stop: 92 },
+                    { blur: 1.5, stop: 70 },
+                    { blur: 3, stop: 48 },
+                    { blur: 6, stop: 28 },
+                  ].map(({ blur, stop }) => (
+                    <div
+                      key={blur}
+                      className="absolute inset-0"
+                      style={{
+                        backdropFilter: `blur(${blur}px)`,
+                        WebkitBackdropFilter: `blur(${blur}px)`,
+                        maskImage: `linear-gradient(to top, #000, transparent ${stop}%)`,
+                        WebkitMaskImage: `linear-gradient(to top, #000, transparent ${stop}%)`,
+                      }}
+                    />
+                  ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+                </div>
+                <div className="relative flex w-fit rounded-lg bg-secondary p-0.5 text-xs">
                 {(["simple", "deep"] as const).map((m) => (
                   <Tooltip key={m} delayDuration={500}>
                     <TooltipTrigger asChild>
@@ -583,8 +712,12 @@ export default function AskHalo() {
                     </TooltipContent>
                   </Tooltip>
                 ))}
+                </div>
               </div>
 
+              {/* Solid zone: from the input's top edge down, so the field and
+                  disclaimer always sit on an opaque backing. */}
+              <div className="bg-background pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               <form
                 onSubmit={(e) => {
                   e.preventDefault()
@@ -631,6 +764,7 @@ export default function AskHalo() {
                 AI can make mistakes. Please consult with your financial advisor before
                 taking any actions.
               </p>
+              </div>
             </div>
           </div>
         </div>
@@ -678,7 +812,15 @@ function truncate(text: string, max = 32) {
 
 const DISLIKE_TAGS = ["Not what I asked", "Inaccurate", "Too verbose", "Tone was off"]
 
-function MessageRow({ message }: { message: Message }) {
+function MessageRow({
+  message,
+  isLast,
+  onFollowUp,
+}: {
+  message: Message
+  isLast?: boolean
+  onFollowUp?: (text: string) => void
+}) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
@@ -693,6 +835,9 @@ function MessageRow({ message }: { message: Message }) {
       text={message.text}
       status={message.status ?? "complete"}
       stock={message.stock}
+      // Only the latest answer offers follow-ups — older turns stay quiet.
+      followUps={isLast ? FOLLOW_UPS : undefined}
+      onFollowUp={onFollowUp}
     />
   )
 }
@@ -702,10 +847,14 @@ function HaloMessage({
   text,
   status,
   stock,
+  followUps,
+  onFollowUp,
 }: {
   text: string
   status: HaloStatus
   stock?: StockSymbol
+  followUps?: string[]
+  onFollowUp?: (text: string) => void
 }) {
   const [vote, setVote] = React.useState<"up" | "down" | null>(null)
   const [copied, setCopied] = React.useState(false)
@@ -749,7 +898,7 @@ function HaloMessage({
   return (
     <div className="min-w-0">
       <div
-        className="text-sm leading-relaxed text-foreground animate-in fade-in-0 duration-150 motion-reduce:animate-none"
+        className="text-sm leading-relaxed whitespace-pre-line text-foreground animate-in fade-in-0 duration-150 motion-reduce:animate-none"
         aria-busy={streaming}
       >
         <span aria-hidden={streaming || undefined}>
@@ -802,6 +951,28 @@ function HaloMessage({
               ))}
             </>
           )}
+        </div>
+      )}
+
+      {status === "complete" && followUps && followUps.length > 0 && (
+        <div className="mt-4" role="group" aria-label="Follow-up questions">
+          <p className="mb-1 text-xs font-medium text-muted-foreground">
+            Follow-ups
+          </p>
+          <div className="flex flex-col">
+            {followUps.map((q, i) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => onFollowUp?.(q)}
+                style={{ animationDelay: `${i * 60}ms` }}
+                className="group flex items-center gap-2.5 py-1.5 text-left text-sm text-muted-foreground transition-colors duration-150 animate-in fade-in-0 slide-in-from-bottom-2 fill-mode-both hover:text-foreground motion-reduce:animate-none"
+              >
+                <RiCornerDownLeftLine className="size-3.5 shrink-0 transition-colors" />
+                <span className="text-balance">{q}</span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

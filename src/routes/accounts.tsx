@@ -8,6 +8,7 @@ import {
   RiExternalLinkLine,
   RiLineChartLine,
   RiMore2Line,
+  RiPencilLine,
   RiRefreshLine,
 } from "@remixicon/react"
 import { toast } from "sonner"
@@ -15,8 +16,10 @@ import { toast } from "sonner"
 import { ConnectAccountDialog } from "@/components/connect-account-dialog"
 import { useAccounts } from "@/components/accounts-provider"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { AutoAnimated } from "@/components/ui/auto-animated"
+import { BrandLogo } from "@/components/ui/brand-logo"
 import { SourceBadge } from "@/components/source-badge"
-import { Card } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -62,28 +65,23 @@ function groupByInstitution(accountList: Account[]) {
 
 export default function Accounts() {
   const [connectOpen, setConnectOpen] = React.useState(false)
-  const { accounts: connectedAccounts, addAccount, removeAccount } = useAccounts()
+  const { accounts: connectedAccounts, addAccount, removeAccount, renameAccount } =
+    useAccounts()
   const [disconnecting, setDisconnecting] = React.useState<Account | null>(null)
+  const [renaming, setRenaming] = React.useState<Account | null>(null)
   const institutions = groupByInstitution(connectedAccounts)
   const hasAccounts = connectedAccounts.length > 0
 
   return (
     <>
-      <div className="app-page max-w-[1100px]">
+      <div className="app-page">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-[-0.02em]">Accounts</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage connected institutions and manually added accounts.
-            </p>
           </div>
           <div className="flex items-center gap-3">
             {hasAccounts && (
-              <p className="text-xs text-muted-foreground">Last synced today at 9:42 AM</p>
-            )}
-            {hasAccounts && (
               <Button
-                size="sm"
                 className="gap-1.5"
                 aria-label="Connect accounts"
                 onClick={() => setConnectOpen(true)}
@@ -97,33 +95,36 @@ export default function Accounts() {
 
         {hasAccounts ? (
           <>
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
-              <SummaryCard label="Institutions" value={String(institutions.length)} />
-              <SummaryCard label="Accounts" value={String(connectedAccounts.length)} />
-              <SummaryCard label="Sync status" value="Up to date" positive />
+            <div className="mt-6">
+              <div className="grid grid-cols-[28px_minmax(0,1fr)_120px_130px_44px] items-center gap-4 border-b border-border/55 px-5 py-2.5 sm:grid-cols-[28px_minmax(0,1.4fr)_minmax(112px,1fr)_minmax(0,1.2fr)_150px_44px] sm:px-6">
+                <span className="text-xs font-medium text-muted-foreground">#</span>
+                <span className="text-xs font-medium text-muted-foreground">Account</span>
+                <span className="text-xs font-medium text-muted-foreground">Status</span>
+                <span className="hidden text-xs font-medium text-muted-foreground sm:block">
+                  Type
+                </span>
+                <span className="text-right text-xs font-medium text-muted-foreground">Balance</span>
+                <span className="sr-only">Actions</span>
+              </div>
+
+              <AutoAnimated>
+              {institutions.map((institution, groupIndex) => (
+                <InstitutionGroup
+                  key={institution.institution}
+                  institution={institution.institution}
+                  accounts={institution.accounts}
+                  startIndex={institutions
+                    .slice(0, groupIndex)
+                    .reduce((sum, group) => sum + group.accounts.length, 0)}
+                  onDisconnectAccount={setDisconnecting}
+                  onRenameAccount={setRenaming}
+                />
+              ))}
+              </AutoAnimated>
             </div>
 
-            <section className="mt-6">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <h2 className="text-sm font-semibold">Accounts</h2>
-                <span className="text-xs text-muted-foreground">
-                  Connected balances sync through Plaid; manual balances update here
-                </span>
-              </div>
-
-              <div className="space-y-4">
-                {institutions.map((institution) => (
-                  <InstitutionCard
-                    key={institution.institution}
-                    institution={institution.institution}
-                    accounts={institution.accounts}
-                    onDisconnectAccount={setDisconnecting}
-                  />
-                ))}
-              </div>
-            </section>
-
-            <p className="mt-5 text-xs leading-relaxed text-muted-foreground">
+            <p className="mt-5 text-xs leading-relaxed text-muted-foreground">Last synced today at 9:42 AM</p>
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
               Halo uses Plaid for secure, read-only access to connected balances. Manually added accounts stay under your control and do not sync automatically.
             </p>
           </>
@@ -162,7 +163,7 @@ export default function Accounts() {
           removeAccount(account.id)
           setDisconnecting(null)
           const manual = account.source === "manual"
-          toast.success(`${account.name} ${manual ? "removed" : "disconnected"}`, {
+          toast.success(`${account.nickname || account.name} ${manual ? "removed" : "disconnected"}`, {
             description:
               manual
                 ? "The manual account was removed from Halo."
@@ -172,122 +173,143 @@ export default function Accounts() {
           })
         }}
       />
+      <RenameAccountDialog
+        account={renaming}
+        onOpenChange={(open) => !open && setRenaming(null)}
+        onConfirm={(account, nickname) => {
+          renameAccount(account.id, nickname)
+          setRenaming(null)
+          const trimmed = nickname.trim()
+          const reverted = !trimmed || trimmed === account.name
+          toast.success(reverted ? "Name reset" : "Account renamed", {
+            description: reverted
+              ? `Now showing as ${account.name}.`
+              : `${account.name} now shows as ${trimmed}.`,
+          })
+        }}
+      />
     </>
   )
 }
 
-function SummaryCard({
-  label,
-  value,
-  positive = false,
-}: {
-  label: string
-  value: string
-  positive?: boolean
-}) {
-  return (
-    <Card className="gap-1 p-5">
-      <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
-      <p className={cn("text-2xl font-semibold tracking-[-0.02em]", positive && "text-positive")}>
-        {value}
-      </p>
-    </Card>
-  )
-}
-
-function InstitutionCard({
+function InstitutionGroup({
   institution,
   accounts,
+  startIndex,
   onDisconnectAccount,
+  onRenameAccount,
 }: {
   institution: string
   accounts: Account[]
+  startIndex: number
   onDisconnectAccount: (account: Account) => void
+  onRenameAccount: (account: Account) => void
 }) {
-  const lastUpdated = accounts[0]?.updatedAt
   const netBalance = accounts.reduce((total, account) => total + account.balance, 0)
   const manualGroup = accounts.every((account) => account.source === "manual")
   const institutionLogo = INSTITUTION_LOGOS[institution]
 
   return (
-    <Card className="gap-0 overflow-hidden p-0">
-      <div className="flex items-center gap-3 border-b border-border px-5 py-4 sm:px-6">
-        <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-1.5">
-          {institutionLogo ? (
-            <img src={institutionLogo} alt="" className="size-full object-contain" />
-          ) : (
-            <RiBankLine className="size-5 text-muted-foreground" />
-          )}
-        </span>
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-semibold">{institution}</h3>
-            <SourceBadge source={manualGroup ? "manual" : "connected"} />
-          </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {accounts.length} account{accounts.length === 1 ? "" : "s"} · {manualGroup ? "Added" : "Last synced"} {lastUpdated?.toLowerCase()}
-          </p>
+    <div className="border-b border-border/55 last:border-b-0">
+      <div className="grid grid-cols-[28px_minmax(0,1fr)_120px_130px_44px] items-center gap-4 px-5 py-3.5 sm:grid-cols-[28px_minmax(0,1.4fr)_minmax(112px,1fr)_minmax(0,1.2fr)_150px_44px] sm:px-6">
+        <span aria-hidden />
+        <div className="flex min-w-0 items-center gap-3">
+          <BrandLogo
+            name={institution}
+            src={institutionLogo}
+            fallback={<RiBankLine className="size-4 text-muted-foreground" />}
+          />
+          <h3 className="truncate text-sm font-semibold">{institution}</h3>
         </div>
-        <div className="hidden text-right sm:block">
-          <p className="text-xs text-muted-foreground">Net balance</p>
-          <p className="mt-0.5 text-sm font-semibold tabular-nums">{formatUSD(netBalance)}</p>
-        </div>
-        {!manualGroup && <InstitutionMenu institution={institution} />}
+        <span aria-hidden />
+        <span className="hidden sm:block" aria-hidden />
+        <p className="text-right text-sm font-semibold tabular-nums">
+          {formatUSD(netBalance)}
+        </p>
+        {!manualGroup ? (
+          <InstitutionMenu institution={institution} />
+        ) : (
+          <span aria-hidden />
+        )}
       </div>
 
-      <ul className="px-5 sm:px-6">
-        {accounts.map((account) => {
-          const Icon = ACCOUNT_ICONS[account.kind]
-          return (
-            <li
-              key={account.id}
-              className="-mx-3 grid grid-cols-[36px_minmax(0,1fr)_auto_32px] items-center gap-3 rounded-lg border-b border-border px-3 py-3.5 transition-colors last:border-0 hover:bg-secondary/40"
-            >
-              <span className="flex size-9 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
+      <AutoAnimated>
+      {accounts.map((account, index) => {
+        const Icon = ACCOUNT_ICONS[account.kind]
+        return (
+          <div
+            key={account.id}
+            className="grid grid-cols-[28px_minmax(0,1fr)_120px_130px_44px] items-center gap-4 border-t border-border/55 px-5 py-3.5 transition-colors hover:bg-secondary/40 sm:grid-cols-[28px_minmax(0,1.4fr)_minmax(112px,1fr)_minmax(0,1.2fr)_150px_44px] sm:px-6"
+          >
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {startIndex + index + 1}
+            </span>
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
                 <Icon className="size-4" />
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{account.name}</p>
+                <p className="truncate text-sm font-medium">
+                  {account.nickname || account.name}
+                </p>
                 <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                  {account.typeLabel} · {account.source === "manual" ? "Manual entry" : `•••• ${account.mask}`}
+                  {account.source === "manual" ? "Manual entry" : `•••• ${account.mask}`}
                 </p>
               </div>
-              <p
-                className={cn(
-                  "text-right text-sm font-semibold tabular-nums",
-                  account.balance < 0 && "text-negative"
-                )}
-              >
-                {formatUSD(account.balance)}
-              </p>
-              <AccountMenu
-                account={account}
-                onDisconnect={() => onDisconnectAccount(account)}
-              />
-            </li>
-          )
-        })}
-      </ul>
-    </Card>
+            </div>
+            <div>
+              <SourceBadge source={account.source === "manual" ? "manual" : "connected"} />
+            </div>
+            <p className="hidden truncate text-sm text-muted-foreground sm:block">
+              {account.typeLabel}
+            </p>
+            <p
+              className={cn(
+                "text-right text-sm font-medium tabular-nums",
+                account.balance < 0 && "text-negative"
+              )}
+            >
+              {formatUSD(account.balance)}
+            </p>
+            <AccountMenu
+              account={account}
+              onRename={() => onRenameAccount(account)}
+              onDisconnect={() => onDisconnectAccount(account)}
+            />
+          </div>
+        )
+      })}
+      </AutoAnimated>
+    </div>
   )
 }
 
 function AccountMenu({
   account,
+  onRename,
   onDisconnect,
 }: {
   account: Account
+  onRename: () => void
   onDisconnect: () => void
 }) {
   const manual = account.source === "manual"
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size="icon-sm" variant="ghost" aria-label={`Actions for ${account.name}`}>
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          aria-label={`Actions for ${account.nickname || account.name}`}
+        >
           <RiMore2Line />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-52">
+        <DropdownMenuItem onSelect={onRename}>
+          <RiPencilLine /> Rename account
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
           onSelect={onDisconnect}
@@ -366,6 +388,79 @@ function DisconnectAccountDialog({
             {account?.source === "manual" ? "Remove account" : "Disconnect account"}
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function RenameAccountDialog({
+  account,
+  onOpenChange,
+  onConfirm,
+}: {
+  account: Account | null
+  onOpenChange: (open: boolean) => void
+  onConfirm: (account: Account, nickname: string) => void
+}) {
+  const [draft, setDraft] = React.useState("")
+
+  React.useEffect(() => {
+    if (account) setDraft(account.nickname ?? account.name)
+  }, [account])
+
+  const original = account?.name ?? ""
+  const currentDisplay = account?.nickname || account?.name || ""
+  const trimmed = draft.trim()
+  const canSave = trimmed.length > 0 && trimmed !== currentDisplay
+
+  return (
+    <Dialog open={account !== null} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Rename account</DialogTitle>
+          <DialogDescription>
+            {account?.source === "manual"
+              ? "Set how this account appears across Halo. Your original entry is kept."
+              : `Set how this account appears across Halo. This is just a display name — it doesn't change anything at ${account?.institution}.`}
+          </DialogDescription>
+        </DialogHeader>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (account && canSave) onConfirm(account, draft)
+          }}
+        >
+          <div className="grid gap-2">
+            <label htmlFor="account-nickname" className="text-sm font-medium">
+              Account name
+            </label>
+            <Input
+              id="account-nickname"
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              placeholder={original}
+              maxLength={40}
+              autoFocus
+            />
+            {account?.nickname && (
+              <button
+                type="button"
+                className="w-fit text-xs font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                onClick={() => onConfirm(account, "")}
+              >
+                Reset to original name ({original})
+              </button>
+            )}
+          </div>
+          <DialogFooter className="mt-6">
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={!canSave}>
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

@@ -1,5 +1,8 @@
 import * as React from "react"
-import { RiFileTextLine, RiDeleteBinLine, RiUpload2Line } from "@remixicon/react"
+import { RiDeleteBinLine, RiUpload2Line } from "@remixicon/react"
+
+import { FileTypeIcon } from "@/components/ask/file-type-icon"
+import { AutoAnimated } from "@/components/ui/auto-animated"
 
 import {
   Dialog,
@@ -20,9 +23,10 @@ export type VaultDoc = {
 
 export const SEED_VAULT_DOCS: VaultDoc[] = [
   { id: "d1", name: "2025 Tax Return.pdf", kind: "PDF", size: "2.4 MB", when: "Jul 3" },
-  { id: "d2", name: "Home Deed.pdf", kind: "PDF", size: "1.1 MB", when: "Jun 28" },
+  { id: "d2", name: "Estate Plan.docx", kind: "DOCX", size: "1.1 MB", when: "Jun 28" },
   { id: "d3", name: "Life Insurance Policy.pdf", kind: "PDF", size: "820 KB", when: "Jun 15" },
   { id: "d4", name: "Brokerage 1099.csv", kind: "CSV", size: "48 KB", when: "May 30" },
+  { id: "d5", name: "Property Appraisal.jpg", kind: "JPG", size: "3.2 MB", when: "May 12" },
 ]
 
 export function VaultDialog({
@@ -102,15 +106,13 @@ export function VaultDialog({
               No documents yet. Upload one above to get started.
             </p>
           ) : (
-            <div className="-mx-1 max-h-64 space-y-0.5 overflow-y-auto px-1">
+            <AutoAnimated className="-mx-1 space-y-0.5 px-1">
               {docs.map((d) => (
                 <div
                   key={d.id}
                   className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-secondary/60"
                 >
-                  <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-muted-foreground">
-                    <RiFileTextLine className="size-4" />
-                  </span>
+                  <FileTypeIcon name={d.name} className="size-9" />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-medium text-foreground">
                       {d.name}
@@ -129,7 +131,7 @@ export function VaultDialog({
                   </button>
                 </div>
               ))}
-            </div>
+            </AutoAnimated>
           )}
         </div>
       </DialogContent>

@@ -19,6 +19,7 @@ import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { AutoAnimated } from "@/components/ui/auto-animated"
 import { Calendar } from "@/components/ui/calendar"
 import { Card } from "@/components/ui/card"
 import {
@@ -221,7 +222,7 @@ export default function Goals({ filled = true }: { filled?: boolean }) {
         ) : (
           <>
             <GoalsOverview goals={goals} className="mt-6" />
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <AutoAnimated className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {sortedGoals.map((goal) => (
                 <GoalCard
                   key={goal.id}
@@ -230,7 +231,7 @@ export default function Goals({ filled = true }: { filled?: boolean }) {
                   onDelete={() => setDeleting(goal)}
                 />
               ))}
-            </div>
+            </AutoAnimated>
           </>
         )}
       </div>

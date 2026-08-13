@@ -6,6 +6,9 @@ type AccountsContextValue = {
   accounts: Account[]
   addAccount: (account: Account) => void
   removeAccount: (accountId: string) => void
+  /** Set (or clear) an account's display nickname. A blank value, or one equal
+   *  to the original name, clears the nickname and reverts to the real name. */
+  renameAccount: (accountId: string, nickname: string) => void
 }
 
 const AccountsContext = React.createContext<AccountsContextValue | null>(null)
@@ -39,9 +42,22 @@ export function AccountsProvider({
     setAccounts((current) => current.filter((account) => account.id !== accountId))
   }, [])
 
+  const renameAccount = React.useCallback((accountId: string, nickname: string) => {
+    setAccounts((current) =>
+      current.map((account) => {
+        if (account.id !== accountId) return account
+        const trimmed = nickname.trim()
+        return {
+          ...account,
+          nickname: trimmed && trimmed !== account.name ? trimmed : undefined,
+        }
+      })
+    )
+  }, [])
+
   const value = React.useMemo(
-    () => ({ accounts, addAccount, removeAccount }),
-    [accounts, addAccount, removeAccount]
+    () => ({ accounts, addAccount, removeAccount, renameAccount }),
+    [accounts, addAccount, removeAccount, renameAccount]
   )
 
   return <AccountsContext.Provider value={value}>{children}</AccountsContext.Provider>

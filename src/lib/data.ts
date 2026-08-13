@@ -108,6 +108,9 @@ export type AccountKind = "bank" | "investment" | "card"
 export type Account = {
   id: string
   name: string
+  /** User-set display name. Falls back to `name` when unset. Editable for both
+   *  connected and manual accounts. */
+  nickname?: string
   kind: AccountKind
   source?: "connected" | "manual"
   institution: string
@@ -136,11 +139,14 @@ export const intakeAllocation: IntakeBalance[] = [
   { side: "liability", category: "Credit Cards", amount: 10_000 },
 ]
 
-export const unconnectedFormBalances = intakeAllocation.filter(
-  (item) => item.category === "Other Assets"
-)
+/**
+ * Form estimates still awaiting a real account. The crypto holding that used to
+ * live here is now tracked as a manual Coinbase account, so nothing remains
+ * estimated — kept as an empty export for the net-worth card's breakdown.
+ */
+export const unconnectedFormBalances: IntakeBalance[] = []
 
-/** Connected balances net to $634,421; $15,000 of unconnected form assets brings total net worth to $649,421. */
+/** Connected balances net to $634,421; a $15,000 manually-tracked crypto holding brings total net worth to $649,421. */
 export const accounts: Account[] = [
   {
     id: "checking",
@@ -191,6 +197,17 @@ export const accounts: Account[] = [
     mask: "3310",
     balance: -8000,
     updatedAt: "Today at 9:42 AM",
+  },
+  {
+    id: "crypto",
+    name: "Crypto Wallet",
+    kind: "investment",
+    source: "manual",
+    institution: "Coinbase",
+    typeLabel: "Cryptocurrency",
+    mask: "",
+    balance: 15000,
+    updatedAt: "Aug 5, 2026",
   },
 ]
 
@@ -298,13 +315,24 @@ export type Activity = {
   name: string
   date: string
   amount: number
+  /** Explicit logo asset (a local file), preferred over `domain`. */
+  src?: string
+  /** Merchant domain, resolved to a brand logo. Omitted for non-brands. */
+  domain?: string
+  /** Render the logo edge-to-edge — only for full colored-tile logos. */
+  bleed?: boolean
+  /** Brand color for the monogram when there's no usable logo. */
+  color?: string
 }
 
 export const activity: Activity[] = [
-  { id: "a1", name: "Whole Foods", date: "Jul 1", amount: -86.42 },
+  // Bundled local asset — the favicon service returns the wrong mark for many
+  // stores, so we ship the logo for a reliable, correct render. Target's mark
+  // is a full colored tile, so it bleeds edge-to-edge.
+  { id: "a1", name: "Target", date: "Jul 1", amount: -86.42, src: "/target.png", bleed: true },
   { id: "a2", name: "Payroll Deposit", date: "Jun 29", amount: 4200 },
-  { id: "a3", name: "Netflix", date: "Jun 28", amount: -15.99 },
-  { id: "a4", name: "Amazon", date: "Jun 27", amount: -142.1 },
+  { id: "a3", name: "Netflix", date: "Jun 28", amount: -15.99, domain: "netflix.com" },
+  { id: "a4", name: "Amazon", date: "Jun 27", amount: -142.1, domain: "amazon.com", bleed: true },
 ]
 
 /** AI-native insights — Halo's proactive read on the same underlying data.

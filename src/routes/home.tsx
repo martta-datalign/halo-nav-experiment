@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { AutoAnimated } from "@/components/ui/auto-animated"
 import { cn } from "@/lib/utils"
 import { user } from "@/lib/data"
 
@@ -86,7 +87,7 @@ export default function Home({
 
   return (
     <>
-      <div className="app-page max-w-[1240px] xl:max-w-[1440px] 2xl:max-w-[1600px]">
+      <div className="app-page">
         {/* Greeting */}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -126,30 +127,27 @@ export default function Home({
       {subtab === "Overview" ? (
         analysisReady ? (
           <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            <div className="flex min-w-0 flex-col gap-5 lg:col-span-2">
+            <AutoAnimated className="flex min-w-0 flex-col gap-5 lg:col-span-2">
               <NetWorthCard />
               {(visible.accounts || visible.goals) && (
-                <div className="grid gap-5 sm:grid-cols-2">
+                <AutoAnimated className="grid gap-5 sm:grid-cols-2">
                   {visible.accounts && <AccountsCard />}
                   {visible.goals && <GoalsCard />}
-                </div>
+                </AutoAnimated>
               )}
               {visible.activity && <ActivityCard />}
-            </div>
+            </AutoAnimated>
 
-            <div className="flex min-w-0 flex-col gap-5">
+            <AutoAnimated className="flex min-w-0 flex-col gap-5">
               <OpportunitiesCard />
               {visible.analysis && (
-                <AnalysisCard
-                  ready
-                  onDismiss={() => toggle("analysis")}
-                />
+                <AnalysisCard ready onDismiss={() => toggle("analysis")} />
               )}
               {visible.insights && <InsightsCard onDismiss={() => toggle("insights")} />}
               {visible.actionable && (
                 <ActionableCard onDismiss={() => toggle("actionable")} />
               )}
-            </div>
+            </AutoAnimated>
           </div>
         ) : (
           <div className="mt-6">

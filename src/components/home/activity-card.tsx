@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { BrandLogo } from "@/components/ui/brand-logo"
 import { CardTitleRow } from "@/components/home/accounts-card"
 import { CardPromptFooter } from "@/components/ask-halo-action"
 import { activity } from "@/lib/data"
@@ -17,6 +18,7 @@ export function ActivityCard() {
               key={t.id}
               className="flex items-center gap-3 border-b border-border py-3 last:border-none last:pb-0"
             >
+              <BrandLogo name={t.name} src={t.src} domain={t.domain} bleed={t.bleed} color={t.color} />
               <div className="min-w-0 flex-1">
                 <div className="text-[13.5px] font-medium">{t.name}</div>
                 <div className="text-xs text-muted-foreground">{t.date}</div>

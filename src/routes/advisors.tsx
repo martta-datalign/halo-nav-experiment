@@ -1,5 +1,4 @@
 import {
-  RiArrowRightLine,
   RiArrowRightUpLine,
   RiGlobalLine,
   RiPhoneLine,
@@ -30,7 +29,7 @@ export default function Advisors({
 
   return (
     <>
-      <main className="app-page max-w-6xl">
+      <main className="app-page">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold tracking-[-0.02em]">
@@ -39,7 +38,6 @@ export default function Advisors({
           </div>
           <Button onClick={onOpenMatch} className="gap-1.5">
             {appointment ? "Review appointment" : "Schedule an introduction"}
-            <RiArrowRightLine className="size-4" />
           </Button>
         </div>
 
@@ -98,12 +96,12 @@ export default function Advisors({
             </div>
             <div className="w-full md:justify-self-end">
               <div className="grid grid-cols-2 gap-2">
-                <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
+                <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.advFormUrl} target="_blank" rel="noreferrer">
                     View ADV form <RiArrowRightUpLine className="size-4" />
                   </a>
                 </Button>
-                <Button asChild variant="secondary" size="sm" className="w-full gap-1.5">
+                <Button asChild variant="outline" size="sm" className="w-full gap-1.5">
                   <a href={advisorMatch.secProfileUrl} target="_blank" rel="noreferrer">
                     View SEC profile <RiArrowRightUpLine className="size-4" />
                   </a>

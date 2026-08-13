@@ -25,10 +25,10 @@ const DISCLOSURES = [
 export default function Disclosures() {
   return (
     <>
-      <main className="app-page max-w-[1080px]">
+      <main className="app-page">
         <h1 className="text-2xl font-semibold tracking-[-0.02em]">Disclosures</h1>
 
-        <div className="mt-6 flex max-w-3xl flex-col">
+        <div className="mt-6 flex flex-col">
           {DISCLOSURES.map((item) => (
             <a
               key={item.href}

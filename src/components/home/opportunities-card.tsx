@@ -122,7 +122,7 @@ export function OpportunitiesCard() {
               </div>
 
               <Button
-                variant="secondary"
+                variant="outline"
                 className="mt-4 w-full"
                 onClick={() => toast.info(`Opening ${item.title}`)}
               >

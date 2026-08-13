@@ -14,9 +14,15 @@ const ICONS: Record<AccountKind, ElementType> = {
 }
 
 export function AccountsCard() {
+  const connectedCount = accounts.filter((a) => a.source !== "manual").length
+  const manualCount = accounts.filter((a) => a.source === "manual").length
+  const caption =
+    manualCount > 0
+      ? `${connectedCount} Plaid · ${manualCount} manual`
+      : `${connectedCount} Plaid`
   return (
     <Card className="gap-0 p-5 sm:p-6">
-      <CardTitleRow title="Accounts" caption={`${accounts.length} connected`} />
+      <CardTitleRow title="Accounts" caption={caption} />
       <ul className="mt-1">
         {accounts.map((a) => {
           const Icon = ICONS[a.kind]

@@ -225,13 +225,33 @@ export function Stat({
   large?: boolean
   className?: string
 }) {
+  // Scale the figure down as it gets longer so large numbers (e.g. billions in a
+  // 3-up grid) stay inside their cell instead of colliding with the next stat.
+  // `large` keeps one tier more presence for hero figures.
+  const len = typeof value === "string" ? value.length : 0
+  const sizeClass = large
+    ? len >= 16
+      ? "text-base"
+      : len >= 13
+        ? "text-lg"
+        : len >= 10
+          ? "text-xl"
+          : "text-2xl"
+    : len >= 16
+      ? "text-sm"
+      : len >= 12
+        ? "text-base"
+        : len >= 9
+          ? "text-lg"
+          : "text-xl"
+
   return (
     <div className={cn("min-w-0", className)}>
       <p className="text-[13px] text-muted-foreground">{label}</p>
       <p
         className={cn(
-          "mt-1 font-semibold tabular-nums tracking-[-0.01em]",
-          large ? "text-2xl leading-none" : "text-2xl",
+          "mt-1.5 font-semibold leading-tight tabular-nums tracking-[-0.01em]",
+          sizeClass,
           accent ? "text-primary" : "text-foreground"
         )}
       >

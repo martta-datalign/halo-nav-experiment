@@ -1,4 +1,4 @@
-import { RiArrowRightLine, RiFileTextLine, RiLineChartLine, RiCloseLine } from "@remixicon/react"
+import { RiFileTextLine, RiLineChartLine, RiCloseLine } from "@remixicon/react"
 
 import { cn } from "@/lib/utils"
 import { useAskHalo } from "@/components/ask-halo"
@@ -58,7 +58,6 @@ export function AnalysisCard({
           >
             <RiFileTextLine className="size-4" />
             {ready ? "Open full report" : "Connect accounts"}
-            <RiArrowRightLine className="size-3.5" />
           </button>
           {ready && (
             <button

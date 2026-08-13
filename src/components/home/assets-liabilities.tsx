@@ -269,7 +269,7 @@ export function AssetsLiabilities() {
       <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1 text-xs text-muted-foreground">
         <span>As of Jul 15, 2026</span>
         <span aria-hidden="true">·</span>
-        <span>{connectedCount} connected</span>
+        <span>{connectedCount} Plaid</span>
         {estimatedCount > 0 && (
           <>
             <span aria-hidden="true">·</span>
@@ -445,7 +445,7 @@ function CompositionCard({
                             </span>
                             <span className="col-span-2 text-[10.5px] text-muted-foreground">
                               {item.source === "connected"
-                                ? "Connected"
+                                ? "Plaid"
                                 : item.source === "form"
                                   ? "Estimated from form"
                                   : "Manual"}

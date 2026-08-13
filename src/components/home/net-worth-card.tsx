@@ -1,5 +1,5 @@
 import * as React from "react"
-import { RiArrowRightDownLine, RiArrowRightUpLine } from "@remixicon/react"
+import { RiArrowDownSFill, RiArrowUpSFill } from "@remixicon/react"
 import {
   Area,
   AreaChart,
@@ -54,6 +54,8 @@ export function NetWorthCard() {
   // Assets vs debts — derived from accounts so they reconcile with net worth.
   const assetAccounts = accounts.filter((a) => a.balance > 0)
   const debtAccounts = accounts.filter((a) => a.balance < 0)
+  const connectedAssetCount = assetAccounts.filter((a) => a.source !== "manual").length
+  const manualAssetCount = assetAccounts.filter((a) => a.source === "manual").length
   const formAssets = unconnectedFormBalances.filter((item) => item.side === "asset")
   const formLiabilities = unconnectedFormBalances.filter((item) => item.side === "liability")
   const totalAssets =
@@ -93,7 +95,9 @@ export function NetWorthCard() {
             {formatUSD(totalAssets)}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {assetAccounts.length} connected · {formAssets.length} estimated from form
+            {connectedAssetCount} Plaid
+            {manualAssetCount > 0 ? ` · ${manualAssetCount} manual` : ""}
+            {formAssets.length > 0 ? ` · ${formAssets.length} estimated from form` : ""}
           </p>
         </div>
         <div>
@@ -102,7 +106,7 @@ export function NetWorthCard() {
             {formatUSD(totalDebts)}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            {debtAccounts.length} connected{formLiabilities.length > 0 ? ` · ${formLiabilities.length} estimated from form` : ""}
+            {debtAccounts.length} Plaid{formLiabilities.length > 0 ? ` · ${formLiabilities.length} estimated from form` : ""}
           </p>
         </div>
       </div>
@@ -228,9 +232,9 @@ function ChartTooltipCustom({ showAnalytics }: { showAnalytics: boolean }) {
                     )}
                   >
                     {up ? (
-                      <RiArrowRightUpLine className="size-3" />
+                      <RiArrowUpSFill className="size-3" />
                     ) : (
-                      <RiArrowRightDownLine className="size-3" />
+                      <RiArrowDownSFill className="size-3" />
                     )}
                     {formatUSD(change as number, { sign: true })}
                     <span className="font-normal text-muted-foreground">

@@ -1,10 +1,10 @@
 import * as React from "react"
 import {
   RiSearchLine,
-  RiHome5Line,
+  RiRocketLine,
   RiBankLine,
   RiSparkling2Line,
-  RiLineChartLine,
+  RiToolsLine,
   RiShieldCheckLine,
 } from "@remixicon/react"
 
@@ -23,7 +23,7 @@ const TOPICS: Topic[] = [
   {
     id: "getting-started",
     title: "Getting started",
-    icon: RiHome5Line,
+    icon: RiRocketLine,
     blurb: "Set up your workspace and find your footing.",
     articles: [
       { title: "Welcome to Halo", excerpt: "A quick tour of the dashboard, Ask Halo, and the tools that help you plan.", mins: 3 },
@@ -56,7 +56,7 @@ const TOPICS: Topic[] = [
   {
     id: "planning",
     title: "Planning & tools",
-    icon: RiLineChartLine,
+    icon: RiToolsLine,
     blurb: "Goals, calculators, and reading your trends.",
     articles: [
       { title: "Set and track a goal", excerpt: "Create a target, fund it, and watch progress update.", mins: 4 },
@@ -132,11 +132,8 @@ export default function Help() {
   }, [query])
 
   return (
-    <main className="app-page max-w-[1080px]">
+    <main className="app-page">
       <h1 className="text-2xl font-semibold tracking-[-0.02em]">Help</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Search the knowledge base, browse by topic, or check the common questions.
-      </p>
 
       {/* Global search */}
       <div className="relative mt-5">
@@ -160,8 +157,7 @@ export default function Help() {
           {/* FAQ — first */}
           {faqResults.length > 0 && (
             <section className="mt-8" aria-label="Frequently asked questions">
-              <h2 className="text-sm font-semibold">Frequently asked questions</h2>
-              <div className="mt-3 rounded-2xl border border-border bg-card px-5 shadow-sm">
+              <div>
                 {faqResults.map((item) => (
                   <FAQItem
                     key={item.question}
@@ -189,7 +185,7 @@ export default function Help() {
                 {topicResults.map(({ topic, articles }) => (
                   <div
                     key={topic.id}
-                    className="flex flex-col rounded-2xl border border-border bg-card p-4 shadow-sm"
+                    className="flex flex-col rounded-2xl border border-border bg-card p-4"
                   >
                     <TopicThumb topic={topic} />
                     <ul className="mt-4 flex flex-col">
@@ -204,6 +200,13 @@ export default function Help() {
                         </li>
                       ))}
                     </ul>
+                    <a
+                      href="#"
+                      aria-label={`View all ${topic.title} articles`}
+                      className="mt-1.5 w-fit rounded-sm py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      View all
+                    </a>
                   </div>
                 ))}
               </div>
@@ -225,7 +228,7 @@ function TopicThumb({ topic }: { topic: Topic }) {
   return (
     <div className="relative h-32 overflow-hidden rounded-xl bg-linear-to-b from-secondary to-muted/50">
       {/* Inset "document" that bleeds off the bottom edge for a preview feel. */}
-      <div className="absolute inset-x-4 -bottom-3 top-4 rounded-t-lg border border-b-0 border-border/70 bg-card p-4 shadow-sm">
+      <div className="absolute inset-x-4 -bottom-3 top-4 rounded-t-lg border border-b-0 border-border/70 bg-card p-4">
         <topic.icon aria-hidden="true" className="size-5 text-muted-foreground" />
         <h3 className="mt-2.5 truncate text-sm font-semibold text-foreground">
           {topic.title}

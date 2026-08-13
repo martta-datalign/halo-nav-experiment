@@ -45,7 +45,7 @@ export function ActionableCard({ onDismiss }: { onDismiss?: () => void }) {
         fiduciary — obligated to protect your interests — and you can revoke access
         anytime.
       </p>
-      <Button variant="secondary" className="mt-4 w-full gap-1.5" onClick={share}>
+      <Button variant="outline" className="mt-4 w-full gap-1.5" onClick={share}>
         <RiShieldCheckLine className="size-4" />
         Share with my advisor
       </Button>

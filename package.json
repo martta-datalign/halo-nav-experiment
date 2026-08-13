@@ -21,6 +21,7 @@
   "homepage": "https://github.com/martta-datalign/halo-nav-experiment#readme",
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.2.8",
+    "@formkit/auto-animate": "^0.10.0",
     "@remixicon/react": "^4.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -30,6 +31,7 @@
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.1",
     "recharts": "^3.8.0",
+    "simple-icons": "^16.28.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0"
   },
